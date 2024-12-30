@@ -7,6 +7,10 @@ import "./../app/app.css";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
+import { uploadData } from 'aws-amplify/storage';
+import { FileUploader } from '@aws-amplify/ui-react-storage';
+import '@aws-amplify/ui-react/styles.css';
+
 
 Amplify.configure(outputs);
 
@@ -14,6 +18,11 @@ const client = generateClient<Schema>();
 
 export default function App() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [file, setFile] = useState();
+
+  const handleChange = (event: any) => {
+    setFile(event.target.files[0]);
+  };
 
   function listTodos() {
     client.models.Todo.observeQuery().subscribe({
@@ -31,7 +40,6 @@ export default function App() {
     });
   }
 
-    
   function deleteTodo(id: string) {
     client.models.Todo.delete({ id })
   }
@@ -56,6 +64,25 @@ export default function App() {
           itsnotrobday.com
         </a>
       </div>
+      <div>
+        <input type="file" onChange={handleChange} />
+          <button
+            onClick={() =>
+              uploadData({
+                path: `picture-submissions/${file.name}`,
+                data: file,
+            })
+          }
+        >
+          Upload
+        </button>
+      </div>
+      <FileUploader
+        acceptedFileTypes={['image/*']}
+        path="picture-submissions/"
+        maxFileCount={1}
+        isResumable
+      />
     </main>
   );
 }
