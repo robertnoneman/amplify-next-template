@@ -49,10 +49,18 @@ export default function TopNav() {
                   <a
                     key={item.name}
                     href={item.href}
-                    aria-current={item.current ? 'page' : undefined}
-                    className={classNames(
-                      item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    // aria-current={item.current ? 'page' : undefined}
+                    // className={classNames(
+                    //   item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    //   'rounded-md px-3 py-2 text-sm font-medium',
+                    // )}
+                    className={clsx(
+                      // 'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-[#ea4444] hover:text-white md:flex-none md:justify-start md:p-2 md:px-3',
+                      'flex h-[48px] grow items-center justify-center gap-2 p-3 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white md:flex-none md:justify-start md:p-2 md:px-3',
                       'rounded-md px-3 py-2 text-sm font-medium',
+                      {
+                        'bg-[#bb4444] text-white': pathname === item.href,
+                      },
                     )}
                   >
                     {item.name}
