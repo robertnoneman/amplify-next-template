@@ -27,7 +27,7 @@ export default function Page() {
                 // fill={false}
                 alt="The Robs"
                 // className="hidden md:block"
-                className="absolute inset-0 -z-10 size-full object-cover object-right-bottom md:object-top"
+                className="absolute inset-0 -z-10 size-full object-cover object-top md:object-top"
             />
             <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
                 <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 bg-opacity-80 px-6 py-10 md:w-2/5 md:px-20">

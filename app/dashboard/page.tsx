@@ -13,21 +13,22 @@ import styles from '@/app/dashboard/styles.module.css';
 import robday from '@/public/robday.jpeg';
 import robdaycropblur from '@/public/robdaycropblur.jpeg';
 
+
 export default async function Page() {
   return (
     <main>
-      <div className={styles.bgWrap}>
-      <Image
-        alt="Mountains"
-        src={robdaycropblur}
-        quality={100}
-        placeholder="blur"
-        fill={false}
-        sizes="100vh"
-        style={{
-          objectFit: "cover",
-        }}
-      />
+      <div className={`${styles.bgWrap} hidden md:block`}>
+        <Image
+          alt="Mountains"
+          src={robdaycropblur}
+          quality={100}
+          placeholder="blur"
+          fill={false}
+          sizes="100vh"
+          style={{
+            objectFit: "contain",
+          }}
+        />
       </div>
       <h1 className={`${roboto.className} text-white mb-4 text-xl md:text-2xl`}>
         Dashboard

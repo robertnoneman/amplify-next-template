@@ -57,8 +57,10 @@ export default function CountdownToMonday() {
     const nextMondayTime = getNextMonday().getTime();
     return calculateTimeLeft(nextMondayTime);
   });
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
     const timer = setInterval(() => {
       const nextMondayTime = getNextMonday().getTime();
       setTimeLeft(calculateTimeLeft(nextMondayTime));
@@ -69,23 +71,38 @@ export default function CountdownToMonday() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-0">
+    <div className="flex flex-col items-center justify-center space-y-0" suppressHydrationWarning>
       <h1 className={`${roboto.className} text-white mb-0 text-xl md:text-2xl`}>The next Robday is in</h1>
       <div className={`${roboto.className} text-white flex space-x-4`}>
         <div className={`text-center`}>
-          <div className="text-3xl font-bold">{timeLeft.days}</div>
+            {isClient ?
+            <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.days}</div>
+            : <div className="text-3xl font-bold">0</div>
+            }
           <div className="text-sm">Days</div>
         </div>
         <div className="text-center">
-          <div className="text-3xl font-bold">{timeLeft.hours}</div>
+            {isClient ?
+            <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.hours}</div>
+            :
+            <div className="text-3xl font-bold">0</div>
+            }
           <div className="text-sm">Hours</div>
         </div>
         <div className="text-center">
-          <div className="text-3xl font-bold">{timeLeft.minutes}</div>
+            {isClient ?
+            <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.minutes}</div>
+            :
+            <div className="text-3xl font-bold">0</div>
+            }
           <div className="text-sm">Minutes</div>
         </div>
         <div className="text-center">
-          <div className="text-3xl font-bold">{timeLeft.seconds}</div>
+            {isClient ?
+            <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.seconds}</div>
+            :
+            <div className="text-3xl font-bold">0</div>
+            }
           <div className="text-sm">Seconds</div>
         </div>
       </div>
