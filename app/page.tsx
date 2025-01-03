@@ -10,7 +10,7 @@ import Banner from './ui/banner';
 export default function Page() {
   return (
     <main className="flex min-h-screen flex-col p-0 bg-gray-800 bg-opacity-90">
-        <div className="flex h-20 shrink-0 items-end rounded-lg bg-[#bb4444] md:bg-opacity-90 p-4 justify-between md:h-52">
+        <div className="flex h-20 shrink-0 items-end rounded-lg bg-[#bb4444] text-white md:bg-opacity-90 p-4 justify-between md:h-52">
             <RobLogo />
         </div>
         <div className="">
