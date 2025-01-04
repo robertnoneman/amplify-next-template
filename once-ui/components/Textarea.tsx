@@ -180,7 +180,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 } else if (ref) {
                   ref.current = node;
                 }
-                textareaRef.current = node;
+                // textareaRef.current = node;
               }}
               id={id}
               rows={typeof lines === "number" ? lines : 1}
