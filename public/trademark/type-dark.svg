@@ -1,0 +1,33 @@
+<svg
+  width="200"
+  height="200"
+  viewBox="0 0 200 200"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+      <style>
+          @import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i");
+      </style>
+  </defs>
+  <style><![CDATA[svg text{stroke:none}]]></style>
+  <!-- Center the text in the SVG -->
+  <text
+    x="50%"
+    y="70%"
+    text-anchor="middle"
+    alignment-baseline="middle"
+    font-family="Arial, sans-serif"
+    font-size="160"
+    fill="white"
+    font-weight="bold"
+  >
+    R
+    <!-- Superscript '2' -->
+    <tspan
+      baseline-shift="super"
+      font-size="94"
+    >
+      2
+    </tspan>
+  </text>
+</svg>

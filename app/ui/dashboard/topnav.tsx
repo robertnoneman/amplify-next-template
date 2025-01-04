@@ -12,7 +12,7 @@ import clsx from 'clsx';
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', current: true },
   { name: 'Activities', href: '/dashboard/activities', current: false },
-  { name: 'Planner', href: '#', current: false },
+  { name: 'Planner', href: '/dashboard/planner', current: false },
   { name: 'Archive', href: '#', current: false },
 ]
 
