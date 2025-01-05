@@ -28,6 +28,7 @@ const schema = a.schema({
       lever_of_effort: a.integer(),
       categories: a.ref("Category").array(),
     })
+    .authorization((allow) => [allow.publicApiKey()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
