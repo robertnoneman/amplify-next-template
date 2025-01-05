@@ -14,7 +14,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.publicApiKey()]),
   Category: a.customType({
-    category: a.enum(["Game", "Food", "Craft", "Music", "Movie/TV", "Exercise", "Outdoor", "Indoor", "Other"])
+    category: a.enum(["Game", "Food", "Craft", "Music", "Movie", "Exercise", "Outdoor", "Indoor", "Other"])
   }),
   Activity: a
     .model({
