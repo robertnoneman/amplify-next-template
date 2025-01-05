@@ -1,4 +1,5 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { count } from "console";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -13,6 +14,20 @@ const schema = a.schema({
       isDone: a.boolean(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
+  Category: a.customType({
+    category: a.enum(['Game', "Food", "Craft", "Music", "Movie/TV", "Exercise", "Other"])
+  }),
+  Activity: a
+    .model({
+      name: a.string(),
+      description: a.string(),
+      count: a.integer(),
+      rating: a.float(),
+      notes: a.string().array(),
+      image: a.url(),
+      lever_of_effort: a.integer(),
+      categories: a.ref("Category").array(),
+    })
 });
 
 export type Schema = ClientSchema<typeof schema>;

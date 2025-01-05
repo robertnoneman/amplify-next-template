@@ -22,8 +22,18 @@ export default function Page() {
     });
     }
 
+  function updateTodo() {
+    client.models.Todo.onUpdate().subscribe({
+      next: (data) => todos.map((todo) => {
+        if (todo.id === data.id) {
+          todo.isDone = !todo.isDone;
+          }})
+    });
+  }
+
     useEffect(() => {
       listTodos();
+      updateTodo();
     }, []);
 
     function createTodo() {
@@ -94,9 +104,6 @@ export default function Page() {
           </Row>
         </Row>
       </Row>
-      <h1 className={`${roboto.className} text-white mb-4 text-xl md:text-2xl text-center`}>
-          Activities page
-      </h1>
       <h2 className={`${roboto.className} text-xl text-gray-50 md:text-3xl md:leading-normal`}>Robday Activity List</h2>
       <button className={`${styles.button}`} onClick={createTodo}>+ new</button>
       
