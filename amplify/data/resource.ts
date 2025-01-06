@@ -23,7 +23,7 @@ const schema = a.schema({
       count: a.integer(),
       rating: a.float(),
       notes: a.string().array(),
-      image: a.url(),
+      image: a.string(),
       lever_of_effort: a.integer(),
       categories: a.string().array(),
     }).authorization((allow) => [allow.publicApiKey()]),

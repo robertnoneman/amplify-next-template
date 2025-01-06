@@ -244,7 +244,7 @@ export default function Page() {
                   aspectRatio="16 / 9"
                   sizes="l"
                   radius={undefined}
-                  initialPreviewImage="/IMG_1065.jpg"
+                  initialPreviewImage={activity.image}
                   key={`${activity.id}mu`}
                 ></MediaUpload>
                 <Column
