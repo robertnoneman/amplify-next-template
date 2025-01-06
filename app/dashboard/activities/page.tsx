@@ -24,12 +24,13 @@ import {
   Switch,
   Dialog,
   Textarea,
-  TagInput
+  TagInput,
+  TiltFx,
+  Chip
 } from "@/once-ui/components";
 import { MediaUpload } from "@/once-ui/modules";
 import { uploadData } from 'aws-amplify/storage';
 import { getUrl } from 'aws-amplify/storage';
-import { get } from 'http';
 
 Amplify.configure(outputs);
 
@@ -149,7 +150,8 @@ export default function Page() {
   }
 
   function createNewActivity() {
-    client.models.Activity.create({
+    console.log("Creating new activty");
+    const result = client.models.Activity.create({
       name: activityName,
       description: activityDescription,
       count: activityCount,
@@ -161,6 +163,7 @@ export default function Page() {
       cost: activityCost,
       location: activityLocation
     });
+    console.log(result);
     setIsFirstDialogOpen(false);
     setActivityName("");
     setActivityDescription("");
@@ -306,62 +309,72 @@ export default function Page() {
           />
           <Column maxWidth={36} gap="8">
           {activities.map((activity) => (
-            <Flex
-                background="page"
-                radius={undefined}
-                bottomRadius="l"
-                topRadius='l'
-                overflow="hidden"
-                position="relative"
-                fillWidth
-                alignItems="center"
-                border="neutral-medium"
-                mobileDirection='column'
-                key={`${activity.id}flex0`}
-              >
-                {/* <MediaUpload
-                  border={undefined}
-                  emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
-                  position="relative"
-                  aspectRatio="16 / 9"
-                  sizes="l"
+            <TiltFx fillWidth paddingX="32" paddingTop="4" key={`${activity.id}fx`}>
+              <Flex
+                  background="page"
                   radius={undefined}
-                  initialPreviewImage={activity.image ? poopGetImageUrl(activity.image) : ""}
-                  key={`${activity.id}mu`}
-                  onFileUpload={handleUploadData}
-                ></MediaUpload> */}
-                <SmartImage
-                  src={urls[activities.indexOf(activity)]}
-                  aspectRatio="16/9"
-                  radius="l"
-                  objectFit="cover"
-                  sizes='s'
-                />
-                <Column
-                  // paddingTop="160"
-                  paddingX="16"
-                  paddingBottom="16"
-                  fillWidth
+                  bottomRadius="l"
+                  topRadius='l'
+                  overflow="hidden"
                   position="relative"
-                  alignItems="flex-start"
-                  justifyContent="flex-start"
-                  overflow='hidden'
-                  // marginTop="xl"
-                  gap="0"
-                  key={`${activity.id}c0`}
+                  fillWidth
+                  alignItems="center"
+                  border="neutral-medium"
+                  mobileDirection='column'
+                  key={`${activity.id}flex0`}
                 >
-                  <Heading marginTop="xs" variant="heading-default-xs" key={`${activity.id}h0`}>
-                    {activity.name}
-                  </Heading>
-                  <Text align="center" onBackground="neutral-weak" marginBottom="2" variant='body-default-xs' key={`${activity.id}t0`}>
-                    Outdoors, Other
-                  </Text>
-                  <Text align="left" onBackground="neutral-medium" variant='body-default-xs' key={`${activity.id}t1`}>
-                    {activity.description}
-                  </Text>
-                </Column>
-              </Flex>
+                  {/* <MediaUpload
+                    border={undefined}
+                    emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
+                    position="relative"
+                    aspectRatio="16 / 9"
+                    sizes="l"
+                    radius={undefined}
+                    initialPreviewImage={activity.image ? poopGetImageUrl(activity.image) : ""}
+                    key={`${activity.id}mu`}
+                    onFileUpload={handleUploadData}
+                  ></MediaUpload> */}
+                  <SmartImage
+                    src={urls[activities.indexOf(activity)]}
+                    aspectRatio="16/9"
+                    radius="l"
+                    objectFit="cover"
+                    sizes='s'
+                  />
+                  <Column
+                    // paddingTop="160"
+                    paddingX="16"
+                    paddingBottom="16"
+                    fillWidth
+                    position="relative"
+                    alignItems="flex-start"
+                    justifyContent="flex-start"
+                    overflow='hidden'
+                    // marginTop="xl"
+                    gap="0"
+                    key={`${activity.id}c0`}
+                  >
+                    <Heading marginTop="xs" variant="heading-default-xs" key={`${activity.id}h0`}>
+                      {activity.name}
+                    </Heading>
+                    <Row>
+                      {(activity.categories ?? []).map((tag) => (
+                        <Text align="center" onBackground="accent-medium" variant='body-default-xs' key={`${activity.categories?.indexOf(tag)}tag`} >
+                          - {tag}, 
+                        </Text>
+                      ))}
+                    </Row>
+                    {/* <Text align="center" onBackground="neutral-weak" marginBottom="2" variant='body-default-xs' key={`${activity.id}t0`}>
+                      Outdoors, Other
+                    </Text> */}
+                    <Text align="left" onBackground="neutral-medium" variant='body-default-xs' key={`${activity.id}t1`}>
+                      {activity.description}
+                    </Text>
+                  </Column>
+                </Flex>
+              </TiltFx>
             ))}
+            {/* <TiltFx fillWidth paddingX="32" paddingTop="64">
               <Flex
                 background="page"
                 radius={undefined}
@@ -407,16 +420,16 @@ export default function Page() {
                   </Text>
                 </Column>
               </Flex>
-              
-              <Flex>
-                <Button
-                  // onClick={createActivity}
-                  onClick={() => setIsFirstDialogOpen(true)}
-                  variant="tertiary"
-                  size="m"
-                  label="Create Activity"
-                />
-              </Flex>
+            </TiltFx> */}
+            <Flex>
+              <Button
+                // onClick={createActivity}
+                onClick={() => setIsFirstDialogOpen(true)}
+                variant="tertiary"
+                size="m"
+                label="Create Activity"
+              />
+            </Flex>
           </Column>
           <Dialog
             isOpen={isFirstDialogOpen}
@@ -426,7 +439,7 @@ export default function Page() {
             onHeightChange={(height) => setFirstDialogHeight(height)}
             footer={
               <>
-                <Button variant="secondary" onClick={() => createNewActivity}>
+                <Button variant="secondary" onClick={() => createNewActivity()}>
                   Submit
                 </Button>
               </>
