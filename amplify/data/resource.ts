@@ -26,6 +26,9 @@ const schema = a.schema({
       image: a.string(),
       lever_of_effort: a.integer(),
       categories: a.string().array(),
+      cost: a.integer(),
+      costMax: a.integer(),
+      location: a.string(),
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 

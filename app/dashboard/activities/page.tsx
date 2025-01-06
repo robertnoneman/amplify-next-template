@@ -20,7 +20,11 @@ import {
   Input, 
   Column, 
   Flex,
-  SmartImage
+  SmartImage,
+  Switch,
+  Dialog,
+  Textarea,
+  TagInput
 } from "@/once-ui/components";
 import { MediaUpload } from "@/once-ui/modules";
 import { uploadData } from 'aws-amplify/storage';
@@ -34,8 +38,20 @@ const client = generateClient<Schema>();
 export default function Page() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
   const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
-  const [file, setFile] = useState();
+  const [file, setFile] = useState("");
   const [urls, setUrls] = useState<Array<string>>([]);
+  const [isFirstDialogOpen, setIsFirstDialogOpen] = useState(false);
+  const [firstDialogHeight, setFirstDialogHeight] = useState<number>();
+  const [twoFA, setTwoFA] = useState(false);
+  const [tags, setTags] = useState<string[]>(["Outdoors", "Food", "Game"]);
+  const [activityName, setActivityName] = useState<string>("");
+  const [activityDescription, setActivityDescription] = useState<string>("");
+  const [activityCount, setActivityCount] = useState<number>(0);
+  const [activityRating, setActivityRating] = useState<number>(0);
+  const [activityNotes, setActivityNotes] = useState<string[]>([]);
+  const [activityImage, setActivityImage] = useState<string>("");
+  const [activityCost, setActivityCost] = useState<number>(0);
+  const [activityLocation, setActivityLocation] = useState<string>("");
 
   const handleChange = (event: any) => {
       setFile(event.target.files[0]);
@@ -46,6 +62,7 @@ export default function Page() {
       path: `picture-submissions/${file.name}`, 
       data: file
     });
+    setActivityImage(`picture-submissions/${file.name}`)
   }
 
   const getImageUrl = async (key: string): Promise<string> => {
@@ -129,6 +146,31 @@ export default function Page() {
       lever_of_effort: 0,
       categories: []
     });
+  }
+
+  function createNewActivity() {
+    client.models.Activity.create({
+      name: activityName,
+      description: activityDescription,
+      count: activityCount,
+      rating: activityRating,
+      notes: activityNotes,
+      image: activityImage,
+      lever_of_effort: 0,
+      categories: tags,
+      cost: activityCost,
+      location: activityLocation
+    });
+    setIsFirstDialogOpen(false);
+    setActivityName("");
+    setActivityDescription("");
+    setActivityCount(0);
+    setActivityRating(0);
+    setActivityNotes([]);
+    setActivityImage("");
+    setActivityCost(0);
+    setActivityLocation("");
+    setFile("");
   }
     
   return (
@@ -368,14 +410,107 @@ export default function Page() {
               
               <Flex>
                 <Button
-                  onClick={createActivity}
+                  // onClick={createActivity}
+                  onClick={() => setIsFirstDialogOpen(true)}
                   variant="tertiary"
                   size="m"
                   label="Create Activity"
                 />
               </Flex>
           </Column>
-        </Flex>
+          <Dialog
+            isOpen={isFirstDialogOpen}
+            onClose={() => setIsFirstDialogOpen(false)}
+            title="Create New Robday Activity"
+            description="Add a new activity for Robday."
+            onHeightChange={(height) => setFirstDialogHeight(height)}
+            footer={
+              <>
+                <Button variant="secondary" onClick={() => createNewActivity}>
+                  Submit
+                </Button>
+              </>
+            }
+          >
+            <Flex
+              fillWidth
+              alignItems='center'
+              justifyContent='center'
+            >
+              <Flex
+                maxWidth={20}
+                alignItems='center'
+              >
+                <MediaUpload
+                  emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
+                  onFileUpload={handleUploadData}
+                >  
+                </MediaUpload>
+              </Flex>
+            </Flex>
+            <Column paddingTop="24" fillWidth gap="24">
+              <Input
+                radius="top"
+                label="Name"
+                // labelAsPlaceholder
+                defaultValue=""
+                id="name"
+                // onChange={(e) => console.log(e.target.value)}
+                onChange={(e) => setActivityName(e.target.value)}
+              />
+              <Input
+                radius="top"
+                label="Location"
+                // labelAsPlaceholder
+                defaultValue=""
+                id="location"
+                // onChange={(e) => console.log(e.target.value)}
+                onChange={(e) => setActivityLocation(e.target.value)}
+              />
+              <Input
+                radius="top"
+                label="Cost"
+                // labelAsPlaceholder
+                defaultValue={0}
+                id="cost"
+                // onChange={(e) => console.log(e.target.value)}
+                onChange={(e) => setActivityCost(parseInt(e.target.value))}
+              />
+              <Textarea
+                id="description"
+                label="Description"
+                lines={2}
+                // onChange={(e) => console.log(e.target.value)}
+                onChange={(e) => setActivityDescription(e.target.value)}
+                >
+              </Textarea>
+              <Textarea
+                id="notes"
+                label="Notes"
+                lines={2}
+                // onChange={(e) => console.log(e.target.value)}
+                onChange={(e) => setActivityNotes([e.target.value])}
+                >
+              </Textarea>
+              <Switch
+                reverse
+                isChecked={twoFA}
+                onToggle={() => setTwoFA(!twoFA)}
+                label="Outdoors"
+                description="Activity is Outdoors"
+              />
+              <TagInput
+                  id="tags"
+                  value={tags}
+                  onChange={(newTags: string[]) => {
+                    setTags(newTags);
+                  }}
+                  label="Tags"
+              />
+              {/* <Button>Add tag</Button> */}
+            </Column>
+        </Dialog>
+      </Flex>
     </main>
   )
 }
