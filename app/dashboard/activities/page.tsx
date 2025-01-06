@@ -20,8 +20,12 @@ import {
   Input, 
   Column, 
   Flex,
+  SmartImage
 } from "@/once-ui/components";
 import { MediaUpload } from "@/once-ui/modules";
+import { uploadData } from 'aws-amplify/storage';
+import { getUrl } from 'aws-amplify/storage';
+import { get } from 'http';
 
 Amplify.configure(outputs);
 
@@ -30,6 +34,33 @@ const client = generateClient<Schema>();
 export default function Page() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
   const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
+  const [file, setFile] = useState();
+  const [urls, setUrls] = useState<Array<string>>([]);
+
+  const handleChange = (event: any) => {
+      setFile(event.target.files[0]);
+  };
+
+  const handleUploadData = async (file: File): Promise<void> => {
+    await uploadData({
+      path: `picture-submissions/${file.name}`, 
+      data: file
+    });
+  }
+
+  const getImageUrl = async (key: string): Promise<string> => {
+    const url = getUrl({
+      path: key
+  });
+    return (await url).url.toString();
+  }
+
+  const poopGetImageUrl = (key: string): any => {
+    getImageUrl(key).then((url) => {
+      return url;
+    });
+  }
+
 
   function listTodos() {
     client.models.Todo.observeQuery().subscribe({
@@ -39,7 +70,16 @@ export default function Page() {
 
   function listActivities() {
     client.models.Activity.observeQuery().subscribe({
-      next: (data) => setActivities([...data.items]),
+      next: async (data) => {
+        setActivities([...data.items]);
+        const urls = await Promise.all(data.items.map(async (activity) => {
+          if (activity.image) {
+            return await getImageUrl(activity.image);
+          }
+          return "";
+        }));
+        setUrls(urls);
+      },
     });
   }
 
@@ -237,16 +277,24 @@ export default function Page() {
                 mobileDirection='column'
                 key={`${activity.id}flex0`}
               >
-                <MediaUpload
+                {/* <MediaUpload
                   border={undefined}
                   emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
                   position="relative"
                   aspectRatio="16 / 9"
                   sizes="l"
                   radius={undefined}
-                  initialPreviewImage={activity.image}
+                  initialPreviewImage={activity.image ? poopGetImageUrl(activity.image) : ""}
                   key={`${activity.id}mu`}
-                ></MediaUpload>
+                  onFileUpload={handleUploadData}
+                ></MediaUpload> */}
+                <SmartImage
+                  src={urls[activities.indexOf(activity)]}
+                  aspectRatio="16/9"
+                  radius="l"
+                  objectFit="cover"
+                  sizes='s'
+                />
                 <Column
                   // paddingTop="160"
                   paddingX="16"
@@ -292,6 +340,7 @@ export default function Page() {
                   sizes="l"
                   radius={undefined}
                   initialPreviewImage="/tunnies.png"
+                  onFileUpload={undefined}
                 ></MediaUpload>
                 <Column
                   // paddingTop="160"
