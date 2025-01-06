@@ -29,12 +29,19 @@ const client = generateClient<Schema>();
 
 export default function Page() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
 
   function listTodos() {
     client.models.Todo.observeQuery().subscribe({
       next: (data) => setTodos([...data.items]),
     });
     }
+
+  function listActivities() {
+    client.models.Activity.observeQuery().subscribe({
+      next: (data) => setActivities([...data.items]),
+    });
+  }
 
   function updateTodo() {
     client.models.Todo.onUpdate().subscribe({
@@ -45,30 +52,44 @@ export default function Page() {
     });
   }
 
-    useEffect(() => {
-      listTodos();
-      updateTodo();
-    }, []);
+  useEffect(() => {
+    listTodos();
+    updateTodo();
+    listActivities();
+  }, []);
 
-    function createTodo() {
-      client.models.Todo.create({
-        content: window.prompt("Todo content"),
-        isDone: false
-      });
-    }
+  function createTodo() {
+    client.models.Todo.create({
+      content: window.prompt("Todo content"),
+      isDone: false
+    });
+  }
 
-    function deleteTodo(id: string, content: any, isDone: any) {
-      // client.models.Todo.delete({ id })
-      const todo = {
-        id: id,
-        isDone: !isDone,
-        content: content
-      }
-      client.models.Todo.update(todo);
-      // client.models.Todo.delete({ id });
-      // client.models.Todo.create({ ...todo });
-      // client.models.Todo.update.arguments = { id: id, isDone: true, content: content }
+  function deleteTodo(id: string, content: any, isDone: any) {
+    // client.models.Todo.delete({ id })
+    const todo = {
+      id: id,
+      isDone: !isDone,
+      content: content
     }
+    client.models.Todo.update(todo);
+    // client.models.Todo.delete({ id });
+    // client.models.Todo.create({ ...todo });
+    // client.models.Todo.update.arguments = { id: id, isDone: true, content: content }
+  }
+
+  function createActivity() {
+    client.models.Activity.create({
+      name: window.prompt("Activity name"),
+      description: window.prompt("Activity description"),
+      count: 0,
+      rating: 0,
+      notes: [],
+      image: "https://via.placeholder.com/150",
+      lever_of_effort: 0,
+      categories: []
+    });
+  }
     
   return (
     <main>
@@ -120,10 +141,10 @@ export default function Page() {
         </Row>
         <h2 className={`${roboto.className} text-xl text-gray-50 md:text-3xl md:leading-normal`}>Robday Activity List</h2>
         <button className={`${styles.button}`} onClick={createTodo}>+ new</button>
-        
-        <ul className={`${styles.ul}`}>
+        {/* <div className={`${styles.ul} ${roboto.className} `}> */}
+        <ul className={`${styles.ul}`} key={"todoList"}>
           <div className={`${styles.li} ${roboto.className} `}>
-            <li>
+            {/* <li key={"todoheader"}> */}
               <Flex background="surface" fillWidth >
                 <Column alignItems="left" paddingTop="4" fillWidth gap="0">
                   <Row fillWidth justifyContent="space-around">
@@ -136,10 +157,11 @@ export default function Page() {
                   </Row>
                 </Column>
               </Flex>
-            </li>
+            {/* </li> */}
           </div>
+        {/* </div> */}
           {todos.map((todo) => (
-            <div className={`${styles.li} ${roboto.className} ${todo.isDone} `}>
+            <div key={todo.id} className={`${styles.li} ${roboto.className} ${todo.isDone} `}>
               <li
                 onClick={() => deleteTodo(todo.id, todo.content, todo.isDone)}
                 key={todo.id}>
@@ -201,6 +223,7 @@ export default function Page() {
             }}
           />
           <Column maxWidth={36} gap="8">
+          {activities.map((activity) => (
             <Flex
                 background="page"
                 radius={undefined}
@@ -212,6 +235,7 @@ export default function Page() {
                 alignItems="center"
                 border="neutral-medium"
                 mobileDirection='column'
+                key={`${activity.id}flex0`}
               >
                 <MediaUpload
                   border={undefined}
@@ -220,7 +244,8 @@ export default function Page() {
                   aspectRatio="16 / 9"
                   sizes="l"
                   radius={undefined}
-                  initialPreviewImage="/capitolSnow.png"
+                  initialPreviewImage="/IMG_1065.jpg"
+                  key={`${activity.id}mu`}
                 ></MediaUpload>
                 <Column
                   // paddingTop="160"
@@ -233,18 +258,20 @@ export default function Page() {
                   overflow='hidden'
                   // marginTop="xl"
                   gap="0"
+                  key={`${activity.id}c0`}
                 >
-                  <Heading marginTop="xs" variant="heading-default-xs">
-                    Go to the Capitol
+                  <Heading marginTop="xs" variant="heading-default-xs" key={`${activity.id}h0`}>
+                    {activity.name}
                   </Heading>
-                  <Text align="center" onBackground="neutral-weak" marginBottom="2" variant='body-default-xs'>
+                  <Text align="center" onBackground="neutral-weak" marginBottom="2" variant='body-default-xs' key={`${activity.id}t0`}>
                     Outdoors, Other
                   </Text>
-                  <Text align="left" onBackground="neutral-medium" variant='body-default-xs'>
-                    I'm a big ass description of the activity and all the awesome shit that the Robs are gonna do
+                  <Text align="left" onBackground="neutral-medium" variant='body-default-xs' key={`${activity.id}t1`}>
+                    {activity.description}
                   </Text>
                 </Column>
               </Flex>
+            ))}
               <Flex
                 background="page"
                 radius={undefined}
@@ -288,6 +315,15 @@ export default function Page() {
                     I'm yet another ass-sized description of the activity and all the shit that the Robs are gonna do
                   </Text>
                 </Column>
+              </Flex>
+              
+              <Flex>
+                <Button
+                  onClick={createActivity}
+                  variant="tertiary"
+                  size="m"
+                  label="Create Activity"
+                />
               </Flex>
           </Column>
         </Flex>

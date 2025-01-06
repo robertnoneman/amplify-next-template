@@ -25,7 +25,7 @@ const schema = a.schema({
       notes: a.string().array(),
       image: a.url(),
       lever_of_effort: a.integer(),
-      categories: a.ref("Category").array(),
+      categories: a.string().array(),
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 

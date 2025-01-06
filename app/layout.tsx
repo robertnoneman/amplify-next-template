@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import '@/app/ui/global.css';
 import { inter } from '@/app/ui/fonts';
 import CountdownToMonday from './ui/CountdownToMonday';
+import dynamic from 'next/dynamic'
 
 // const inter = Inter({ subsets: ["latin"] });
+const NoSSR = dynamic(() => import('./ui/CountdownToMonday'), { ssr: false })
 
 export const metadata: Metadata = {
   title: "It's Rob Day",
@@ -22,7 +24,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>{children}
       <footer className="">
         <div className="bg-[#bb4444]">
-            <CountdownToMonday />
+            <NoSSR />
         </div>
       </footer>
 
