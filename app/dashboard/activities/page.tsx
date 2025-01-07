@@ -26,7 +26,8 @@ import {
   Textarea,
   TagInput,
   TiltFx,
-  Chip
+  Chip,
+  Tag
 } from "@/once-ui/components";
 import { MediaUpload } from "@/once-ui/modules";
 import { uploadData } from 'aws-amplify/storage';
@@ -39,9 +40,11 @@ const client = generateClient<Schema>();
 export default function Page() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
   const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
+  const [editedActivity, setEditedActivity] = useState<Schema["Activity"]["type"]>();
   const [file, setFile] = useState("");
   const [urls, setUrls] = useState<Array<string>>([]);
   const [isFirstDialogOpen, setIsFirstDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [firstDialogHeight, setFirstDialogHeight] = useState<number>();
   const [twoFA, setTwoFA] = useState(false);
   const [tags, setTags] = useState<string[]>(["Outdoors", "Food", "Game"]);
@@ -174,6 +177,46 @@ export default function Page() {
     setActivityCost(0);
     setActivityLocation("");
     setFile("");
+  }
+
+  function updateActivity(activity: Schema["Activity"]["type"]) {
+    console.log(`Done Editing Activity: ${activity.name}`);
+    activity.name = activityName;
+    activity.description = activityDescription;
+    activity.count = activityCount;
+    activity.rating = activityRating;
+    activity.notes = activityNotes;
+    activity.image = activityImage;
+    activity.cost = activityCost;
+    activity.location = activityLocation;
+    activity.categories = tags;
+    client.models.Activity.update(activity);
+    setIsEditDialogOpen(false);
+    setActivityName("");
+    setActivityDescription("");
+    setActivityCount(0);
+    setActivityRating(0);
+    setActivityNotes([]);
+    setActivityImage("");
+    setActivityCost(0);
+    setActivityLocation("");
+    setFile("");
+  }
+
+  function populateActivity(activity: Schema["Activity"]["type"]) {
+    isEditDialogOpen? console.log("returning ") :
+    setIsEditDialogOpen(true);
+    setEditedActivity(activity);
+    activity.name? setActivityName(activity.name) : setActivityName("");
+    activity.description? setActivityDescription(activity.description) : setActivityDescription("");
+    activity.count? setActivityCount(activity.count) : setActivityCount(0);
+    activity.rating? setActivityRating(activity.rating) : setActivityRating(0);
+    activity.notes ? setActivityNotes(activity.notes.filter(note => note !== null)) : setActivityNotes([]);
+    activity.image? setActivityImage(activity.image) : setActivityImage("");
+    activity.cost? setActivityCost(activity.cost) : setActivityCost(0);
+    activity.location? setActivityLocation(activity.location) : setActivityLocation("");
+    activity.categories? setTags(activity.categories.filter(tag => tag !== null )) : setTags([]);
+    console.log(`Editing Activity: ${activity.name}`);
   }
     
   return (
@@ -322,6 +365,8 @@ export default function Page() {
                   border="neutral-medium"
                   mobileDirection='column'
                   key={`${activity.id}flex0`}
+                  onClick={() => populateActivity(activity)}
+                  // onDoubleClick={() => populateActivity(activity)}
                 >
                   {/* <MediaUpload
                     border={undefined}
@@ -359,9 +404,16 @@ export default function Page() {
                     </Heading>
                     <Row>
                       {(activity.categories ?? []).map((tag) => (
-                        <Text align="center" onBackground="accent-medium" variant='body-default-xs' key={`${activity.categories?.indexOf(tag)}tag`} >
-                          - {tag}, 
-                        </Text>
+                        // <Text align="center" onBackground="accent-medium" variant='body-default-xs' key={`${activity.categories?.indexOf(tag)}tag`} >
+                        //   - {tag}, 
+                        // </Text>
+                        // {const tagString = tag.toString()}
+                        <Tag
+                          key={`${activity.categories?.indexOf(tag)}tag`}
+                          label={tag?.toString()}
+                          size="s"
+                          variant="info"
+                          />
                       ))}
                     </Row>
                     {/* <Text align="center" onBackground="neutral-weak" marginBottom="2" variant='body-default-xs' key={`${activity.id}t0`}>
@@ -373,6 +425,7 @@ export default function Page() {
                   </Column>
                 </Flex>
               </TiltFx>
+              
             ))}
             {/* <TiltFx fillWidth paddingX="32" paddingTop="64">
               <Flex
@@ -522,6 +575,101 @@ export default function Page() {
               />
               {/* <Button>Add tag</Button> */}
             </Column>
+        </Dialog>
+        <Dialog
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          title="Edit Robday Activity"
+          description="Edit Robday activity."
+          onHeightChange={(height) => setFirstDialogHeight(height)}
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => editedActivity && updateActivity(editedActivity)}>
+                Update
+              </Button>
+            </>
+          }
+        >
+          <Flex
+            fillWidth
+            alignItems='center'
+            justifyContent='center'
+          >
+            <Flex
+              maxWidth={20}
+              alignItems='center'
+            >
+              <MediaUpload
+                emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
+                onFileUpload={handleUploadData}
+                initialPreviewImage={editedActivity ? urls[activities.indexOf(editedActivity)] : ""}
+              >  
+              </MediaUpload>
+            </Flex>
+          </Flex>
+          <Column paddingTop="24" fillWidth gap="24">
+            <Input
+              radius="top"
+              label="Name"
+              // labelAsPlaceholder
+              defaultValue={editedActivity?.name?.toString() ?? ""}
+              id="name"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityName(e.target.value)}
+            />
+            <Input
+              radius="top"
+              label="Location"
+              // labelAsPlaceholder
+              defaultValue={editedActivity?.location?.toString() ?? ""}
+              id="location"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityLocation(e.target.value)}
+            />
+            <Input
+              radius="top"
+              label="Cost"
+              // labelAsPlaceholder
+              defaultValue={editedActivity?.cost?.toString()}
+              id="cost"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityCost(parseInt(e.target.value))}
+            />
+            <Textarea
+              id="description"
+              label="Description"
+              defaultValue={editedActivity?.description?.toString()}
+              lines={2}
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityDescription(e.target.value)}
+              >
+            </Textarea>
+            <Textarea
+              id="notes"
+              label="Notes"
+              defaultValue={editedActivity?.notes?.toString()}
+              lines={2}
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityNotes([e.target.value])}
+              >
+            </Textarea>
+            <Switch
+              reverse
+              isChecked={twoFA}
+              onToggle={() => setTwoFA(!twoFA)}
+              label="Outdoors"
+              description="Activity is Outdoors"
+            />
+            <TagInput
+                id="tags"
+                value={editedActivity?.categories?.filter(tag => tag !== null) ?? []}
+                onChange={(newTags: string[]) => {
+                  setTags(newTags);
+                }}
+                label="Tags"
+            />
+            {/* <Button>Add tag</Button> */}
+          </Column>
         </Dialog>
       </Flex>
     </main>

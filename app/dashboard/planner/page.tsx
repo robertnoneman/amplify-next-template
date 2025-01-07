@@ -39,6 +39,17 @@ import {
   StyleOverlay,
 } from "@/once-ui/components";
 import { CodeBlock, MediaUpload } from "@/once-ui/modules";
+import Link from 'next/link';
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import clsx from 'clsx';
+import { usePathname } from 'next/navigation';
+
+const navigation = [
+  { name: 'Dashboard', href: '/dashboard', current: true },
+  { name: 'Activities', href: '/dashboard/activities', current: false },
+  { name: 'Planner', href: '/dashboard/planner', current: false },
+  { name: 'Archive', href: '#', current: false },
+]
 
 export default function Page() {
   const [selectedValue, setSelectedValue] = useState("");
@@ -57,6 +68,8 @@ export default function Page() {
     console.log("Selected option:", value);
     setSelectedValue(value);
   };
+
+  const pathname = usePathname();
   return (
     <Column fillWidth paddingY="80" paddingX="s" alignItems="center" flex={1}>
       <Fade
