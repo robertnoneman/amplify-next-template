@@ -103,7 +103,7 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       "November",
       "December",
     ];
-    const dayNames = ["Su", "ROBDAY", "Tu", "We", "Th", "Fr", "Sa"];
+    const dayNames = ["Su", "RD", "Tu", "We", "Th", "Fr", "Sa"];
 
     const handleTimeToggle = (show: boolean) => {
       setIsTransitioning(false);
@@ -387,8 +387,8 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
                 <Text
                   marginBottom="16"
                   key={day}
-                  variant={day === "ROBDAY" ? "label-strong-m" : "label-default-m"}
-                  onBackground={day === "ROBDAY" ? "accent-weak" : "neutral-medium"}
+                  variant={day === "RD" ? "label-strong-m" : "label-default-m"}
+                  onBackground={day === "RD" ? "accent-weak" : "neutral-medium"}
                   align="center"
                 >
                   {day}

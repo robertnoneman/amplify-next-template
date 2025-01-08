@@ -132,7 +132,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         })}
       >
         <Flex
-          minHeight="56"
+          // minHeight="56"
           transition="micro-medium"
           border="neutral-medium"
           background="neutral-alpha-weak"

@@ -67,3 +67,17 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     totalPages,
   ];
 };
+
+export const getNextRobDay = () => {
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // Sunday=0, Monday=1, ... Saturday=6
+  // If today is Monday, we want the *next* Monday, which is 7 days away.
+  const daysUntilMonday = (1 - dayOfWeek + 7) % 7 || 7;
+
+  // Create a new Date for next Monday at midnight
+  const nextMonday = new Date(now);
+  nextMonday.setDate(now.getDate() + daysUntilMonday);
+  nextMonday.setHours(0, 0, 0, 0);
+
+  return nextMonday;
+};

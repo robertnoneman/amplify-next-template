@@ -28,6 +28,8 @@ import {
   HiCheckCircle,
   HiOutlineShieldCheck,
   HiOutlineSparkles,
+  HiOutlinePencil,
+  HiOutlineCalendarDays
 } from "react-icons/hi2";
 
 import {
@@ -69,6 +71,7 @@ export const iconLibrary: Record<string, IconType> = {
   minus: HiMiniMinus,
   plus: HiMiniPlus,
   calendar: HiCalendar,
+  calendarDays: HiOutlineCalendarDays,
   eye: HiOutlineEye,
   eyeOff: HiOutlineEyeSlash,
   search: HiOutlineMagnifyingGlass,
@@ -79,4 +82,5 @@ export const iconLibrary: Record<string, IconType> = {
   home: PiHouseDuotone,
   grid: PiGridFourDuotone,
   book: PiBookBookmarkDuotone,
+  edit: HiOutlinePencil
 };

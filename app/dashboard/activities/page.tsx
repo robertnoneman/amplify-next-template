@@ -14,7 +14,8 @@ import {
   Logo, 
   Button, 
   StyleOverlay, 
-  IconButton, 
+  IconButton,
+  Icon,
   Row, 
   Text, 
   Input, 
@@ -27,7 +28,8 @@ import {
   TagInput,
   TiltFx,
   Chip,
-  Tag
+  Tag,
+  RevealFx
 } from "@/once-ui/components";
 import { MediaUpload } from "@/once-ui/modules";
 import { uploadData } from 'aws-amplify/storage';
@@ -268,7 +270,6 @@ export default function Page() {
           </Row>
         </Row> */}
         <h2 className={`${roboto.className} text-xl text-gray-50 md:text-3xl md:leading-normal`}>Robday Activity List</h2>
-        <button className={`${styles.button}`} onClick={createTodo}>+ new</button>
         {/* <div className={`${styles.ul} ${roboto.className} `}> */}
         <ul className={`${styles.ul}`} key={"todoList"}>
           <div className={`${styles.li} ${roboto.className} `}>
@@ -310,12 +311,21 @@ export default function Page() {
                     />
                     {/* <Text variant="body-default-m"> 
                       {todo.isDone ? "Done" : "Not Done"}
-                    </Text> */}
+                      </Text> */}
                   </Row>
               </li>
             </div>
           ))}
         </ul>
+        <Flex >
+          <Button
+            onClick={createTodo}
+            variant="secondary"
+            size="m"
+            label="Create Todo">
+          </Button>
+          {/* <button className={`${styles.button}`} onClick={createTodo}>+ new</button> */}
+        </Flex>
       </Column>
       <Flex
           justifyContent="center"
@@ -352,79 +362,94 @@ export default function Page() {
           />
           <Column maxWidth={36} gap="8">
           {activities.map((activity) => (
-            <TiltFx fillWidth paddingX="32" paddingTop="4" key={`${activity.id}fx`}>
-              <Flex
-                  background="page"
-                  radius={undefined}
-                  bottomRadius="l"
-                  topRadius='l'
-                  overflow="hidden"
-                  position="relative"
-                  fillWidth
-                  alignItems="center"
-                  border="neutral-medium"
-                  mobileDirection='column'
-                  key={`${activity.id}flex0`}
-                  onClick={() => populateActivity(activity)}
-                  // onDoubleClick={() => populateActivity(activity)}
-                >
-                  {/* <MediaUpload
-                    border={undefined}
-                    emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
-                    position="relative"
-                    aspectRatio="16 / 9"
-                    sizes="l"
+            <RevealFx translateY="16" delay={0.6} key={`${activity.id}rfx`}>
+              {/* <TiltFx fillWidth paddingX="32" paddingTop="4" key={`${activity.id}fx`}> */}
+                <Flex
+                    background="page"
                     radius={undefined}
-                    initialPreviewImage={activity.image ? poopGetImageUrl(activity.image) : ""}
-                    key={`${activity.id}mu`}
-                    onFileUpload={handleUploadData}
-                  ></MediaUpload> */}
-                  <SmartImage
-                    src={urls[activities.indexOf(activity)]}
-                    aspectRatio="16/9"
-                    radius="l"
-                    objectFit="cover"
-                    sizes='s'
-                  />
-                  <Column
-                    // paddingTop="160"
-                    paddingX="16"
-                    paddingBottom="16"
-                    fillWidth
+                    bottomRadius="l"
+                    topRadius='l'
+                    overflow="hidden"
                     position="relative"
-                    alignItems="flex-start"
-                    justifyContent="flex-start"
-                    overflow='hidden'
-                    // marginTop="xl"
-                    gap="0"
-                    key={`${activity.id}c0`}
+                    fillWidth
+                    alignItems="center"
+                    border="neutral-medium"
+                    mobileDirection='column'
+                    key={`${activity.id}flex0`}
+                    // onClick={() => populateActivity(activity)}
+                    // onDoubleClick={() => populateActivity(activity)}
                   >
-                    <Heading marginTop="xs" variant="heading-default-xs" key={`${activity.id}h0`}>
-                      {activity.name}
-                    </Heading>
-                    <Row>
-                      {(activity.categories ?? []).map((tag) => (
-                        // <Text align="center" onBackground="accent-medium" variant='body-default-xs' key={`${activity.categories?.indexOf(tag)}tag`} >
-                        //   - {tag}, 
-                        // </Text>
-                        // {const tagString = tag.toString()}
-                        <Tag
-                          key={`${activity.categories?.indexOf(tag)}tag`}
-                          label={tag?.toString()}
-                          size="s"
-                          variant="info"
-                          />
-                      ))}
-                    </Row>
-                    {/* <Text align="center" onBackground="neutral-weak" marginBottom="2" variant='body-default-xs' key={`${activity.id}t0`}>
-                      Outdoors, Other
-                    </Text> */}
-                    <Text align="left" onBackground="neutral-medium" variant='body-default-xs' key={`${activity.id}t1`}>
-                      {activity.description}
-                    </Text>
-                  </Column>
-                </Flex>
-              </TiltFx>
+                    {/* <MediaUpload
+                      border={undefined}
+                      emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
+                      position="relative"
+                      aspectRatio="16 / 9"
+                      sizes="l"
+                      radius={undefined}
+                      initialPreviewImage={activity.image ? poopGetImageUrl(activity.image) : ""}
+                      key={`${activity.id}mu`}
+                      onFileUpload={handleUploadData}
+                    ></MediaUpload> */}
+                    
+                    <SmartImage
+                      src={urls[activities.indexOf(activity)]}
+                      aspectRatio="16/9"
+                      radius="l"
+                      objectFit="cover"
+                      sizes='s'
+                    />
+                    <Column
+                      // paddingTop="160"
+                      paddingX="16"
+                      paddingBottom="16"
+                      fillWidth
+                      position="relative"
+                      alignItems="flex-start"
+                      justifyContent="flex-start"
+                      overflow='hidden'
+                      // marginTop="xl"
+                      gap="0"
+                      key={`${activity.id}c0`}
+                    >
+                      <Heading marginTop="xs" variant="heading-default-xs" key={`${activity.id}h0`}>
+                        {activity.name}
+                      </Heading>
+                      <Row>
+                        {(activity.categories ?? []).map((tag) => (
+                          // <Text align="center" onBackground="accent-medium" variant='body-default-xs' key={`${activity.categories?.indexOf(tag)}tag`} >
+                          //   - {tag}, 
+                          // </Text>
+                          // {const tagString = tag.toString()}
+                          <Tag
+                            key={`${activity.categories?.indexOf(tag)}tag`}
+                            label={tag?.toString()}
+                            size="s"
+                            variant="info"
+                            />
+                        ))}
+                      </Row>
+                      {/* <Text align="center" onBackground="neutral-weak" marginBottom="2" variant='body-default-xs' key={`${activity.id}t0`}>
+                        Outdoors, Other
+                      </Text> */}
+                      <Text align="left" onBackground="neutral-medium" variant='body-default-xs' key={`${activity.id}t1`}>
+                        {activity.description}
+                      </Text>
+                    </Column>
+                    <Flex position="absolute" justifyContent='flex-end' fillHeight fillWidth padding="4" zIndex={9}>
+                      <Flex fillHeight justifyContent="flex-start" direction="column">
+                        <IconButton
+                          onClick={() => populateActivity(activity)}
+                          // name="HiOutlinePencil"
+                          icon="edit"
+                          size="m"
+                          variant="tertiary"
+                          // onBackground="brand-weak"
+                        ></IconButton>
+                      </Flex>
+                    </Flex>
+                  </Flex>
+                {/* </TiltFx> */}
+              </RevealFx>
               
             ))}
             {/* <TiltFx fillWidth paddingX="32" paddingTop="64">

@@ -9,7 +9,7 @@ import {
   LatestInvoicesSkeleton,
   CardsSkeleton,
 } from '@/app/ui/skeletons';
-import styles from '@/app/dashboard/styles.module.css';
+import styles from '@/app/dashboard/(overview)/styles.module.css';
 import robday from '@/public/robday.jpeg';
 import robdaycropblur from '@/public/robdaycropblur.jpeg';
 
