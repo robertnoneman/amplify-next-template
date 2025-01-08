@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { roboto } from '@/app/ui/fonts';
+import { Flex, ToggleButton } from "@/once-ui/components"
 
 interface TimeLeft {
   days: number;
@@ -71,41 +72,87 @@ export default function CountdownToMonday() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-0" suppressHydrationWarning>
-      <h1 className={`${roboto.className} text-white mb-0 text-xl md:text-2xl`}>The next Robday is in</h1>
-      <div className={`${roboto.className} text-white flex space-x-4`}>
-        <div className={`text-center`}>
-            {isClient ?
-            <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.days}</div>
-            : <div className="text-3xl font-bold">0</div>
-            }
-          <div className="text-sm">Days</div>
-        </div>
-        <div className="text-center">
-            {isClient ?
-            <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.hours}</div>
-            :
-            <div className="text-3xl font-bold">0</div>
-            }
-          <div className="text-sm">Hours</div>
-        </div>
-        <div className="text-center">
-            {isClient ?
-            <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.minutes}</div>
-            :
-            <div className="text-3xl font-bold">0</div>
-            }
-          <div className="text-sm">Minutes</div>
-        </div>
-        <div className="text-center">
-            {isClient ?
-            <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.seconds}</div>
-            :
-            <div className="text-3xl font-bold">0</div>
-            }
-          <div className="text-sm">Seconds</div>
-        </div>
-      </div>
-    </div>
+    <Flex fillWidth justifyContent="center" alignItems="center" width={8}>
+        <Flex
+          paddingX="12"
+          justifyContent="flex-end" 
+          alignItems="center"
+          textVariant="body-default-xs"
+          direction="column"
+          overflow="hidden"
+          // maxHeight={1}
+          gap="-1">
+            <Flex hide="m" fillWidth minWidth={8} justifyContent="space-around" style={{fontSize: "9px"}} >
+              <div className="hidden md:flex">
+                THE NEXT ROBDAY IS IN
+              </div>
+            </Flex>
+            <Flex justifyContent="space-evenly" fillWidth>
+              <Flex direction="column" gap="-1" alignItems="center" justifyContent="flex-end" maxWidth={1}>
+                <Flex fillWidth justifyContent="center">0{timeLeft.days}</Flex>
+                <div className="hidden md:flex">
+                  <Flex style={{fontSize: "8px"}}>{timeLeft.days > 1 ? `days` : "day"}</Flex>
+                </div>
+              </Flex>
+              :
+              <Flex direction="column" gap="-1" alignItems="center" justifyContent="flex-end"  maxWidth={1}>
+                <Flex fillWidth alignItems="center" justifyContent="center">{timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}</Flex>
+                <div className="hidden md:flex">
+                  <Flex style={{fontSize: "8px"}}>{timeLeft.hours > 1 ? "hours" : "hour"}</Flex>
+                </div>
+              </Flex>
+              :
+              <Flex direction="column" gap="-1" alignItems="center" justifyContent="flex-end" maxWidth={1}>
+                <Flex fillWidth justifyContent="center">{timeLeft.minutes < 10 ? `0${timeLeft.minutes}` : timeLeft.minutes}</Flex>
+                <div className="hidden md:flex">
+                  <Flex style={{fontSize: "8px"}} alignItems="flex-start">min</Flex>
+                </div>
+              </Flex>
+              :
+              <Flex direction="column" gap="-1" alignItems="center" justifyContent="flex-end" maxWidth={1}>
+                <Flex fillWidth justifyContent="center">{timeLeft.seconds < 10 ? `0${timeLeft.seconds}` : timeLeft.seconds}</Flex>
+                <div className="hidden md:flex">
+                  <Flex style={{fontSize: "8px"}}>sec</Flex>
+                </div>
+              </Flex>
+            </Flex>
+      </Flex>
+    </Flex>
+//     <div className="flex flex-col items-center justify-center space-y-0" suppressHydrationWarning>
+//       <h1 className={`${roboto.className} text-white mb-0 text-xl md:text-2xl`}>The next Robday is in</h1>
+//       <div className={`${roboto.className} text-white flex space-x-4`}>
+//         <div className={`text-center`}>
+//             {isClient ?
+//             <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.days}</div>
+//             : <div className="text-3xl font-bold">0</div>
+//             }
+//           <div className="text-sm">Days</div>
+//         </div>
+//         <div className="text-center">
+//             {isClient ?
+//             <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.hours}</div>
+//             :
+//             <div className="text-3xl font-bold">0</div>
+//             }
+//           <div className="text-sm">Hours</div>
+//         </div>
+//         <div className="text-center">
+//             {isClient ?
+//             <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.minutes}</div>
+//             :
+//             <div className="text-3xl font-bold">0</div>
+//             }
+//           <div className="text-sm">Minutes</div>
+//         </div>
+//         <div className="text-center">
+//             {isClient ?
+//             <div className="text-3xl font-bold" suppressHydrationWarning>{timeLeft.seconds}</div>
+//             :
+//             <div className="text-3xl font-bold">0</div>
+//             }
+//           <div className="text-sm">Seconds</div>
+//         </div>
+//       </div>
+//     </div>
   );
 }

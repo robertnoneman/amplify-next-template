@@ -236,7 +236,7 @@ export default function Page() {
           fillWidth
           blur={0.25}
         />
-        <Row position="fixed" top="0" fillWidth justifyContent="center" zIndex={3}>
+        {/* <Row position="fixed" top="0" fillWidth justifyContent="center" zIndex={3}>
           <Row
             data-border="rounded"
             justifyContent="space-between"
@@ -266,7 +266,7 @@ export default function Page() {
               <StyleOverlay top="20" right="24" />
             </Row>
           </Row>
-        </Row>
+        </Row> */}
         <h2 className={`${roboto.className} text-xl text-gray-50 md:text-3xl md:leading-normal`}>Robday Activity List</h2>
         <button className={`${styles.button}`} onClick={createTodo}>+ new</button>
         {/* <div className={`${styles.ul} ${roboto.className} `}> */}

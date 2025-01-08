@@ -4,6 +4,7 @@ import "@/once-ui/tokens/index.scss";
 import classNames from "classnames";
 import { headers } from "next/headers";
 import { Metadata } from "next";
+import { Header } from "@/app/ui/header";
 
 import { baseURL, style, meta, og, schema, social } from "@/once-ui/resources/config";
 
@@ -110,6 +111,11 @@ const schemaData = {
                 height: "0.25rem",
               }}
             />
+            <Flex
+						  fillWidth
+						  minHeight="16">
+					  </Flex>
+            <Header />
             {children}
           </Flex>
         </ToastProvider>
