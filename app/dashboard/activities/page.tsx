@@ -364,7 +364,7 @@ export default function Page() {
           {activities.map((activity) => (
             <RevealFx translateY="16" delay={0.6} key={`${activity.id}rfx`}>
               {/* <TiltFx fillWidth paddingX="32" paddingTop="4" key={`${activity.id}fx`}> */}
-                <Flex
+                <Row
                     background="page"
                     radius={undefined}
                     bottomRadius="l"
@@ -435,8 +435,8 @@ export default function Page() {
                         {activity.description}
                       </Text>
                     </Column>
-                    <Flex position="absolute" justifyContent='flex-end' fillHeight fillWidth padding="4" zIndex={9}>
-                      <Flex fillHeight justifyContent="flex-start" direction="column">
+                    <Row position="absolute" justifyContent='flex-end' fillHeight fillWidth padding="4" zIndex={9}>
+                      <Column fillHeight justifyContent="flex-start" direction="column">
                         <IconButton
                           onClick={() => populateActivity(activity)}
                           // name="HiOutlinePencil"
@@ -445,9 +445,9 @@ export default function Page() {
                           variant="tertiary"
                           // onBackground="brand-weak"
                         ></IconButton>
-                      </Flex>
-                    </Flex>
-                  </Flex>
+                      </Column>
+                    </Row>
+                </Row>
                 {/* </TiltFx> */}
               </RevealFx>
               

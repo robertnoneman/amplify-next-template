@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { act, useEffect, useState } from "react";
 
 import {
   Heading,
@@ -48,6 +48,15 @@ import clsx from 'clsx';
 import { roboto } from '@/app/ui/fonts';
 import { usePathname } from 'next/navigation';
 import { getNextRobDay } from "@/app/lib/utils";
+import { Amplify } from "aws-amplify";
+import { generateClient } from "aws-amplify/data";
+import type { Schema } from "@/amplify/data/resource";
+import outputs from "@/amplify_outputs.json"
+import { getUrl } from 'aws-amplify/storage';
+
+Amplify.configure(outputs);
+
+const client = generateClient<Schema>();
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', current: true },
@@ -68,11 +77,42 @@ export default function Page() {
   const [password, setPassword] = useState("");
   const [tags, setTags] = useState<string[]>(["UX / UI", "Design systems", "AI / ML"]);
   const [twoFA, setTwoFA] = useState(false);
+  const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
+  const [selectedActivities, setSelectedActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
+  const [urls, setUrls] = useState<Array<string>>([]);
 
   const handleSelect = (value: string) => {
     console.log("Selected option:", value);
     setSelectedValue(value);
   };
+
+  const getImageUrl = async (key: string): Promise<string> => {
+    const url = getUrl({
+        path: key
+    });
+      return (await url).url.toString();
+    }
+
+  function listActivities() {
+    client.models.Activity.observeQuery().subscribe({
+      next: async (data) => {
+        setActivities([...data.items]);
+        const urls = await Promise.all(data.items.map(async (activity) => {
+          if (activity.image && activity.isOnNextRobDay) {
+            return await getImageUrl(activity.image);
+          }
+          return "";
+        }));
+        setUrls(urls);
+        const selected = data.items.filter((activity) => activity.isOnNextRobDay);
+        setSelectedActivities(selected);
+      },
+    })
+  }
+
+  useEffect(() => {
+    listActivities();
+  }, []);
 
   const pathname = usePathname();
   return (
@@ -191,12 +231,6 @@ export default function Page() {
             }}
           />
           <Column fillWidth alignItems="center" gap="32" padding="32" position="relative">
-            {/* <InlineCode radius="xl" shadow="m" fit paddingX="16" paddingY="8">
-              Start by editing
-              <Text onBackground="brand-medium" marginLeft="8">
-                app/page.tsx
-              </Text>
-            </InlineCode> */}
             <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
               On the next Robday...
             </Heading>
@@ -210,21 +244,6 @@ export default function Page() {
             mobileDirection="column"
             alignItems="center"
           >
-            {/* <Background
-              fill
-              position="absolute"
-              gradient={{
-                display: true,
-                opacity: 10,
-                tilt: 0,
-                height: 100,
-                width: 100,
-                x: 50,
-                y: 0,
-                colorStart: "brand-solid-strong",
-                colorEnd: "static-transparent",
-              }}
-            /> */}
             <Column
               fillWidth
               background="surface"
@@ -248,119 +267,193 @@ export default function Page() {
               </Row>
             </Column>
           </Row>
-          {/* <Card fillWidth> */}
-            <Row
-              fillWidth 
-              transition="macro-medium"
+
+          {/* AGENDA CARD */}
+          <Row
+            fillWidth 
+            transition="macro-medium"
+            padding="32"
+            gap="64"
+            position="relative"
+            overflow="hidden"
+          >
+            <Column
+              background="brand-weak"
+              // direction="column"
+              // overflow="hidden"
               padding="32"
-              gap="64"
-              position="relative"
-            >
-              <Column
-                background="accent-alpha-weak"
-                // direction="column"
-                overflow="hidden"
-                padding="32"
-                gap="40"
-                border="neutral-medium"
-                radius="xl"
+              gap="20"
+              border="neutral-medium"
+              radius="xl"
+              fillWidth
+              fillHeight>
+              <Line height={0.25}/>
+              <Heading variant="display-default-m" align="center">
+                ROBDAY AGENDA
+              </Heading>
+              <Line height={0.25}/>
+              <Row fillWidth justifyContent="space-between">
+                <DateInput
+                  id="date-input"
+                  label="Date"
+                  value={getNextRobDay()}>
+                </DateInput>
+                <Icon
+                  name="calendarDays"
+                  size="l"
+                  onBackground="neutral-medium"
+                />
+              </Row>
+
+              <Line height={0.1}/>
+              <Line height={0.1}/>
+              {selectedActivities.map((activity, index) => (
+                <Row 
                 fillWidth
-                >
-                <Row fillWidth justifyContent="space-between">
-                  <DateInput
-                    id="date-input"
-                    label="Date"
-                    value={getNextRobDay()}>
-                  </DateInput>
-                  <Icon
-                    name="calendarDays"
-                    size="l"
-                    onBackground="neutral-medium"
-                  />
-                </Row>
-                <Heading variant="display-default-m">
-                  Activities
-                </Heading>
-                <Line/>
-                <Row 
-                  fillWidth
-                  padding="32"
-                  gap="64"
-                  position="relative"
-                  // border="brand-medium"
-                  // radius="l"
-                >
-                  <Background
-                    mask={{
-                      cursor: true
-                    }}
-                    position="absolute"
-                    border="brand-alpha-weak"
-                    radius="xl"
-                    gradient={{
-                      colorEnd: 'static-transparent',
-                      colorStart: 'accent-solid-strong',
-                      display: true,
-                      height: 100,
-                      opacity: 50,
-                      tilt: 0,
-                      width: 150,
-                      x: 0,
-                      y: 0
-                    }}
+                padding="xs"
+                gap="m"
+                position="relative"
+                // height="xs"
+                mobileDirection="column"
+                overflow="hidden"
+                radius={undefined}
+                key={`${activity.id}`}
+                // bottomRadius="l"
+                // topRadius='l'
+                // alignItems="center"
+                // overflow="scroll"
+                // border="brand-medium"
+                // background="page"
+                // radius="l"
+              >
+                <SmartImage
+                  // fitWidth
+                  src={urls[selectedActivities.indexOf(activity)]}
+                  alt="Robday"
+                  aspectRatio="16/9"
+                  objectFit="contain"
+                  sizes="xs"
+                  radius="xl"
+                  // maxHeight={15}
+                />
+                {/* <Column fillHeight fillWidth mobileDirection="row">
+                  <Row height={2}></Row>
+                  <Row height={2}></Row>
+                </Column> */}
+                <Column fillWidth >
+                  <Text
+                    padding="xs" align="left" onBackground="neutral-strong" variant="display-default-s"
                   >
-                    <Text
-                      padding="12" align="center" onBackground="neutral-strong" variant="body-default-xs"
-                    >
-                      Activity 1
-                    </Text>
-                  </Background>
-                </Row>
-                <Row 
-                  fillWidth
-                  padding="32"
-                  gap="64"
-                  position="relative"
-                  // border="brand-medium"
-                  // radius="l"
-                >
-                  <Background
-                    mask={{
-                      cursor: true
-                    }}
-                    position="absolute"
-                    border="brand-alpha-weak"
-                    radius="xl"
-                    gradient={{
-                      colorEnd: 'static-transparent',
-                      colorStart: 'accent-solid-strong',
-                      display: true,
-                      height: 100,
-                      opacity: 50,
-                      tilt: 0,
-                      width: 150,
-                      x: 0,
-                      y: 0
-                    }}
+                    {activity.name?.toUpperCase() ?? "ACTIVITY TBD"}
+                  </Text>
+                  <Text
+                    paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
                   >
-                    <Text
-                      padding="12" align="center" onBackground="info-strong" variant="body-default-xs"
-                    >
-                      Activity 2
-                    </Text>
-                  </Background>
-                </Row>
-                {/* <Skeleton
-                  shape="line"
-                  width="m"
-                  height="xl"/>
-                <Skeleton
-                  shape="line"
-                  width="m"
-                  height="xl"/> */}
-              </Column>
-              
-            </Row>
+                    {activity.location?.toUpperCase() ?? "LOCATION TBD"}
+                  </Text>
+                  <Text
+                    padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
+                  >
+                    {activity.description}
+                  </Text>
+                </Column>
+                {/* </Background> */}
+              </Row>
+              ))}
+              {/* <Row 
+                fillWidth
+                padding="xs"
+                gap="m"
+                position="relative"
+                // height="xs"
+                mobileDirection="column"
+                overflow="hidden"
+                radius={undefined}
+                // bottomRadius="l"
+                // topRadius='l'
+                // alignItems="center"
+                // overflow="scroll"
+                // border="brand-medium"
+                // background="page"
+                // radius="l"
+                >
+                <SmartImage
+                  // fitWidth
+                  src="/robday.jpeg"
+                  alt="Robday"
+                  aspectRatio="16/9"
+                  objectFit="contain"
+                  sizes="xs"
+                  radius="xl"
+                  // maxHeight={15}
+                />
+                {/* <Column fillHeight fillWidth mobileDirection="row">
+                  <Row height={2}></Row>
+                  <Row height={2}></Row>
+                </Column> */}
+                {/* <Column fillWidth >
+                  <Text
+                    padding="xs" align="left" onBackground="neutral-strong" variant="display-default-s"
+                  >
+                    ACTIVITY 1 TITLE
+                  </Text>
+                  <Text
+                    paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
+                  >
+                    LOCATION TBD
+                  </Text>
+                  <Text
+                    padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
+                  >
+                    Short description of activity 1. The goal here is to explain what the plan for this activity is. It should be informative and contain information.
+                  </Text>
+                </Column> */}
+              {/* </Row> */} 
+
+              <Line height={0.1}/>
+
+              {/* <Row 
+                fillWidth
+                padding="s"
+                gap="m"
+                position="relative"
+                // height="xs"
+                mobileDirection="column"
+                overflow="hidden"
+                // justifyContent="flex-start"
+                radius={undefined}
+                bottomRadius="l"
+                topRadius='l'
+              >
+                <Column fillWidth>
+                  <Text
+                    padding="xs" align="left" onBackground="neutral-strong" variant="display-default-s"
+                  >
+                    ACTIVITY 2 TITLE
+                  </Text>
+                  <Text
+                    paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
+                  >
+                    LOCATION ALSO TBD
+                  </Text>
+                  <Text
+                    padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
+                  >
+                    Short description of activity 2 that describes the activity, as if it were a description of it.
+                  </Text>
+                </Column>
+                <SmartImage
+                  src="/robdaycropblur.jpeg"
+                  alt="Robday"
+                  aspectRatio="16/9"
+                  objectFit="contain"
+                  sizes="xs"
+                  radius="xl"
+                />
+              </Row> */}
+
+            </Column>
+          </Row>
           {/* </Card> */}
         </Column>
       </Column>

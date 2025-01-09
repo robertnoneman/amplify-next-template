@@ -29,6 +29,7 @@ const schema = a.schema({
       cost: a.integer(),
       costMax: a.integer(),
       location: a.string(),
+      isOnNextRobDay: a.boolean(),
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 
