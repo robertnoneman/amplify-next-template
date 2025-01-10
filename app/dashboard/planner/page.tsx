@@ -177,6 +177,8 @@ export default function Page() {
     addedActivity ? client.models.Activity.update({ ...addedActivity }) : null;
     setAddedActivity(undefined);
     setIsAddActivityDialogOpen(false);
+    setSelectedValue("");
+    setSelectedValueLabel("Choose an activity");
   }
 
   function completeActivity() {
@@ -621,7 +623,7 @@ export default function Page() {
         >
           <Column >
             <Text variant="body-default-s">
-              Ability to add activity here coming soon...
+              Ability to add a new activity if it hasn't been created yet here coming soon...
             </Text>
             <Select
               searchable
