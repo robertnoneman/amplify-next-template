@@ -74,6 +74,7 @@ type ActivityType = Schema["Activity"]["type"];
 
 export default function Page() {
   const [selectedValue, setSelectedValue] = useState("");
+  const [selectedValueLabel, setSelectedValueLabel] = useState("Choose an activity");
   const [selectedRange, setSelectedRange] = useState<DateRange>();
   const [isFirstDialogOpen, setIsFirstDialogOpen] = useState(false);
   const [isSecondDialogOpen, setIsSecondDialogOpen] = useState(false);
@@ -95,10 +96,18 @@ export default function Page() {
   // const [urls, setUrls] = useState<Array<string>>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
 
-  const handleSelect = (value: string) => {
-    console.log("Selected option:", value);
-    setSelectedValue(value);
+  const handleSelect = (activity: Schema["Activity"]["type"]) => {
+    console.log("Selected option:", activity.name);
+    setSelectedValue(activity.name ?? "");
+    setSelectedValueLabel(activity.location ?? "");
+    setAddedActivity(activity);
   };
+
+  const printSelect = (value: string) => {
+    setSelectedValue(value);
+    setSelectedValueLabel(value);
+    console.log("Selected value:", value);
+  }
 
   const getImageUrl = async (key: string): Promise<string> => {
     const url = getUrl({
@@ -161,6 +170,13 @@ export default function Page() {
     editededActivity ? client.models.Activity.update({ ...editededActivity }) : null;
     setEditedActivity(undefined);
     setIsSecondDialogOpen(false);
+  }
+
+  function addActivity() {
+    addedActivity ? addedActivity.isOnNextRobDay = true : null;
+    addedActivity ? client.models.Activity.update({ ...addedActivity }) : null;
+    setAddedActivity(undefined);
+    setIsAddActivityDialogOpen(false);
   }
 
   function completeActivity() {
@@ -597,15 +613,32 @@ export default function Page() {
         // onHeightChange={(height) => setFirstDialogHeight(height)}
         footer={
           <>
-            <Button variant="secondary" onClick={() => editActivity()}>
+            <Button variant="secondary" onClick={() => addActivity()}>
               ADD
             </Button>
           </>
         }
-          >
-          <Text variant="body-default-s">
-            Ability to add activity here coming soon...
-          </Text>
+        >
+          <Column >
+            <Text variant="body-default-s">
+              Ability to add activity here coming soon...
+            </Text>
+            <Select
+              searchable
+              id="activity"
+              label={selectedValueLabel}
+              minHeight={300}
+              options={activities.map((activity) => {
+                return { value: activity.id, label: activity.name, description: activity.description }
+              })}
+              // onChange={(value) => setSelectedValue(activities.find((activity) => activity.id === value.target.value)?.id ?? "")}
+              // onChange={(value) => handleSelect(activities.find((activity) => activity.name === value.target.value ) ?? activities[0])}
+              // onSelect={(value) => printSelect(value)}
+              onSelect={(value) => handleSelect(activities.find((activity) => activity.id === value ) ?? activities[0])}
+              value={selectedValue}
+              // value=""
+            />
+          </Column>
         </Dialog>
         
     </Column>
