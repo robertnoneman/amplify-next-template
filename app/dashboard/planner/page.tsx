@@ -40,6 +40,7 @@ import {
   Flex,
   DateInput,
   Skeleton,
+  Arrow
 } from "@/once-ui/components";
 import { CodeBlock, MediaUpload } from "@/once-ui/modules";
 import Link from 'next/link';
@@ -65,11 +66,19 @@ const navigation = [
   { name: 'Archive', href: '#', current: false },
 ]
 
+interface Dictionarty {
+  activity: Schema["Activity"]["type"];
+  url: string;
+}
+type ActivityType = Schema["Activity"]["type"];
+
 export default function Page() {
   const [selectedValue, setSelectedValue] = useState("");
   const [selectedRange, setSelectedRange] = useState<DateRange>();
   const [isFirstDialogOpen, setIsFirstDialogOpen] = useState(false);
   const [isSecondDialogOpen, setIsSecondDialogOpen] = useState(false);
+  const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
+  const [isAddActivityDialogOpen, setIsAddActivityDialogOpen] = useState(false);
   const [firstDialogHeight, setFirstDialogHeight] = useState<number>();
   // const { addToast } = useToast();
   const [intro, setIntro] = useState("");
@@ -79,7 +88,12 @@ export default function Page() {
   const [twoFA, setTwoFA] = useState(false);
   const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
   const [selectedActivities, setSelectedActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
-  const [urls, setUrls] = useState<Array<string>>([]);
+  const [removedActivity, setRemovedActivity] = useState<Schema["Activity"]["type"]>();
+  const [editededActivity, setEditedActivity] = useState<Schema["Activity"]["type"]>();
+  const [completedActivity, setCompletedActivity] = useState<Schema["Activity"]["type"]>();
+  const [addedActivity, setAddedActivity] = useState<Schema["Activity"]["type"]>();
+  // const [urls, setUrls] = useState<Array<string>>([]);
+  const [urls, setUrls] = useState<Record<string, string>>({});
 
   const handleSelect = (value: string) => {
     console.log("Selected option:", value);
@@ -94,20 +108,68 @@ export default function Page() {
     }
 
   function listActivities() {
+    const urlDict: Record<string, string> = {};
     client.models.Activity.observeQuery().subscribe({
       next: async (data) => {
         setActivities([...data.items]);
         const urls = await Promise.all(data.items.map(async (activity) => {
           if (activity.image && activity.isOnNextRobDay) {
+            urlDict[activity.id] = await getImageUrl(activity.image);
             return await getImageUrl(activity.image);
           }
           return "";
         }));
-        setUrls(urls);
+        // setUrls(urls);
+        setUrls(urlDict);
         const selected = data.items.filter((activity) => activity.isOnNextRobDay);
         setSelectedActivities(selected);
       },
     })
+  }
+
+  function onRemoveActivity(activity: Schema["Activity"]["type"]) {
+    setRemovedActivity(activity);
+    setIsFirstDialogOpen(true);
+  }
+
+  function onEditActivity(activity: Schema["Activity"]["type"]) {
+    setEditedActivity(activity);
+    setIsSecondDialogOpen(true);
+  }
+
+  function onAddActivity(activity: Schema["Activity"]["type"]) {
+    setAddedActivity(activity);
+    addedActivity ? addedActivity.isOnNextRobDay = true : null;
+    addedActivity ? client.models.Activity.update({ ...addedActivity }) : null;
+    setAddedActivity(undefined);
+    // setIsSecondDialogOpen(true);
+  }
+
+  function onCompleteActivity(activity: Schema["Activity"]["type"]) {
+    setCompletedActivity(activity);
+    setIsCompleteDialogOpen(true);
+  }
+
+  function removeActivity() {
+    removedActivity ? removedActivity.isOnNextRobDay = false : null;
+    removedActivity ? client.models.Activity.update({ ...removedActivity }) : null;
+    setRemovedActivity(undefined);
+    setIsFirstDialogOpen(false);
+  }
+
+  function editActivity() {
+    editededActivity ? client.models.Activity.update({ ...editededActivity }) : null;
+    setEditedActivity(undefined);
+    setIsSecondDialogOpen(false);
+  }
+
+  function completeActivity() {
+    completedActivity ? completedActivity.isOnNextRobDay = false : null;
+    const newCount = completedActivity ? completedActivity.count ? completedActivity.count + 1 : completedActivity.count = 1 : 1;
+    completedActivity ? completedActivity.count? completedActivity.count = newCount : completedActivity.count = 1 : 1;
+    completedActivity ? client.models.Activity.update({ ...completedActivity }) : null;
+    setCompletedActivity(undefined);
+    setIsCompleteDialogOpen(false);
   }
 
   useEffect(() => {
@@ -307,156 +369,245 @@ export default function Page() {
 
               <Line height={0.1}/>
               <Line height={0.1}/>
-              {selectedActivities.map((activity, index) => (
-                <Row 
-                fillWidth
-                padding="xs"
-                gap="m"
-                position="relative"
-                // height="xs"
-                mobileDirection="column"
-                overflow="hidden"
-                radius={undefined}
-                key={`${activity.id}`}
-                // bottomRadius="l"
-                // topRadius='l'
-                // alignItems="center"
-                // overflow="scroll"
-                // border="brand-medium"
-                // background="page"
-                // radius="l"
-              >
-                <SmartImage
-                  // fitWidth
-                  src={urls[selectedActivities.indexOf(activity)]}
-                  alt="Robday"
-                  aspectRatio="16/9"
-                  objectFit="contain"
-                  sizes="xs"
-                  radius="xl"
-                  // maxHeight={15}
-                />
-                {/* <Column fillHeight fillWidth mobileDirection="row">
-                  <Row height={2}></Row>
-                  <Row height={2}></Row>
-                </Column> */}
-                <Column fillWidth >
-                  <Text
-                    padding="xs" align="left" onBackground="neutral-strong" variant="display-default-s"
+              
+              <Column>
+                {selectedActivities.map((activity, index) => (
+                  <Column key={`${activity.id}`}>
+                    <Row 
+                    fillWidth
+                    padding="xs"
+                    gap="m"
+                    position="relative"
+                    // height="xs"
+                    mobileDirection="column"
+                    overflow="hidden"
+                    radius={undefined}
+                    // key={`${activity.id}`}
+                    // bottomRadius="l"
+                    // topRadius='l'
+                    // alignItems="md:center"
+                    // overflow="scroll"
+                    // border="brand-medium"
+                    // background="page"
+                    // radius="l"
                   >
-                    {activity.name?.toUpperCase() ?? "ACTIVITY TBD"}
-                  </Text>
-                  <Text
-                    paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
-                  >
-                    {activity.location?.toUpperCase() ?? "LOCATION TBD"}
-                  </Text>
-                  <Text
-                    padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
-                  >
-                    {activity.description}
-                  </Text>
+                    <Flex
+                      border="brand-alpha-weak"
+                      position="relative"
+                      maxWidth={10}
+                      // aspectRatio={0.75}
+                      overflow="hidden"
+                    >
+                      <SmartImage
+                        // fitWidth
+                        // src={urls[selectedActivities.indexOf(activity)]}
+                        src={urls[activity.id]}
+                        alt="Robday"
+                        aspectRatio="16/9"
+                        objectFit="cover"
+                        sizes="xs"
+                        radius="xl"
+                        // maxHeight={15}
+                      />
+                      <Fade
+                        fillWidth
+                        position="absolute"
+                        top="0"
+                        to="bottom"
+                        height={1}
+                        zIndex={3}
+                        pattern={{
+                          display: true,
+                          size: '2'
+                        }}
+                      />
+                      <Fade
+                        fillWidth
+                        position="absolute"
+                        to="top"
+                        bottom="0"
+                        height={1}
+                        zIndex={3}
+                        pattern={{
+                          display: true,
+                          size: '2'
+                        }}
+                      />
+                      <Fade
+                        // fillWidth
+                        width={1}
+                        fillHeight
+                        position="absolute"
+                        to="left"
+                        // bottom="0"
+                        right="0"
+                        // height={12}
+                        zIndex={3}
+                        pattern={{
+                          display: true,
+                          size: '2'
+                        }}
+                      />
+                      <Fade
+                        // fillWidth
+                        width={1}
+                        fillHeight
+                        position="absolute"
+                        to="right"
+                        // bottom="0"
+                        left="0"
+                        // height={12}
+                        zIndex={3}
+                        pattern={{
+                          display: true,
+                          size: '2'
+                        }}
+                      />
+                    </Flex>
+                    <Column fillWidth >
+                      <Text
+                        padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs"
+                      >
+                        {activity.name?.toUpperCase() ?? "ACTIVITY TBD"}
+                      </Text>
+                      <Text
+                        paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
+                      >
+                        {activity.location?.toUpperCase() ?? "LOCATION TBD"}
+                      </Text>
+                      <Line/>
+                      <Text
+                        padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
+                      >
+                        {activity.description}
+                      </Text>
+                    </Column>
+                    <Column justifyContent="space-evenly" mobileDirection="row" background="neutral-alpha-weak" border="neutral-alpha-medium" radius="s">
+                      <IconButton
+                        icon="close"
+                        onClick={() => onRemoveActivity(activity)}
+                        variant="tertiary"
+                        size="s"
+                        />
+                        <IconButton
+                          icon="edit"
+                          onClick={() => setIsSecondDialogOpen(true)}
+                          variant="tertiary"
+                          size="s"
+                        />
+                        <IconButton
+                          icon="check"
+                          onClick={() => onCompleteActivity(activity)}
+                          variant="tertiary"
+                          size="s"
+                          />
+                      </Column>
+                    {/* </Background> */}
+                  </Row>
+                  <Line height={0.1}/>
                 </Column>
-                {/* </Background> */}
-              </Row>
-              ))}
-              {/* <Row 
-                fillWidth
-                padding="xs"
-                gap="m"
-                position="relative"
-                // height="xs"
-                mobileDirection="column"
-                overflow="hidden"
-                radius={undefined}
-                // bottomRadius="l"
-                // topRadius='l'
-                // alignItems="center"
-                // overflow="scroll"
-                // border="brand-medium"
-                // background="page"
-                // radius="l"
+                ))}
+              </Column>
+              <Row fillWidth justifyContent="center">
+                <Button
+                  onClick={() => setIsAddActivityDialogOpen(true)}
+                  variant="tertiary"
+                  size="m"
+                  id="trigger"
                 >
-                <SmartImage
-                  // fitWidth
-                  src="/robday.jpeg"
-                  alt="Robday"
-                  aspectRatio="16/9"
-                  objectFit="contain"
-                  sizes="xs"
-                  radius="xl"
-                  // maxHeight={15}
-                />
-                {/* <Column fillHeight fillWidth mobileDirection="row">
-                  <Row height={2}></Row>
-                  <Row height={2}></Row>
-                </Column> */}
-                {/* <Column fillWidth >
-                  <Text
-                    padding="xs" align="left" onBackground="neutral-strong" variant="display-default-s"
-                  >
-                    ACTIVITY 1 TITLE
-                  </Text>
-                  <Text
-                    paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
-                  >
-                    LOCATION TBD
-                  </Text>
-                  <Text
-                    padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
-                  >
-                    Short description of activity 1. The goal here is to explain what the plan for this activity is. It should be informative and contain information.
-                  </Text>
-                </Column> */}
-              {/* </Row> */} 
-
-              <Line height={0.1}/>
-
-              {/* <Row 
-                fillWidth
-                padding="s"
-                gap="m"
-                position="relative"
-                // height="xs"
-                mobileDirection="column"
-                overflow="hidden"
-                // justifyContent="flex-start"
-                radius={undefined}
-                bottomRadius="l"
-                topRadius='l'
-              >
-                <Column fillWidth>
-                  <Text
-                    padding="xs" align="left" onBackground="neutral-strong" variant="display-default-s"
-                  >
-                    ACTIVITY 2 TITLE
-                  </Text>
-                  <Text
-                    paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
-                  >
-                    LOCATION ALSO TBD
-                  </Text>
-                  <Text
-                    padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
-                  >
-                    Short description of activity 2 that describes the activity, as if it were a description of it.
-                  </Text>
-                </Column>
-                <SmartImage
-                  src="/robdaycropblur.jpeg"
-                  alt="Robday"
-                  aspectRatio="16/9"
-                  objectFit="contain"
-                  sizes="xs"
-                  radius="xl"
-                />
-              </Row> */}
+                <Flex justifyContent="center" alignItems="center">
+                  ADD NEW ACTIVITY
+                  <Arrow
+                    trigger="#trigger"
+                    color="onBackground"
+                  />
+                </Flex>
+                </Button>
+              </Row>
 
             </Column>
           </Row>
           {/* </Card> */}
         </Column>
       </Column>
+      
+      <Dialog
+        isOpen={isFirstDialogOpen}
+        onClose={() => setIsFirstDialogOpen(false)}
+        title="Remove Robday Activity?"
+        description=""
+        onHeightChange={(height) => setFirstDialogHeight(height)}
+        style={{marginBottom: "50%"}}
+        justifyContent="center"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => removeActivity()}>
+              REMOVE
+            </Button>
+          </>
+        }
+          >
+          <Text variant="body-default-s">
+            Are you sure you want to remove this activity from the Robday agenda?
+          </Text>  
+        </Dialog>
+        <Dialog
+        isOpen={isSecondDialogOpen}
+        onClose={() => setIsSecondDialogOpen(false)}
+        title="Edit Robday Activity"
+        description=""
+        // onHeightChange={(height) => setFirstDialogHeight(height)}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => editActivity()}>
+              UPDATE
+            </Button>
+          </>
+        }
+          >
+          <Text variant="body-default-s">
+            Ability to edit activity here coming soon...
+          </Text>  
+        </Dialog>
+        <Dialog
+        isOpen={isCompleteDialogOpen}
+        onClose={() => setIsCompleteDialogOpen(false)}
+        title="Mark Robday Activity as Complete?"
+        description=""
+        style={{marginBottom: "50%"}}
+        // onHeightChange={(height) => setFirstDialogHeight(height)}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => completeActivity()}>
+              COMPLETE
+            </Button>
+          </>
+        }
+          >
+          <Text variant="body-default-s">
+            Are you sure you want to mark this activity as complete?
+          </Text>
+        </Dialog>
+        <Dialog
+        isOpen={isAddActivityDialogOpen}
+        onClose={() => setIsAddActivityDialogOpen(false)}
+        title="Add Robday Activity"
+        description=""
+        style={{marginBottom: "50%"}}
+        // onHeightChange={(height) => setFirstDialogHeight(height)}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => editActivity()}>
+              ADD
+            </Button>
+          </>
+        }
+          >
+          <Text variant="body-default-s">
+            Ability to add activity here coming soon...
+          </Text>
+        </Dialog>
+        
     </Column>
   );
 }

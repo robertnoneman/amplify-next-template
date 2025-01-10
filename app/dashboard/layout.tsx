@@ -13,10 +13,17 @@ import { Background, Flex, ToastProvider } from "@/once-ui/components";
 import { Inter } from "next/font/google";
 import { Raleway, Roboto_Mono, Roboto } from "next/font/google";
 
-const primary = Inter({
-  variable: "--font-primary",
-  subsets: ["latin"],
-  display: "swap",
+// const primary = Inter({
+//   variable: "--font-primary",
+//   subsets: ["latin"],
+//   display: "swap",
+// });
+
+const primary = Roboto({
+  variable: '--font-primary',
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['100']
 });
 
 const code = Roboto_Mono({
