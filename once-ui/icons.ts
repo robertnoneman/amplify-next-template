@@ -29,7 +29,8 @@ import {
   HiOutlineShieldCheck,
   HiOutlineSparkles,
   HiOutlinePencil,
-  HiOutlineCalendarDays
+  HiOutlineCalendarDays,
+  HiOutlineTrophy
 } from "react-icons/hi2";
 
 import {
@@ -37,7 +38,9 @@ import {
 	PiUserCircleDuotone,
 	PiGridFourDuotone,
 	PiBookBookmarkDuotone,
-	PiImageDuotone
+	PiImageDuotone,
+  PiNotebookDuotone,
+  PiTrendUpDuotone,
 } from "react-icons/pi";
 
 import { RiVisaLine } from "react-icons/ri";
@@ -82,5 +85,8 @@ export const iconLibrary: Record<string, IconType> = {
   home: PiHouseDuotone,
   grid: PiGridFourDuotone,
   book: PiBookBookmarkDuotone,
-  edit: HiOutlinePencil
+  edit: HiOutlinePencil,
+  game: HiOutlineTrophy,
+  notebook: PiNotebookDuotone,
+  trendUp: PiTrendUpDuotone,
 };

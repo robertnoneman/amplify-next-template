@@ -14,6 +14,7 @@ export const Header = () => {
         '/work':    true,
         '/blog':    true,
         '/gallery': true,
+        '/games': true,
     }
 
     return (
@@ -90,10 +91,20 @@ export const Header = () => {
                             { routes['/gallery'] && (
                                 <ToggleButton
                                     prefixIcon="gallery"
-                                    href={`/${params?.locale}/gallery`}
+                                    href={`/dashboard/gallery`}
                                     selected={pathname.startsWith('/gallery')}>
                                         <Flex paddingX="2" hide="s">
                                             Gallery
+                                        </Flex>
+                                </ToggleButton>
+                            )}
+                            { routes['/games'] && (
+                                <ToggleButton
+                                    prefixIcon="game"
+                                    href={`/dashboard/games`}
+                                    selected={pathname.startsWith('/games')}>
+                                        <Flex paddingX="2" hide="s">
+                                            Games
                                         </Flex>
                                 </ToggleButton>
                             )}

@@ -34,7 +34,7 @@ const Sidebar: React.FC = ({}) => {
           </Text>
           <ToggleButton fillWidth justifyContent="flex-start" href="" selected={true}>
             <Flex padding="4" alignItems="center" gap="12" textVariant="label-default-s">
-              <Icon name="PiHouseDuotone" onBackground="neutral-weak" size="xs" />
+              <Icon name="home" onBackground="neutral-weak" size="xs" />
               Home
             </Flex>
           </ToggleButton>
@@ -45,7 +45,7 @@ const Sidebar: React.FC = ({}) => {
             selected={pathname === "analytics"}
           >
             <Flex padding="4" alignItems="center" gap="12" textVariant="label-default-s">
-              <Icon name="PiTrendUpDuotone" onBackground="neutral-weak" size="xs" />
+              <Icon name="trendUp" onBackground="neutral-weak" size="xs" />
               Analytics
             </Flex>
           </ToggleButton>
@@ -60,7 +60,7 @@ const Sidebar: React.FC = ({}) => {
             selected={pathname === "reports"}
           >
             <Flex padding="4" alignItems="center" gap="12" textVariant="label-default-s">
-              <Icon name="PiNotebookDuotone" onBackground="neutral-weak" size="xs" />
+              <Icon name="notebook" onBackground="neutral-weak" size="xs" />
               Reports
               <Flex
                 position="absolute"
