@@ -55,7 +55,7 @@ export default function Page() {
             
             <Column justifyContent="flex-start" paddingX="24">
               <Text variant="body-strong-l" align="left">
-                1. Cointoss
+                1. COINTOSS
               </Text>
               <Text variant="body-default-m" align="left">
                 - Both players stand behind the throwline side by side. <br/> 
@@ -80,7 +80,7 @@ export default function Page() {
             
             <Column justifyContent="flex-start" paddingX="24">
               <Text variant="body-strong-l" align="left">
-                2. Kickoff / Punting
+                2. {"Kickoff / Punting".toUpperCase()}
               </Text>
               <Text variant="body-default-m" align="left">
                 - Kicking team can throw up to 3 darts. <br/>
@@ -118,11 +118,14 @@ export default function Page() {
               >
             </SmartImage> */}
           </Row>
+
+          <Line height={0.2} background="neutral-alpha-strong"/>
+
           <Row gap="24" mobileDirection="column">
             
             <Column justifyContent="flex-start" paddingX="24">
               <Text variant="body-strong-l" align="left">
-                3. Offense
+                3. {"Offense".toUpperCase()}
               </Text>
               <Text variant="body-default-m" align="left">
                 The offensive team starts at the yard line determined by the kickoff. <br/>
@@ -154,11 +157,14 @@ export default function Page() {
               >
             </SmartImage> */}
           </Row>
+          
+          <Line height={0.2} background="neutral-alpha-strong"/>
+
           <Row gap="24" mobileDirection="column">
             
             <Column justifyContent="flex-start" paddingX="24">
               <Text variant="body-strong-l" align="left">
-                4. Defense
+                4. {"Defense".toUpperCase()}
               </Text>
               <Text variant="body-default-m" align="left">
                 The offensive team throws a dart that misses any point value on the board, but does still stick to the board, this triggers a potential sack play <br/>
@@ -184,11 +190,14 @@ export default function Page() {
               >
             </SmartImage> */}
           </Row>
+
+          <Line height={0.2} background="neutral-alpha-strong"/>
+
           <Row gap="24" mobileDirection="column">
             
             <Column justifyContent="flex-start" paddingX="24">
               <Text variant="body-strong-l" align="left">
-                5. Scoring
+                5. {"Scoring".toUpperCase()}
               </Text>
               <Text variant="body-strong-m" align="left">
                 Field Goals
@@ -202,22 +211,37 @@ export default function Page() {
                 Touchdowns
               </Text>
               <Text variant="body-default-m" align="left">
-                Once the offensive team is in field goal range, they can also score a touchdown by hitting:
-                a triple 7 if they are on their opponents 30 yard line, <br/>
-                a double (or triple) 7 if they are on their opponents 20 yard line, or <br/>
-                a single (or double or triple) 7 if they are on their opponents 10 yard line. <br/>
+                Once the offensive team is in field goal range, they can also score a touchdown by hitting: <br/>
+                - a triple 7 if they are on their opponents 30 yard line, <br/>
+                - a double (or triple) 7 if they are on their opponents 20 yard line, or <br/>
+                - a single (or double or triple) 7 if they are on their opponents 10 yard line. <br/>
                 <br/>
+                </Text>
+                <Text variant="body-strong-m" align="left">
+                Extra Point / 2 Point Conversion
+              </Text>
+              <Text variant="body-default-m" align="left">
+                - Extra points are automatic. <br/>
+                - - If the offsensive team so chooses, they can forego the automatic extra point and attempt a 2 point conversion by hitting the 2 on the dartboard. <br/>
+              </Text>
+              <br/>
+                <Text variant="body-strong-m" align="left">
+                Special Rules
+              </Text>
+              <Text variant="body-default-m" align="left">
+                Regardless of their field position, the offensive team can score a touchdown from any part of the field on any down by hitting a double bullseye. <br/>
                 <br/>
-                Regardless of their field position, the offensive team can score a touchdown from any part of the field by hitting a double bullseye. <br/>
-                They can also achieve a first down by hitting a single bullseye (unless they are on their opponents 10 or less, in which case a single bullseye would be a touchdown). <br/>
+                They can also achieve a first down by hitting a single bullseye (unless they are on their opponent's 10 or less, in which case a single bullseye would be a touchdown). <br/>
                 </Text>
             </Column>
           </Row>
-            <Row gap="24" mobileDirection="column">
-            
+
+          <Line height={0.2} background="neutral-alpha-strong"/>
+
+          <Row gap="24" mobileDirection="column">
             <Column justifyContent="flex-start" paddingX="24">
               <Text variant="body-strong-l" align="left">
-                6. Game Duration
+                6. {"Game Duration".toUpperCase()}
               </Text>
               <Text variant="body-default-m" align="left">
                 - There are 4 quarters in a game, and each team gets 2 offensive possessions per quarter. <br/>
@@ -234,6 +258,30 @@ export default function Page() {
               >
             </SmartImage> */}
           </Row>
+
+          <Line height={0.2} background="neutral-alpha-strong"/>
+          
+          <Row gap="24" mobileDirection="column">
+            <Column justifyContent="flex-start" paddingX="24">
+              <Text variant="body-strong-l" align="left">
+                7. {"Onside Kicks".toUpperCase()}
+              </Text>
+              <Text variant="body-default-m" align="left">
+                - Remember how this works?<br/>
+              </Text>
+            </Column>
+            {/* <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+              <Dartboard />
+            </Row> */}
+            {/* <SmartImage
+              style={{width: "50%"}}
+              alt="Darts"
+              aspectRatio="1 / 1"
+              src="/dartboard.png"
+              >
+            </SmartImage> */}
+          </Row>
+
         </Column>
         <Button
           id="trigger"
