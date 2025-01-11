@@ -297,7 +297,7 @@
   }
 
   .kickoffresult > div:nth-of-type(1):after {
-    content: "20 + 20 + 1 = 41 yard kick";
+    content: "20 + 20 + 1 = 40 yard kick";
     position: absolute;
     font-size: 0.5em;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -511,14 +511,14 @@
         transform: rotate(-72deg);
       }
       40% {
-        left: 39%;
+        left: 37%;
         transform: rotate(-84deg);
         scale: 1.0;
         bottom: 80%;
         /* transform: scale(1.0); */
       }
       100% {
-        left: 39%;
+        left: 37%;
         bottom: 80%;
         transform: rotate(-85deg);
         
@@ -548,14 +548,14 @@
         transform: rotate(-72deg);
       }
       60% {
-        left: 40%;
+        left: 36%;
         transform: rotate(-84deg);
         scale: 1.0;
         bottom: 64%;
         /* transform: scale(1.0); */
       }
       100% {
-        left: 40%;
+        left: 36%;
         bottom: 64%;
         transform: rotate(-85deg);
         
@@ -585,14 +585,14 @@
         transform: rotate(-72deg);
       }
       30% {
-        left: 43%;
+        left: 42%;
         transform: rotate(-84deg);
         scale: 1.0;
         bottom: 64%;
         /* transform: scale(1.0); */
       }
       100% {
-        left: 43%;
+        left: 42%;
         bottom: 64%;
         transform: rotate(-85deg);
         

@@ -67,6 +67,7 @@ export default function Page() {
             <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
               <Dartboard animation="cointoss"/>
             </Row>
+            <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
             {/* <SmartImage
               style={{width: "50%"}}
               alt="Darts"
@@ -82,34 +83,52 @@ export default function Page() {
               <Text variant="body-strong-l" align="left">
                 2. {"Kickoff / Punting".toUpperCase()}
               </Text>
-              <Text variant="body-default-m" align="left">
-                - Kicking team can throw up to 3 darts. <br/>
+              <Row mobileDirection="column">
+                <Text variant="body-default-m" align="left">
+                  - The kicking team can throw up to 3 darts. <br/><br/>
+                  - The kicking team kicks off from their 40 yard line. <br/><br/>
+                  - Each dart is worth the point value in yards (e.g., a single 10 is worth 10 yards, a triple 20 is worth 60 yards). <br/><br/>
+                  - Single digits are rounded up or down (e.g., a 41 yard kickoff is rounded to 40 yards; 45 is rounded to 50). <br/><br/>
+                </Text>
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative" >
+                  <Dartboard animation="kickoff"/>
+                </Row>
+              </Row>
+              <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+              <Row mobileDirection="column">
+                <Text variant="body-default-m" align="left">
+                  - The kicking team can decide to stop throwing if they are satisfied with the yardage kicked in less than 3 darts if they so choose <br/><br/>
+                  - - (e.g., the kicking team throws a triple 19 on their first throw, amounting to 57 yards, and elects to stop there to prevent a potential touchback or penalty). <br/><br/>
 
-                - Each dart is worth the point value in yards (e.g., a single 10 is worth 10 yards, a triple 20 is worth 60 yards). <br/>
+                  - If the total yards kicked exceeds 60 yards, it is a touchback, and the receiving team can opt to throw a single “return” dart or take a knee and start from their own 30 yard line. <br/><br/>
 
-                - The kicking team kicks off from their 40 yard line. <br/>
-
-                - The kicking team can decide to stop throwing if they are satisfied with the yardage kicked in less than 3 darts if they so choose <br/>
-                - - (e.g., the kicking team throws a triple 19 on their first throw, amounting to 57 yards, and elects to stop there to prevent a potential touchback or penalty). <br/>
-
-                - If the total yards kicked exceeds 60 yards, it is a touchback, and the receiving team can opt to throw a single “return” dart or take a knee and start from their own 30 yard line. <br/>
-
-                - After the kicking team has ended their kickoff, the receiving team can opt to throw a single “return” dart. <br/>
-                  - - The yards returned is equivalent to the point total of the dart (e.g., a single 10 is worth 10 yards, a triple 20 is worth 60 yards). <br/>
+                  - After the kicking team has ended their kickoff, the receiving team can opt to throw a single “return” dart. <br/><br/>
+                    - - The yards returned is equivalent to the point total of the dart (e.g., a single 10 is worth 10 yards, a triple 20 is worth 60 yards). <br/><br/>
+                </Text>
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+                  <Dartboard animation="bigkickoff"/>
+                </Row>
+                <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+              </Row>
                 
-              </Text>
-                <Text variant="body-strong-m" align="left">
+              <Text variant="body-strong-m" align="left">
                 Penalties
               </Text>
+              <Row mobileDirection="column">
+                <Text variant="body-default-m" align="left">
+                  If the kicking team bounces out a dart, it is considered a kick out of bounds, and the receiving team starts on their own 40 yard line. <br/><br/>
+                  If the punting team bounces out a dart, it is considered a blocked punt / fumble / turnover, and the receiving team takes possession at the spot of the punt. (plus a return yards dart throw) <br/><br/>
+                </Text>
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+                  <Dartboard animation="kickout"/>
+                </Row>
+                <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+              </Row>
               <Text variant="body-default-m" align="left">
-                If the kicking team bounces out a dart, it is considered a kick out of bounds, and the receiving team starts on their own 40 yard line. <br/>
-                If the punting team bounces out a dart, it is considered a blocked punt / fumble / turnover, and the receiving team takes possession at the spot of the punt. (plus a return yards dart throw) <br/>
                 If the receiving team bounces out their single return yard dart, it is considered a muffed punt / fumble / turnover, and the kicking team takes possession at the spot of the return. <br/>
                 </Text>
             </Column>
-            <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
-              <Dartboard animation="kickoff"/>
-            </Row>
+            
             {/* <SmartImage
               style={{width: "50%"}}
               alt="Darts"
