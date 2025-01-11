@@ -98,17 +98,25 @@ export default function Page() {
               <Row mobileDirection="column">
                 <Text variant="body-default-m" align="left">
                   - The kicking team can decide to stop throwing if they are satisfied with the yardage kicked in less than 3 darts if they so choose <br/><br/>
-                  - - (e.g., the kicking team throws a triple 19 on their first throw, amounting to 57 yards, and elects to stop there to prevent a potential touchback or penalty). <br/><br/>
-
-                  - If the total yards kicked exceeds 60 yards, it is a touchback, and the receiving team can opt to throw a single “return” dart or take a knee and start from their own 30 yard line. <br/><br/>
-
-                  - After the kicking team has ended their kickoff, the receiving team can opt to throw a single “return” dart. <br/><br/>
-                    - - The yards returned is equivalent to the point total of the dart (e.g., a single 10 is worth 10 yards, a triple 20 is worth 60 yards). <br/><br/>
+                  - - (e.g., the kicking team throws a triple 20 on their first throw, amounting to 60 yards, and elects to stop there to prevent a potential touchback or penalty). <br/><br/>
                 </Text>
                 <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
                   <Dartboard animation="bigkickoff"/>
                 </Row>
                 <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+                <Text variant="body-default-m" align="left">
+                  - If the total yards kicked exceeds 60 yards, it is a touchback, and the receiving team can opt to throw a single “return” dart or take a knee and start from their own 30 yard line. <br/><br/>
+                </Text>
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+                  <Dartboard animation="bustkickoff"/>
+                </Row>
+                <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+
+                <Text variant="body-default-m" align="left">
+                  - After the kicking team has ended their kickoff, the receiving team can opt to throw a single “return” dart. <br/><br/>
+                    - - The yards returned is equivalent to the point total of the dart (e.g., a single 10 is worth 10 yards, a triple 20 is worth 60 yards). <br/><br/>
+                </Text>
+                
               </Row>
                 
               <Text variant="body-strong-m" align="left">

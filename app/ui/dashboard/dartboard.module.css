@@ -310,6 +310,34 @@
     opacity: 0;
   }
 
+  .bigKickoffResult > div:nth-of-type(1):after {
+    content: "Triple 20 = 60 yard kick in one dart";
+    position: absolute;
+    font-size: 0.5em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background-color: black;
+    transform: translate(-50%, -1800%) scale(1.5);
+    /* transform: rotate(calc(1/20 * 1turn)); */
+    /* transform: translate(0%, 50%); */
+    animation: score 4s ease-in forwards infinite;
+    opacity: 0;
+  }
+
+  .bustKickoffResult > div:nth-of-type(1):after {
+    content: "Triple 20 = 60 + more = touchback";
+    position: absolute;
+    font-size: 0.5em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background-color: black;
+    transform: translate(-50%, -1800%) scale(1.5);
+    /* transform: rotate(calc(1/20 * 1turn)); */
+    /* transform: translate(0%, 50%); */
+    animation: score 4s ease-in forwards infinite;
+    opacity: 0;
+  }
+
   @keyframes score {
     0% {
       ocacity: 0;
@@ -402,6 +430,32 @@
       transform-origin: right;
       transform: rotate(-65deg);
       animation: fly-in5 4s ease-out forwards;
+      animation-iteration-count: infinite;
+    }
+
+    .dartBigKickoff {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url(https://pngimg.com/uploads/darts/darts_PNG55.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: bigkickoff 4s ease-out forwards;
+      animation-iteration-count: infinite;
+    }
+
+    .dartTouchbackKickoff {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url(https://pngimg.com/uploads/darts/darts_PNG55.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: fly-in 4s ease-out forwards;
       animation-iteration-count: infinite;
     }
   
@@ -594,6 +648,43 @@
       100% {
         left: 42%;
         bottom: 64%;
+        transform: rotate(-85deg);
+        
+      }
+    }
+
+    @keyframes bigkickoff {
+      0% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      10% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      11% {
+        left: 5%;
+        /* transform: scale(1.5); */
+      }
+      20% {
+        transform: rotate(-72deg);
+      }
+      30% {
+        left: 38%;
+        transform: rotate(-84deg);
+        scale: 1.0;
+        bottom: 70%;
+        /* transform: scale(1.0); */
+      }
+      100% {
+        left: 38%;
+        bottom: 70%;
         transform: rotate(-85deg);
         
       }

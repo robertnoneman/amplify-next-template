@@ -81,6 +81,13 @@ return (
     {animation === "kickoff" ? <div className={styles.dart4}></div> : null}
     {animation === "kickoff" ? <div className={styles.dart5}></div> : null}
     {animation === "kickoff" ? <div className={styles.kickoffresult}><div></div></div> : null}
+
+    {animation === "bigkickoff" ? <div className={styles.dartBigKickoff}></div> : null}
+    {animation === "bigkickoff" ? <div className={styles.bigKickoffResult}><div/></div> : null}
+
+    {animation === "bustkickoff" ? <div className={styles.dartBigKickoff}></div> : null}
+    {animation === "bustkickoff" ? <div className={styles.dartTouchbackKickoff}></div> : null}
+    {animation === "bustkickoff" ? <div className={styles.bustKickoffResult}><div/></div> : null}
     {/* </Row> */}
   </Column>
 //   </div>
