@@ -436,25 +436,25 @@
         /* transform: rotate(143deg); */
         bottom: 50%;
       }
-      40% {
+      29% {
         transform: rotate(135deg);
         bottom: 50%;
         /* right: 39%; */
       }
-      50% {
-        right: 49%;
+      39% {
+        right: 30%;
         bottom: 50%;
         transform: rotate(130deg);
         scale: 1.0;
         /* transform: scale(1.0); */
       }
-      52% {
-        right: 49%;
+      40% {
+        right: 30%;
         bottom: 50%;
         transform: rotate(129deg);
       }
       100% {
-        right: 49%;
+        right: 30%;
         bottom: 50%;
         transform: rotate(129deg);
       }
