@@ -38,15 +38,18 @@ export default function Page() {
           images={[
             {
               alt: 'Darts',
-              src: '/dartboard.png'
+              src: '/dartboard.png',
+              link: '/dashboard/games/darts'
             },
             {
               alt: 'fooleyball',
-              src: '/fooleyball.png'
+              src: '/fooleyball.png',
+              link: '/dashboard/games/fooleyball'
             },
             {
               alt: 'Tennis',
-              src: '/tennis.png'
+              src: '/tennis.png',
+              link: '/dashboard/games/tennis'
             },
           ]}
         />

@@ -1,11 +1,13 @@
 "use client";
 
-import { Flex, RevealFx, Scroller, SmartImage } from "@/once-ui/components";
+import { Flex, RevealFx, Scroller, SmartImage, Button, Arrow } from "@/once-ui/components";
 import { useEffect, useState, useRef } from "react";
+import Link from 'next/link';
 
 interface Image {
   src: string;
   alt: string;
+  link: string;
 }
 
 interface CarouselProps extends React.ComponentProps<typeof Flex> {
@@ -100,7 +102,8 @@ const Carousel: React.FC<CarouselProps> = ({
               cursor: "pointer",
             }),
           }}
-        />
+        >
+        </SmartImage>
       </RevealFx>
       {images.length > 1 && (
         <>
@@ -153,6 +156,20 @@ const Carousel: React.FC<CarouselProps> = ({
               ))}
             </Scroller>
           )}
+            <Button
+              id="trigger"
+              variant="primary"
+              size="l"
+              href={images[activeIndex]?.link}
+            >
+              <Flex fillHeight>
+                Explore
+                <Arrow
+                  trigger="#trigger"
+                  color="onBackground"
+                />
+              </Flex>
+            </Button>
         </>
       )}
     </Flex>
