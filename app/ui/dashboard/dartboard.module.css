@@ -325,7 +325,7 @@
   }
 
   .bustKickoffResult > div:nth-of-type(1):after {
-    content: "Triple 20 = 60 + more = touchback";
+    content: "Triple 20 + 13 > 60; = touchback";
     position: absolute;
     font-size: 0.5em;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

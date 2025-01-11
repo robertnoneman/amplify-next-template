@@ -95,7 +95,8 @@ export default function Page() {
                 </Row>
               </Row>
               <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
-              <Row mobileDirection="column">
+              <Line height={0.1} background="neutral-alpha-strong"/>
+              <Row mobileDirection="column" paddingTop="m">
                 <Text variant="body-default-m" align="left">
                   - The kicking team can decide to stop throwing if they are satisfied with the yardage kicked in less than 3 darts if they so choose <br/><br/>
                   - - (e.g., the kicking team throws a triple 20 on their first throw, amounting to 60 yards, and elects to stop there to prevent a potential touchback or penalty). <br/><br/>
@@ -104,22 +105,30 @@ export default function Page() {
                   <Dartboard animation="bigkickoff"/>
                 </Row>
                 <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
-                <Text variant="body-default-m" align="left">
-                  - If the total yards kicked exceeds 60 yards, it is a touchback, and the receiving team can opt to throw a single “return” dart or take a knee and start from their own 30 yard line. <br/><br/>
-                </Text>
+              </Row>
+              <Line height={0.05} background="neutral-alpha-strong"/>
+              <Row mobileDirection="column" paddingTop="m">
+                  <Text variant="body-default-m" align="left">
+                    - If the total yards kicked exceeds 60 yards, it is a touchback, and the receiving team can opt to throw a single “return” dart or take a knee and start from their own 30 yard line. <br/><br/>
+                  </Text>
                 <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
                   <Dartboard animation="bustkickoff"/>
                 </Row>
                 <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
-
+              </Row>
+              <Line height={0.05} background="neutral-alpha-strong"/>
+              <Row mobileDirection="column" paddingTop="m">
                 <Text variant="body-default-m" align="left">
                   - After the kicking team has ended their kickoff, the receiving team can opt to throw a single “return” dart. <br/><br/>
                     - - The yards returned is equivalent to the point total of the dart (e.g., a single 10 is worth 10 yards, a triple 20 is worth 60 yards). <br/><br/>
                 </Text>
-                
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+                  <Dartboard animation="kickoffReturn"/>
+                </Row>
+                <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
               </Row>
-                
-              <Text variant="body-strong-m" align="left">
+              <Line height={0.1} background="neutral-alpha-strong"/>
+              <Text variant="body-strong-m" align="left" paddingTop="m">
                 Penalties
               </Text>
               <Row mobileDirection="column">
