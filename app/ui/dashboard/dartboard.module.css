@@ -156,7 +156,7 @@
     }
   
     .dart:nth-child(1) {
-      right: 40%;
+      right: 10%;
       animation-delay: 0.5s;
     }
   
@@ -165,7 +165,7 @@
       animation-delay: 0.7s;
     }
     .dart2:nth-child(1) {
-      left: 40%;
+      left: 4%;
       animation-delay: 0.5s;
     }
   
