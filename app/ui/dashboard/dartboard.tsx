@@ -13,7 +13,11 @@ import {
     SmartImage
   } from "@/once-ui/components";
 
-export default function Dartboard() {
+export default function Dartboard({
+  animation,
+}: {
+  animation: string;
+}) {
 return (
     
     // <div className="height-[1px] width-[1px] flex items-center justify-center">
@@ -47,9 +51,35 @@ return (
       <li></li>
       <li></li>
     </ul>
-    
-    <div className={styles.dart}></div>
-    <div className={styles.dart2}></div>
+    <div className={`${styles.board} position-absolute`}>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      
+    </div>
+    {animation === "cointoss" ? <div className={styles.dart}></div> : null}
+    {animation === "cointoss" ? <div className={styles.dart2}></div> : null}
+
+    {animation === "kickoff" ? <div className={styles.dart3}></div> : null}
+    {animation === "kickoff" ? <div className={styles.dart4}></div> : null}
+    {animation === "kickoff" ? <div className={styles.dart5}></div> : null}
     {/* </Row> */}
   </Column>
 //   </div>

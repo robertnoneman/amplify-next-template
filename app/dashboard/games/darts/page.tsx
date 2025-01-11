@@ -65,7 +65,7 @@ export default function Page() {
               </Text>
             </Column>
             <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
-              <Dartboard />
+              <Dartboard animation="cointoss"/>
             </Row>
             {/* <SmartImage
               style={{width: "50%"}}
@@ -107,9 +107,9 @@ export default function Page() {
                 If the receiving team bounces out their single return yard dart, it is considered a muffed punt / fumble / turnover, and the kicking team takes possession at the spot of the return. <br/>
                 </Text>
             </Column>
-            {/* <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
-              <Dartboard />
-            </Row> */}
+            <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+              <Dartboard animation="kickoff"/>
+            </Row>
             {/* <SmartImage
               style={{width: "50%"}}
               alt="Darts"
@@ -260,7 +260,7 @@ export default function Page() {
           </Row>
 
           <Line height={0.2} background="neutral-alpha-strong"/>
-          
+
           <Row gap="24" mobileDirection="column">
             <Column justifyContent="flex-start" paddingX="24">
               <Text variant="body-strong-l" align="left">

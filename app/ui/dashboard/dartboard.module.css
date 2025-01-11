@@ -114,6 +114,185 @@
   .dartboard > li:nth-of-type(20) {
     transform: rotate(calc(19/20 * 1turn));
   }
+
+  .board > div:nth-of-type(1):after {
+    content: "20";
+    transform: rotate(calc(1/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    /* animation: score 4s ease-in forwards infinite; */
+    /* opacity: 0; */
+  }
+  .board > div:nth-of-type(2):after {
+    transform: rotate(calc(2/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "1";
+  }
+
+  .board > div:nth-of-type(3):after {
+    transform: rotate(calc(3/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "18";
+  }
+  .board > div:nth-of-type(4):after {
+    transform: rotate(calc(4/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "4";
+  }
+  .board > div:nth-of-type(5):after {
+    transform: rotate(calc(5/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "13";
+  }
+  .board > div:nth-of-type(6):after {
+    transform: rotate(calc(6/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "6";
+  }
+  .board > div:nth-of-type(7):after {
+    transform: rotate(calc(7/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "10";
+  }
+  .board > div:nth-of-type(8):after {
+    transform: rotate(calc(8/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "15";
+  }
+  .board > div:nth-of-type(9):after {
+    transform: rotate(calc(9/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "2";
+  }
+  .board > div:nth-of-type(10):after {
+    transform: rotate(calc(10/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "17";
+  }
+  .board > div:nth-of-type(11):after {
+    transform: rotate(calc(11/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "3";
+  }
+  .board > div:nth-of-type(12):after {
+    transform: rotate(calc(12/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "19";
+  }
+  .board > div:nth-of-type(13):after {
+    transform: rotate(calc(13/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "7";
+  }
+  .board > div:nth-of-type(14):after {
+    transform: rotate(calc(14/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "16";
+  }
+  .board > div:nth-of-type(15):after {
+    transform: rotate(calc(15/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "8";
+  }
+  .board > div:nth-of-type(16):after {
+    transform: rotate(calc(16/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "11";
+  }
+  .board > div:nth-of-type(17):after {
+    transform: rotate(calc(17/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "14";
+  }
+  .board > div:nth-of-type(18):after {
+    transform: rotate(calc(18/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "9";
+  }
+  .board > div:nth-of-type(19):after {
+    transform: rotate(calc(19/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "12";
+  }
+  .board > div:nth-of-type(20):after {
+    transform: rotate(calc(20/20 * 1turn));
+    /* transform: translate(0%, 50%); */
+    content: "5";
+  }
+  .board > div:nth-of-type(1) {
+    transform: translate(0%, 560%) scale(0.75);
+    /* animation: score 4s ease-in forwards infinite; */
+    /* opacity: 0; */
+  }
+
+  .board > div:nth-of-type(2) {
+    transform: translate(170%, 490%) rotate(20deg) scale(0.75);
+  }
+
+  .board > div:nth-of-type(3) {
+    transform: translate(280%, 440%) rotate(35deg) scale(0.75);
+  }
+  .board > div:nth-of-type(4) {
+    transform: translate(390%, 420%) rotate(50deg) scale(0.75);
+  }
+
+  .board > div:nth-of-type(5) {
+    transform: translate(450%, 440%) rotate(70deg) scale(0.75);
+  }
+
+  .board > div:nth-of-type(6) {
+    transform: translate(465%, 460%) rotate(90deg) scale(0.75);
+  }
+  .board > div:nth-of-type(7) {
+    transform: translate(445%, 470%) rotate(-70deg) scale(0.75);
+  }
+  .board > div:nth-of-type(8) {
+    transform: translate(390%, 470%) rotate(-50deg) scale(0.75);
+  }
+  .board > div:nth-of-type(9) {
+    transform: translate(290%, 450%) rotate(-30deg) scale(0.75);
+  }
+  .board > div:nth-of-type(10) {
+    transform: translate(160%, 410%) rotate(-20deg) scale(0.75);
+  }
+  .board > div:nth-of-type(11) {
+    transform: translate(20%, 340%) rotate(0deg) scale(0.75);
+  }
+  .board > div:nth-of-type(12) {
+    transform: translate(-140%, 220%) rotate(20deg) scale(0.75);
+  }
+  .board > div:nth-of-type(13) {
+    transform: translate(-250%, 80%) rotate(30deg) scale(0.75);
+  }
+  .board > div:nth-of-type(14) {
+    transform: translate(-370%, -120%) rotate(50deg) scale(0.75);
+  }
+  .board > div:nth-of-type(15) {
+    transform: translate(-430%, -320%) rotate(70deg) scale(0.75);
+  }
+  .board > div:nth-of-type(16) {
+    transform: translate(-470%, -550%) rotate(-90deg) scale(0.75);
+  }
+  .board > div:nth-of-type(17) {
+    transform: translate(-445%, -760%) rotate(-70deg) scale(0.75);
+  }
+  .board > div:nth-of-type(18) {
+    transform: translate(-370%, -990%) rotate(-50deg) scale(0.75);
+  }
+  .board > div:nth-of-type(19) {
+    transform: translate(-270%, -1170%) rotate(-30deg) scale(0.75);
+  }
+  .board > div:nth-of-type(20) {
+    transform: translate(-140%, -1320%) rotate(-20deg) scale(0.75);
+  }
+
+  @keyframes score {
+    0% {
+      ocacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
   
   /* *, ::before, ::after {
     box-sizing: border-box;
@@ -154,6 +333,45 @@
       animation: fly-in2 4s ease-out forwards;
       animation-iteration-count: infinite;
     }
+
+    .dart3 {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url(https://pngimg.com/uploads/darts/darts_PNG55.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: fly-in3 4s ease-out forwards;
+      animation-iteration-count: infinite;
+    }
+
+    .dart4 {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url(https://pngimg.com/uploads/darts/darts_PNG55.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: fly-in4 4s ease-out forwards;
+      animation-iteration-count: infinite;
+    }
+
+    .dart5 {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url(https://pngimg.com/uploads/darts/darts_PNG55.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: fly-in5 4s ease-out forwards;
+      animation-iteration-count: infinite;
+    }
   
     .dart:nth-child(1) {
       right: 10%;
@@ -166,13 +384,13 @@
     }
     .dart2:nth-child(1) {
       left: 4%;
-      animation-delay: 0.5s;
+      animation-delay: 1.5s;
     }
   
-    .dart2:nth-child(2) {
+    /* .dart2:nth-child(2) {
       left: 60%;
       animation-delay: 0.7s;
-    }
+    } */
   
     @keyframes fly-in {
       0% {
@@ -183,7 +401,7 @@
         /* transform: scale(1.5); */
       }
       20% {
-        transform: rotate(143deg);
+        /* transform: rotate(143deg); */
         bottom: 50%;
       }
       40% {
@@ -192,7 +410,7 @@
         /* right: 39%; */
       }
       50% {
-        right: 50%;
+        right: 49%;
         bottom: 50%;
         transform: rotate(130deg);
         scale: 1.0;
@@ -221,10 +439,10 @@
         left: 5%;
         /* transform: scale(1.5); */
       }
-      40% {
+      10% {
         transform: rotate(-72deg);
       }
-      50% {
+      20% {
         left: 40%;
         transform: rotate(-84deg);
         scale: 1.0;
@@ -233,6 +451,117 @@
       100% {
         left: 40%;
         bottom: 50%;
+        transform: rotate(-85deg);
+        
+      }
+    }
+
+    @keyframes fly-in3 {
+      0% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      20% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      21% {
+        left: 5%;
+        /* transform: scale(1.5); */
+      }
+      30% {
+        transform: rotate(-72deg);
+      }
+      40% {
+        left: 39%;
+        transform: rotate(-84deg);
+        scale: 1.0;
+        bottom: 80%;
+        /* transform: scale(1.0); */
+      }
+      100% {
+        left: 39%;
+        bottom: 80%;
+        transform: rotate(-85deg);
+        
+      }
+    }
+
+    @keyframes fly-in4 {
+      0% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      40% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      41% {
+        left: 5%;
+        /* transform: scale(1.5); */
+      }
+      50% {
+        transform: rotate(-72deg);
+      }
+      60% {
+        left: 40%;
+        transform: rotate(-84deg);
+        scale: 1.0;
+        bottom: 64%;
+        /* transform: scale(1.0); */
+      }
+      100% {
+        left: 40%;
+        bottom: 64%;
+        transform: rotate(-85deg);
+        
+      }
+    }
+
+    @keyframes fly-in5 {
+      0% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      10% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      11% {
+        left: 5%;
+        /* transform: scale(1.5); */
+      }
+      20% {
+        transform: rotate(-72deg);
+      }
+      30% {
+        left: 43%;
+        transform: rotate(-84deg);
+        scale: 1.0;
+        bottom: 64%;
+        /* transform: scale(1.0); */
+      }
+      100% {
+        left: 43%;
+        bottom: 64%;
         transform: rotate(-85deg);
         
       }
