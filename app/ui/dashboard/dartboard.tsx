@@ -72,14 +72,15 @@ return (
       <div></div>
       <div></div>
       <div></div>
-      
     </div>
     {animation === "cointoss" ? <div className={styles.dart}></div> : null}
     {animation === "cointoss" ? <div className={styles.dart2}></div> : null}
+    {animation === "cointoss" ? <div className={styles.result}><div/></div> : null}
 
     {animation === "kickoff" ? <div className={styles.dart3}></div> : null}
     {animation === "kickoff" ? <div className={styles.dart4}></div> : null}
     {animation === "kickoff" ? <div className={styles.dart5}></div> : null}
+    {animation === "kickoff" ? <div className={styles.kickoffresult}><div></div></div> : null}
     {/* </Row> */}
   </Column>
 //   </div>

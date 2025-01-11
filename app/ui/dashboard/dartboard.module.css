@@ -284,12 +284,43 @@
   .board > div:nth-of-type(20) {
     transform: translate(-140%, -1320%) rotate(-20deg) scale(0.75);
   }
+  .result > div:nth-of-type(1):after {
+    content: "Left Wins!";
+    position: absolute;
+    color: white;
+    background-color: black;
+    transform: translate(-50%, -800%) scale(1.5);
+    /* transform: rotate(calc(1/20 * 1turn)); */
+    /* transform: translate(0%, 50%); */
+    animation: score 4s ease-in forwards infinite;
+    opacity: 0;
+  }
+
+  .kickoffresult > div:nth-of-type(1):after {
+    content: "20 + 20 + 1 = 41 yard kick";
+    position: absolute;
+    font-size: 0.5em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background-color: black;
+    transform: translate(-50%, -1800%) scale(1.5);
+    /* transform: rotate(calc(1/20 * 1turn)); */
+    /* transform: translate(0%, 50%); */
+    animation: score 4s ease-in forwards infinite;
+    opacity: 0;
+  }
 
   @keyframes score {
     0% {
       ocacity: 0;
     }
-    50% {
+    55% {
+      opacity: 0;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
       opacity: 1;
     }
   }
@@ -320,6 +351,7 @@
       transform: rotate(-70deg);
       animation: fly-in 4s ease-out forwards;
       animation-iteration-count: infinite;
+      /* content: "left"; */
     }
     .dart2 {
       position: absolute;
