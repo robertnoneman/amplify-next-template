@@ -123,7 +123,7 @@ export default function Page() {
                     - - The yards returned is equivalent to the point total of the dart (e.g., a single 10 is worth 10 yards, a triple 20 is worth 60 yards). <br/><br/>
                 </Text>
                 <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
-                  <Dartboard animation="kickoffReturn"/>
+                  <Dartboard animation="kickoffreturn"/>
                 </Row>
                 <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
               </Row>
@@ -134,16 +134,34 @@ export default function Page() {
               <Row mobileDirection="column">
                 <Text variant="body-default-m" align="left">
                   If the kicking team bounces out a dart, it is considered a kick out of bounds, and the receiving team starts on their own 40 yard line. <br/><br/>
-                  If the punting team bounces out a dart, it is considered a blocked punt / fumble / turnover, and the receiving team takes possession at the spot of the punt. (plus a return yards dart throw) <br/><br/>
                 </Text>
                 <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
-                  <Dartboard animation="kickout"/>
+                  <Dartboard animation="kickOutOfBounds"/>
                 </Row>
                 <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
               </Row>
-              <Text variant="body-default-m" align="left">
-                If the receiving team bounces out their single return yard dart, it is considered a muffed punt / fumble / turnover, and the kicking team takes possession at the spot of the return. <br/>
+              <Line height={0.05} background="neutral-alpha-strong"/>
+
+              <Row mobileDirection="column">
+                <Text variant="body-default-m" align="left">
+                  If the punting team bounces out a dart, it is considered a blocked punt / fumble / turnover, and the receiving team takes possession at the spot of the punt. (plus a return yards dart throw) <br/><br/>
                 </Text>
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+                  <Dartboard animation="blockedPunt"/>
+                </Row>
+                <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+              </Row>
+              <Line height={0.05} background="neutral-alpha-strong"/>
+
+              <Row mobileDirection="column">
+                <Text variant="body-default-m" align="left">
+                  If the receiving team bounces out their single return yard dart, it is considered a muffed punt / fumble / turnover, and the kicking team takes possession at the spot of the return. <br/>
+                </Text>
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+                    <Dartboard animation="bounceOut"/>
+                </Row>
+                <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+              </Row>
             </Column>
             
             {/* <SmartImage
@@ -163,24 +181,48 @@ export default function Page() {
               <Text variant="body-strong-l" align="left">
                 3. {"Offense".toUpperCase()}
               </Text>
-              <Text variant="body-default-m" align="left">
-                The offensive team starts at the yard line determined by the kickoff. <br/>
-                The offensive team then has up to 4 throws (equivalent to 4 downs) to achieve a new set of downs (aka get a 1st down). <br/>
-                This is accomplished by hitting the next 10 increment on the board from where the line of scrimmage is <br/>
-                (e.g., if the offense team is starting from their own 30 yard line, they would be aiming for the 4 on the dartboard. <br/>
-                Hitting a single 4 would achieve a new set of downs, and the offensive team would then attempt to reach the 50 yard line by hitting the 5 on the dartboard). <br/>
-                If the offensive team hits a double or triple on the target yard line, this is equivalent to a 20 or 30 yard gain <br/>
-                (e.g., if the offensive team is on their 30 (thus aiming for the 4 on the dartboard to reach the 40 yard line) and hits a triple 4, it is a 30 yard gain, <br/>
-                resulting in a 1st down starting at the opponents 40 yard line).<br/>
-              </Text>
-                <Text variant="body-strong-m" align="left">
+              <Row mobileDirection="column">
+                <Text variant="body-default-m" align="left">
+                  The offensive team starts at the yard line determined by the kickoff. <br/><br/>
+                  The offensive team then has up to 4 throws (equivalent to 4 downs) to achieve a new set of downs (aka get a 1st down). <br/><br/>
+                  This is accomplished by hitting the next 10 increment on the board from where the line of scrimmage is <br/><br/>
+                  (e.g., if the offense team is starting from their own 30 yard line, they would be aiming for the 4 on the dartboard. <br/><br/>
+                  Hitting a single 4 would achieve a new set of downs, and the offensive team would then attempt to reach the 50 yard line by hitting the 5 on the dartboard). <br/><br/>
+                </Text>
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+                  <Dartboard animation="firstDown"/>
+                </Row>
+                <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+              </Row>
+              <Line height={0.05} background="neutral-alpha-strong"/>
+              <Row mobileDirection="column">
+                <Text variant="body-default-m" align="left">
+                  If the offensive team hits a double or triple on the target yard line, this is equivalent to a 20 or 30 yard gain <br/><br/>
+                  (e.g., if the offensive team is on their 30 (thus aiming for the 4 on the dartboard to reach the 40 yard line) and hits a triple 4, it is a 30 yard gain, <br/>
+                  resulting in a 1st down starting at the opponents 40 yard line).<br/><br/>
+                </Text>
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+                  <Dartboard animation="bigfirstDown"/>
+                </Row>
+                <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+              </Row>
+              <Line height={0.05} background="neutral-alpha-strong"/>
+
+              <Text variant="body-strong-m" align="left">
                 Turnovers
               </Text>
-              <Text variant="body-default-m" align="left">
-                If the offensive team fails to convert on 4th down, it is a turnover on downs, and the opposing team takes possession at the line of scrimmage. <br/>
-                Any bounce out throw is a turnover from the line of scrimage. The defense can opt to throw a single return yards dart or “fair catch” and start at the point of the turnover. <br/>
-                If the receiving team bounces out their single return yard dart, it is considered a muffed punt / fumble / turnover, and the kicking team takes possession at the spot of the return. <br/>
+              <Row mobileDirection="column">
+                <Text variant="body-default-m" align="left">
+                  If the offensive team fails to convert on 4th down, it is a turnover on downs, and the opposing team takes possession at the line of scrimmage. <br/><br/>
+                  Any bounce out throw is a turnover from the line of scrimage. The defense can opt to throw a single return yards dart or simply start at the point of the turnover. <br/><br/>
+                  If the receiving team bounces out their single return yard dart, it is considered a muffed punt / fumble / turnover, and the kicking team takes possession at the spot of the return. <br/><br/>
                 </Text>
+                <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
+                  <Dartboard animation="turnoverOnDowns"/>
+                </Row>
+                <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
+              </Row>
+              
             </Column>
             {/* <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
               <Dartboard />
@@ -203,16 +245,16 @@ export default function Page() {
                 4. {"Defense".toUpperCase()}
               </Text>
               <Text variant="body-default-m" align="left">
-                The offensive team throws a dart that misses any point value on the board, but does still stick to the board, this triggers a potential sack play <br/>
-                The defensive team then has one opportunity to throw a dart at the line of scrimmage minus 10 yards (e.g., if the offensive team is on the 50, the defensive team would aim for the 4). <br/>
-                If successful, the defensive team records a sack, and the offensive team loses 10 yards. <br/>
-                If the defensive team misses the target yard line, the offensive team retains possession at the line of scrimmage, and it is simply considered an incomplete pass.<br/>
+                The offensive team throws a dart that misses any point value on the board, but does still stick to the board, this triggers a potential sack play <br/><br/>
+                The defensive team then has one opportunity to throw a dart at the line of scrimmage minus 10 yards (e.g., if the offensive team is on the 50, the defensive team would aim for the 4). <br/><br/>
+                If successful, the defensive team records a sack, and the offensive team loses 10 yards. <br/><br/>
+                If the defensive team misses the target yard line, the offensive team retains possession at the line of scrimmage, and it is simply considered an incomplete pass.<br/><br/>
               </Text>
                 <Text variant="body-strong-m" align="left">
                 Penalities
               </Text>
               <Text variant="body-default-m" align="left">
-                If the defensive team bounces out their sack dart, it is considered a roughing the passer penalty, and the offensive team gains 10 yards. <br/>
+                If the defensive team bounces out their sack dart, it is considered a roughing the passer penalty, and the offensive team gains 10 yards. <br/><br/>
                 </Text>
             </Column>
             {/* <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
@@ -239,35 +281,35 @@ export default function Page() {
                 Field Goals
               </Text>
               <Text variant="body-default-m" align="left">
-                - Once the offensive team has reached the 30 yard line, they are on in field goal range, and can elect to kick a field goal on any down there after. <br/>
-                - The team must declare they are kicking a field goal if they decide to do so. To succeed, the player must hit a single, double, or triple 3 (all are worth a single field goal). <br/>
+                - Once the offensive team has reached the 30 yard line, they are on in field goal range, and can elect to kick a field goal on any down there after. <br/><br/>
+                - The team must declare they are kicking a field goal if they decide to do so. To succeed, the player must hit a single, double, or triple 3 (all are worth a single field goal). <br/><br/>
               </Text>
-              <br/>
+              <br/><br/>
               <Text variant="body-strong-m" align="left">
                 Touchdowns
               </Text>
               <Text variant="body-default-m" align="left">
-                Once the offensive team is in field goal range, they can also score a touchdown by hitting: <br/>
-                - a triple 7 if they are on their opponents 30 yard line, <br/>
-                - a double (or triple) 7 if they are on their opponents 20 yard line, or <br/>
-                - a single (or double or triple) 7 if they are on their opponents 10 yard line. <br/>
-                <br/>
+                Once the offensive team is in field goal range, they can also score a touchdown by hitting: <br/><br/>
+                - a triple 7 if they are on their opponents 30 yard line, <br/><br/>
+                - a double (or triple) 7 if they are on their opponents 20 yard line, or <br/><br/>
+                - a single (or double or triple) 7 if they are on their opponents 10 yard line. <br/><br/>
+                <br/><br/>
                 </Text>
                 <Text variant="body-strong-m" align="left">
                 Extra Point / 2 Point Conversion
               </Text>
               <Text variant="body-default-m" align="left">
-                - Extra points are automatic. <br/>
-                - - If the offsensive team so chooses, they can forego the automatic extra point and attempt a 2 point conversion by hitting the 2 on the dartboard. <br/>
+                - Extra points are automatic. <br/><br/>
+                - - If the offsensive team so chooses, they can forego the automatic extra point and attempt a 2 point conversion by hitting the 2 on the dartboard. <br/><br/>
               </Text>
-              <br/>
+              <br/><br/>
                 <Text variant="body-strong-m" align="left">
                 Special Rules
               </Text>
               <Text variant="body-default-m" align="left">
-                Regardless of their field position, the offensive team can score a touchdown from any part of the field on any down by hitting a double bullseye. <br/>
-                <br/>
-                They can also achieve a first down by hitting a single bullseye (unless they are on their opponent's 10 or less, in which case a single bullseye would be a touchdown). <br/>
+                Regardless of their field position, the offensive team can score a touchdown from any part of the field on any down by hitting a double bullseye. <br/><br/>
+                <br/><br/>
+                They can also achieve a first down by hitting a single bullseye (unless they are on their opponent's 10 or less, in which case a single bullseye would be a touchdown). <br/><br/>
                 </Text>
             </Column>
           </Row>
@@ -280,7 +322,7 @@ export default function Page() {
                 6. {"Game Duration".toUpperCase()}
               </Text>
               <Text variant="body-default-m" align="left">
-                - There are 4 quarters in a game, and each team gets 2 offensive possessions per quarter. <br/>
+                - There are 4 quarters in a game, and each team gets 2 offensive possessions per quarter. <br/><br/>
               </Text>
             </Column>
             {/* <Row height="xs" alignItems="center" mobileDirection="column" position="relative">
@@ -303,7 +345,7 @@ export default function Page() {
                 7. {"Onside Kicks".toUpperCase()}
               </Text>
               <Text variant="body-default-m" align="left">
-                - Remember how this works?<br/>
+                - Remember how this works?<br/><br/>
               </Text>
             </Column>
             {/* <Row height="xs" alignItems="center" mobileDirection="column" position="relative">

@@ -173,6 +173,24 @@
     /* transform: translate(0%, 50%); */
     content: "3";
   }
+  .los > div:nth-of-type(1):after {
+    /* transform: rotate(calc(11/20 * 1turn)); */
+    /* opacity: .5; */
+    animation: score 4s ease-in forwards infinite;
+    color: rgba(163, 163, 159, 0.71);
+    position: absolute;
+    transform: translate(-40%, -95%) scale(4, 3.5);
+    content: "o";
+  }
+  .los > div:nth-of-type(2):after {
+    /* transform: rotate(calc(11/20 * 1turn)); */
+    /* opacity: .5; */
+    animation: score 4s ease-in forwards infinite;
+    color: rgba(255, 255, 0, 0.71);
+    position: absolute;
+    transform: translate(700%, -725%) scale(4, 3.5);
+    content: "o";
+  }
   .board > div:nth-of-type(12):after {
     transform: rotate(calc(12/20 * 1turn));
     /* transform: translate(0%, 50%); */
@@ -285,7 +303,7 @@
     transform: translate(-140%, -1320%) rotate(-20deg) scale(0.75);
   }
   .result > div:nth-of-type(1):after {
-    content: "Left Wins!";
+    content: "Red Wins!";
     position: absolute;
     color: white;
     background-color: black;
@@ -338,6 +356,76 @@
     opacity: 0;
   }
 
+  .kickoffReturnResult > div:nth-of-type(1):after {
+    content: "20 yard return";
+    position: absolute;
+    font-size: 0.5em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background-color: black;
+    transform: translate(-50%, -1800%) scale(1.5);
+    /* transform: rotate(calc(1/20 * 1turn)); */
+    /* transform: translate(0%, 50%); */
+    animation: score 4s ease-in forwards infinite;
+    opacity: 0;
+  }
+
+  .kickoutResult > div:nth-of-type(1):after {
+    content: "Kick out of bounds - start at 40 yard line";
+    position: absolute;
+    font-size: 0.5em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background-color: black;
+    transform: translate(-50%, -1800%) scale(1.5);
+    /* transform: rotate(calc(1/20 * 1turn)); */
+    /* transform: translate(0%, 50%); */
+    animation: score 4s ease-in forwards infinite;
+    opacity: 0;
+  }
+
+  .blockedPuntResult > div:nth-of-type(1):after {
+    content: "Blocked punt - Turnover";
+    position: absolute;
+    font-size: 0.5em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background-color: black;
+    transform: translate(-50%, -1800%) scale(1.5);
+    /* transform: rotate(calc(1/20 * 1turn)); */
+    /* transform: translate(0%, 50%); */
+    animation: score 4s ease-in forwards infinite;
+    opacity: 0;
+  }
+
+  .firstDownResult > div:nth-of-type(1):after {
+    content: "First Down!";
+    position: absolute;
+    font-size: 0.5em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background-color: black;
+    transform: translate(-50%, -1800%) scale(1.5);
+    /* transform: rotate(calc(1/20 * 1turn)); */
+    /* transform: translate(0%, 50%); */
+    animation: score 4s ease-in forwards infinite;
+    opacity: 0;
+  }
+
+  .turnoverOnDownsResult > div:nth-of-type(1):after {
+    content: "Turnover On Downs";
+    position: absolute;
+    font-size: 0.5em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background-color: black;
+    transform: translate(-50%, -1800%) scale(1.5);
+    /* transform: rotate(calc(1/20 * 1turn)); */
+    /* transform: translate(0%, 50%); */
+    animation: score 4s ease-in forwards infinite;
+    opacity: 0;
+  }
+
   @keyframes score {
     0% {
       ocacity: 0;
@@ -365,6 +453,14 @@
       margin: 0;
       background-color: #f0f0f0;
     }
+
+    .lineOfScrimmage {
+      clip-path: circle(16rem at 50% 50%);
+      position: absolute;
+      color: white;
+      width: 50px;
+      height: 50px;
+    }
   
     .dart {
       position: absolute;
@@ -372,7 +468,7 @@
       width: 40px;
       /* height: calc(10vmin - 20px); */
       height: 40px;
-      background-image: url(https://pngimg.com/uploads/darts/darts_PNG55.png);
+      background-image: url('/dartblue.png');
       background-size: contain;
       background-repeat: no-repeat;
       transform-origin: center;
@@ -385,7 +481,7 @@
       position: absolute;
       width: 30px;
       height: 30px;
-      background-image: url(https://pngimg.com/uploads/darts/darts_PNG55.png);
+      background-image: url('/dart.png');
       background-size: contain;
       background-repeat: no-repeat;
       transform-origin: right;
@@ -399,6 +495,19 @@
       width: 30px;
       height: 30px;
       background-image: url(https://pngimg.com/uploads/darts/darts_PNG55.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: fly-in3 4s ease-out forwards;
+      animation-iteration-count: infinite;
+    }
+
+    .dart3return {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url('/dartblue.png');
       background-size: contain;
       background-repeat: no-repeat;
       transform-origin: right;
@@ -457,6 +566,63 @@
       transform: rotate(-65deg);
       animation: fly-in 4s ease-out forwards;
       animation-iteration-count: infinite;
+      overflow: hidden;
+    }
+
+    .dartBounceout {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url('/dartblue.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: bounceout 4s ease-out forwards;
+      animation-iteration-count: infinite;
+      overflow: hidden;
+    }
+
+    .dartRedBounceout {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url('/dart.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: bounceout 4s ease-out forwards;
+      animation-iteration-count: infinite;
+      overflow: hidden;
+    }
+
+    .dartFirstDown {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url('/dart.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: firstdown 4s ease-out forwards;
+      animation-iteration-count: infinite;
+      overflow: hidden;
+    }
+
+    .dartBigFirstDown {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url('/dart.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform-origin: right;
+      transform: rotate(-65deg);
+      animation: bigfirstdown 4s ease-out forwards;
+      animation-iteration-count: infinite;
+      overflow: hidden;
     }
   
     .dart:nth-child(1) {
@@ -488,21 +654,23 @@
       }
       20% {
         /* transform: rotate(143deg); */
+        right: 10%;
         bottom: 50%;
+        scale: 3.0;
       }
       29% {
         transform: rotate(135deg);
         bottom: 50%;
         /* right: 39%; */
       }
-      39% {
+      30% {
         right: 30%;
         bottom: 50%;
         transform: rotate(130deg);
         scale: 1.0;
         /* transform: scale(1.0); */
       }
-      40% {
+      35% {
         right: 30%;
         bottom: 50%;
         transform: rotate(129deg);
@@ -686,6 +854,140 @@
         left: 38%;
         bottom: 70%;
         transform: rotate(-85deg);
+        
+      }
+    }
+
+    @keyframes firstdown {
+      0% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      10% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      11% {
+        left: 5%;
+        /* transform: scale(1.5); */
+      }
+      20% {
+        transform: rotate(-72deg);
+      }
+      30% {
+        left: 55%;
+        transform: rotate(-84deg);
+        scale: 1.0;
+        bottom: 65%;
+        /* transform: scale(1.0); */
+      }
+      100% {
+        left: 55%;
+        bottom: 65%;
+        transform: rotate(-85deg);
+        
+      }
+    }
+
+    @keyframes bigfirstdown {
+      0% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      10% {
+        left: 4%;
+        bottom: 50%;
+        transform: rotate(-70deg);
+        scale: 3.5;
+        /* transform: scale(1.5); */
+      }
+      11% {
+        left: 5%;
+        /* transform: scale(1.5); */
+      }
+      20% {
+        transform: rotate(-72deg);
+      }
+      30% {
+        left: 50%;
+        transform: rotate(-84deg);
+        scale: 1.0;
+        bottom: 60%;
+        /* transform: scale(1.0); */
+      }
+      100% {
+        left: 50%;
+        bottom: 60%;
+        transform: rotate(-85deg);
+        
+      }
+    }
+
+    @keyframes bounceout {
+      0% {
+        right: 24%;
+        bottom: 20%;
+        transform: rotate(150deg);
+        scale: 3.0;
+        /* transform: scale(1.5); */
+      }
+      10% {
+        right: 24%;
+        bottom: 20%;
+        transform: rotate(150deg);
+        scale: 3.0;
+        /* transform: scale(1.5); */
+      }
+      11% {
+        right: 25%;
+        /* transform: scale(1.5); */
+      }
+      15% {
+        transform: rotate(102deg);
+        bottom: 80%;
+      }
+      20% {
+        right: 38%;
+        transform: rotate(84deg);
+        scale: 1.0;
+        bottom: 70%;
+        /* transform: scale(1.0); */
+      }
+      25% {
+        right: 34%;
+        scale: 2.0;
+        transform: rotate(60deg);
+      }
+      30% {
+        transform: rotate(40deg);
+      }
+      35% {
+        right: 37%;
+        scale: 1.0;
+        bottom: -10%;
+        /* transform: scale(1.0); */
+      }
+      40% {
+        bottom: -5%;
+        transform: rotate(40deg);
+      }
+      50% {
+        bottom: -10%;
+        transform: rotate(-38deg);
+      }
+      100% {
+        right: 37%;
+        bottom: -10%;
+        transform: rotate(-40deg);
         
       }
     }
