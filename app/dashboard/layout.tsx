@@ -74,14 +74,14 @@ const schemaData = {
     sameAs: Object.values(social).filter(Boolean),
   };
 
-  export default function RootLayout({
+export default function RootLayout({
     children,
   }: Readonly<{
     children: React.ReactNode;
   }>) {
     return (
       <Flex
-        as="html"
+        as="main"
         lang="en"
         fillHeight
         background="page"
@@ -102,16 +102,16 @@ const schemaData = {
           tertiary ? tertiary.variable : "",
         )}
       >
-        <head>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(schemaData),
-            }}
-          />
-        </head>
         <ToastProvider>
-          <Flex as="body" fillWidth direction="column" margin="0" padding="0">
+          {/* <head>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(schemaData),
+              }}
+            />
+          </head> */}
+          <Flex fillWidth direction="column" margin="0" padding="0" zIndex={1}>
             <Background
               position="absolute"
               mask={{

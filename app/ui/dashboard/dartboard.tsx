@@ -12,6 +12,7 @@ import {
     Text,
     SmartImage
   } from "@/once-ui/components";
+  import { inter } from '@/app/ui/fonts';
 
 export default function Dartboard({
   animation,
@@ -51,7 +52,7 @@ return (
       <li></li>
       <li></li>
     </ul>
-    <div className={`${styles.board} position-absolute`}>
+    <div className={`${styles.board} ${inter.className} position-absolute`}>
       <div></div>
       <div></div>
       <div></div>

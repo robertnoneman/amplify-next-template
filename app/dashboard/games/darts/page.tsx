@@ -378,6 +378,7 @@ export default function Page() {
             Back
           </Flex>
         </Button>
+        <Row height={4} alignItems="center" mobileDirection="column" position="relative"/>
       </Column>
     )
   }

@@ -115,6 +115,10 @@
     transform: rotate(calc(19/20 * 1turn));
   }
 
+  .board {
+    font: Inter, sans-serif;
+  }
+
   .board > div:nth-of-type(1):after {
     content: "20";
     transform: rotate(calc(1/20 * 1turn));

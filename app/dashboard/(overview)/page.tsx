@@ -34,6 +34,7 @@ export default async function Page() {
           placeholder="blur"
           fill={false}
           sizes="100vh"
+          // zIndex={10}
           style={{
             objectFit: "contain",
           }}
