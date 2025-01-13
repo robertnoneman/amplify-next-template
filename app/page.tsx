@@ -34,10 +34,10 @@ export default function Page() {
                     <p
                         className={`${roboto.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}
                     >
-                        <strong>Happy Robday!</strong><br></br> {' '}
-                        If it's not Robday, try <br></br>
+                        <strong>It's not Robday 🙁</strong><br></br> {' '}
+                        When it's Robday, try <br></br>
                         <a href="https://itsnotrobday.com" className="text-blue-500">
-                            itsnotrobday.com
+                            itsrobday.com
                         </a>
                     </p>
                     <Link
