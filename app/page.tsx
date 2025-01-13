@@ -73,7 +73,7 @@ export default function Page() {
         // border="neutral-alpha-weak"
         fillWidth
       >
-      <Pride autorun={{ speed: 60, duration: 5000 }} />
+      
     {/* <main className="flex min-h-screen flex-col p-0 bg-gray-800 bg-opacity-90"> */}
         <Row height={5} fillWidth background="accent-strong" alignItems="flex-end" justifyContent='space-between'>
         {/* <div className="flex h-20 shrink-0 items-end rounded-lg bg-[#bb4444] text-white md:bg-opacity-90 p-4 justify-between md:h-52"> */}
@@ -108,7 +108,7 @@ export default function Page() {
           // aspectRatio='16:9'
           style={{opacity: 50, objectFit: 'fill', height: '100vh', transform: 'translateX(-20%)'}}
         /> */}
-        <div className="">
+        {/* <div className=""> */}
             {/* <Image
                 src={robdaycropblur}
                 // width={1500}
@@ -125,49 +125,86 @@ export default function Page() {
                 className="absolute inset-0 -z-10 size-full object-cover object-top md:object-top"
             /> */}
             {/* <div className="mt-4 flex grow flex-col gap-4 md:flex-row z-20"> */}
-            <Column fillHeight justifyContent='center' padding="m">
+            <Column fillHeight justifyContent='center' fillWidth minHeight={5}>
                 {/* <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 bg-opacity-80 px-6 py-10 md:w-2/5 md:px-20"> */}
-                <Column height="m" justifyContent='center' radius="s" paddingX="4" paddingY="12" gap="4" alignItems="left" style={{backgroundColor: "rgba(255, 255, 255, 0.8)"}} border="surface">
-                    <p
+                {/* <RevealFx delay={0.6} fillWidth> */}
+                {/* <Column height={5} background="surface" justifyContent='center' radius="xs" paddingX="4" paddingY="12" gap="0" alignItems="left" border="surface"/> */}
+                <Column height={50} background="surface" justifyContent='flex-end' paddingX="0" paddingY="0" gap="0" alignItems="left">
+                    {/* <p
                         className={`${roboto.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}
-                    >
-                        <b>Happy Robday!</b><br></br> {' '}
-                        <Text>
-                        When it's not Robday, try <br></br>
+                    > */}
+                      <SmartImage 
+                        src="/robdaycrop.jpeg"
+                        objectFit='cover'
+                        // sizes="100vw"
+                        position="absolute"
+                        // height={30}
+                        zIndex={-1}
+                        // height={20}
+                        // width={25}
+                        fillWidth
+                        opacity={10}
+                        background='transparent'
+                        // style={{maskImage: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%)'}}
+                        // radius="s-8"
+                        // paddingRight="xl"
+                        // aspectRatio='16:9'
+                        // style={{opacity: 50, objectFit: 'fill', height: '100vh', transform: 'translateX(-20%)'}}
+                      />
+                      <Column paddingX="12" paddingY="12">
+                        <Text variant="display-default-m" onSolid="brand-strong">
+                          Happy Robday!<br></br><br/>
                         </Text>
-                        <SmartLink href="https://itsnotrobday.com" style={{color: "#0070f3"}}>
-                        itsnotrobday.com
-                        </SmartLink>
+                          <Text>
+                          When it's not Robday, try <br/>
+                          </Text>
+                          <SmartLink href="https://itsnotrobday.com" style={{color: "#0070f3", margin: 0}}>
+                          <b>itsnotrobday.com</b>
+                          </SmartLink>
                         {/* <a href="https://itsnotrobday.com" className="text-blue-500">
                             itsnotrobday.com
-                        </a> */}
-                    </p>
+                            </a> */}
+                    {/* </p> */}
                     {/* <Link
                         href="/dashboard"
                         className="flex items-center gap-5 self-start rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
                     >
                         <span>Explore</span> <ArrowRightIcon className="w-5 md:w-6" />
-                    </Link> */}
+                        </Link> */}
                     <br></br>
-                    <Button
-                      id="trigger"
-                      variant="primary"
-                      size="l"
-                      href="/dashboard"
-                      style={{backgroundColor: "#0070f3"}}
-                    >
-                      <Flex fillHeight>
-                        Explore
-                        <Arrow
-                          trigger="#trigger"
-                          color="onBackground"
-                        />
-                      </Flex>
-                    </Button>
+                        <Button
+                          id="trigger"
+                          variant="primary"
+                          size="l"
+                          href="/dashboard"
+                          style={{backgroundColor: "#0070f3"}}
+                        >
+                          <Flex fillHeight>
+                            Explore
+                            <Arrow
+                              trigger="#trigger"
+                              color="onBackground"
+                              />
+                          </Flex>
+                        </Button>
+                    </Column>
                 </Column>
+                {/* </RevealFx> */}
                 {/* </div> */}
                 {/* <div className="flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12"> */}
                     {/* Add Hero Images Here */}
+                  {/* <Column fillHeight justifyContent='center' width="s"> */}
+                    {/* <SmartImage 
+                      src="/robdaycropblur.jpeg"
+                      objectFit='cover'
+                      sizes="100vw"
+                      // position='absolute'
+                      // height={30}
+                      height={20}
+                      // paddingRight="xl"
+                      // aspectRatio='16:9'
+                      // style={{opacity: 50, objectFit: 'fill', height: '100vh', transform: 'translateX(-20%)'}}
+                    /> */}
                     {/* <Image
                         // src={robdaycropblur}
                         src="/robday.jpeg"
@@ -182,22 +219,28 @@ export default function Page() {
                         fill={false}
                         alt="Screenshots of the dashboard project showing desktop version"
                         className="hidden md:block"
-                        />
-                        <Image
+                        /> */}
+                        {/* <Image
                         src="/S+RGroupPics-122.jpg"
                         width={560}
                         height={620}
                         alt="Screenshot of the dashboard project showing mobile version"
                         className="block md:hidden"
                         /> */}
+                    {/* </Column> */}
                 {/* </div> */}
             {/* </div> */}
             </Column>
-        </div>
+            <Fade>
+
+            </Fade>
+            <Column fillHeight justifyContent='center' width="s"></Column>
+        {/* </div> */}
         {/* <Flex fillWidth border="neutral-medium" background="page">
         
         </Flex> */}
     {/* </main> */}
+      <Pride autorun={{ speed: 60, duration: 5000 }} />
       </Column>
       <Dialog
           isOpen={!isRobDay()}
