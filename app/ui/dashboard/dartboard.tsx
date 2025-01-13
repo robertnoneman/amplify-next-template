@@ -101,11 +101,11 @@ return (
 
     {animation === "bounceOut" ? <div className={styles.dartBounceout}></div> : null}
 
-    {animation === "firstDown" ? <div className={styles.los}><div></div><div></div></div> : null}
+    {animation === "firstDown" ? <div className={`${styles.los} ${inter.className}`}><div></div><div></div></div> : null}
     {animation === "firstDown" ? <div className={styles.dartFirstDown}></div> : null}
     {animation ===  "firstDown" ? <div className={styles.firstDownResult}><div></div></div> : null}
 
-    {animation === "bigfirstDown" ? <div className={styles.los}><div></div><div></div></div> : null}
+    {animation === "bigfirstDown" ? <div className={`${styles.los} ${inter.className}`}><div></div><div></div></div> : null}
     {animation === "bigfirstDown" ? <div className={styles.dartBigFirstDown}></div> : null}
     {animation ===  "bigfirstDown" ? <div className={styles.firstDownResult}><div></div></div> : null}
 
@@ -113,7 +113,7 @@ return (
     {animation === "turnoverOnDowns" ? <div className={styles.dartTouchbackKickoff}></div> : null}
     {animation === "turnoverOnDowns" ? <div className={styles.dart4}></div> : null}
     {animation === "turnoverOnDowns" ? <div className={styles.dart5}></div> : null}
-    {animation === "turnoverOnDowns" ? <div className={styles.los}><div></div><div></div></div> : null}
+    {animation === "turnoverOnDowns" ? <div className={`${styles.los} ${inter.className}`}><div></div><div></div></div> : null}
     {animation ===  "turnoverOnDowns" ? <div className={styles.turnoverOnDownsResult}><div></div></div> : null}
 
     {/* </Row> */}
