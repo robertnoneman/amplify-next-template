@@ -36,9 +36,13 @@ import {
   } from "@/once-ui/components";
   import { isRobDay } from "@/app/lib/utils";
 import { Arrow } from '@/once-ui/components/Arrow';
+import { useWindowSize } from 'react-use';
+import Confetti from 'react-confetti';
+import Pride from "react-canvas-confetti/dist/presets/pride";
 
 export default function Page() {
   const [isRedirectDialogOpen, setIsRedirectDialogOpen] = useState(false);
+  const { width, height } = useWindowSize()
 
   useEffect(() => {
     if (!isRobDay()) {
@@ -52,6 +56,13 @@ export default function Page() {
 
   return (
     <Column fillWidth paddingY="0" paddingX="0" alignItems="center" flex={1}>
+      {/* <Confetti
+      width={width}
+      height={height}
+      recycle={false}
+      // numberOfPieces={1000}
+      tweenDuration={10000}
+      /> */}
       <Column
         overflow="hidden"
         as="main"
@@ -62,6 +73,7 @@ export default function Page() {
         // border="neutral-alpha-weak"
         fillWidth
       >
+      <Pride autorun={{ speed: 60, duration: 5000 }} />
     {/* <main className="flex min-h-screen flex-col p-0 bg-gray-800 bg-opacity-90"> */}
         <Row height={5} fillWidth background="accent-strong" alignItems="flex-end" justifyContent='space-between'>
         {/* <div className="flex h-20 shrink-0 items-end rounded-lg bg-[#bb4444] text-white md:bg-opacity-90 p-4 justify-between md:h-52"> */}
