@@ -1,3 +1,5 @@
+"use client";
+
 import { Revenue } from './definitions';
 
 export const formatCurrency = (amount: number) => {

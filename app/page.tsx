@@ -42,17 +42,24 @@ import Pride from "react-canvas-confetti/dist/presets/pride";
 
 export default function Page() {
   const [isRedirectDialogOpen, setIsRedirectDialogOpen] = useState(false);
-  const { width, height } = useWindowSize()
+  const [todayIsRobDay, setTodayIsRobDay] = useState(false);
+  const { width, height } = useWindowSize();
 
   useEffect(() => {
-    if (!isRobDay()) {
+    checkIfRobDay();
+    console.log("Today is Robday?:", todayIsRobDay);
+    if (todayIsRobDay) {
       setIsRedirectDialogOpen(true);
     }
   }, []);
 
   function onRedirect() {
     console.log("Redirecting to itsnotrobday.com");
-  }
+  };
+
+  function checkIfRobDay() {
+    setTodayIsRobDay(isRobDay());
+  };
 
   return (
     <Column fillWidth paddingY="0" paddingX="0" alignItems="center" flex={1}>
@@ -111,30 +118,65 @@ export default function Page() {
             </Column>
           </Column>
         </Column>
-        <Pride autorun={{ speed: 60, duration: 5000 }} />
+        
+        {todayIsRobDay && (
+          <Pride autorun={{ speed: 60, duration: 5000 }} />
+        )}
       </Column>
-      <Dialog
-          isOpen={!isRobDay()}
-          onClose={() => setIsRedirectDialogOpen(false)}
-          title="It's not Robday 🙁"
-          description="Bummer man."
-          fillHeight
-          footer={
-            <>
-              <Button variant="secondary" onClick={() => onRedirect()}>
-                Take me to itsnotrobday.com
-              </Button>
-            </>
-          }
+
+      {!todayIsRobDay && (
+      <Column 
+        fillWidth
+        fillHeight
+        background="surface"
+        position='absolute'
+        alignItems='center'
+        justifyContent='space-around'
         >
-          <Flex
-            fillWidth
-            alignItems='center'
-            justifyContent='center'
+        {/* <Dialog
+        isOpen={true}
+        onClose={() => setIsRedirectDialogOpen(false)}
+        title="It's not Robday 🙁"
+        description="Bummer man."
+        fillHeight
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => onRedirect()}>
+              Take me to itsnotrobday.com
+            </Button>
+          </>
+        }
+      > */}
+      <Column paddingTop="xl">
+        <Heading as='h1' variant="display-default-l" onSolid="brand-strong">
+          It's not Robday 🙁
+        </Heading>
+        <Text
+          variant="body-default-s"
+          onBackground="neutral-strong"
+        >
+          Bummer man.
+        </Text>
+      </Column>
+        <Column
+          fillWidth
+          alignItems='center'
+          justifyContent='center'
+        >
+          <CountdownToMonday/>
+        </Column>
+      {/* </Dialog> */}
+        <Button 
+          variant="secondary" 
+          onClick={() => onRedirect()}
+          href="https://itsnotrobday.com"
+          arrowIcon
           >
-            <CountdownToMonday/>
-          </Flex>
-        </Dialog>
+          Take me to itsnotrobday.com
+        </Button>
+      </Column>
+      )}
+
     </Column>
   );
 }
