@@ -34,7 +34,7 @@ import {
     RevealFx,
     SmartLink
   } from "@/once-ui/components";
-import { isRobDay } from "@/app/lib/utils";
+  import { isRobDay } from "@/app/lib/utils";
 import { Arrow } from '@/once-ui/components/Arrow';
 import { useWindowSize } from 'react-use';
 import Confetti from 'react-confetti';
@@ -45,7 +45,7 @@ export default function Page() {
   const { width, height } = useWindowSize()
 
   useEffect(() => {
-    if (isRobDay()) {
+    if (!isRobDay()) {
       setIsRedirectDialogOpen(true);
     }
   }, []);
@@ -84,13 +84,13 @@ export default function Page() {
           >
             <Column paddingX="12" paddingY="12">
               <Text variant="display-default-m" onSolid="brand-strong">
-                It can't always be Robday.<br></br><br/>
+                Happy Robday!<br></br><br/>
               </Text>
               <Text>
-                When it's Robday, try <br/>
+                When it's not Robday, try <br/>
               </Text>
               <SmartLink href="https://itsnotrobday.com" style={{color: "#0070f3", margin: 0}}>
-                <b>itsrobday.com</b>
+                <b>itsnotrobday.com</b>
               </SmartLink>
                 <br></br>
                 <Button
@@ -111,18 +111,18 @@ export default function Page() {
             </Column>
           </Column>
         </Column>
-        {/* <Pride autorun={{ speed: 60, duration: 5000 }} /> */}
+        <Pride autorun={{ speed: 60, duration: 5000 }} />
       </Column>
       <Dialog
           isOpen={!isRobDay()}
           onClose={() => setIsRedirectDialogOpen(false)}
-          title="It's actually Robday!"
-          description="Heck yeah man."
+          title="It's not Robday 🙁"
+          description="Bummer man."
           fillHeight
           footer={
             <>
               <Button variant="secondary" onClick={() => onRedirect()}>
-                Take me to itsrobday.com
+                Take me to itsnotrobday.com
               </Button>
             </>
           }
