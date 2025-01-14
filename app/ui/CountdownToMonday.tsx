@@ -73,10 +73,12 @@ export default function CountdownToMonday() {
     fillWidth 
     // justifyContent="flex-end" 
     alignItems="center" 
-    width={12}
-    background="brand-medium"
-    border="neutral-alpha-strong"
+    // width={12}
+    background="surface"
+    borderBottom="neutral-alpha-strong"
+    borderTop="neutral-alpha-strong"
     radius="xs"
+    // fillHeight
     >
       <Column
         paddingX="12"
