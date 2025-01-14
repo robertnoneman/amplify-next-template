@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic'
 import { Header } from "@/app/ui/header";
 import "@/once-ui/styles/index.scss";
 import "@/once-ui/tokens/index.scss";
-import { Background, Flex, ToastProvider } from "@/once-ui/components";
+import { Background, Flex, ToastProvider, SmartImage } from "@/once-ui/components";
 import { baseURL, style, meta, og, schema, social } from "@/once-ui/resources/config";
 import classNames from "classnames";
 import { Raleway, Roboto_Mono, Roboto } from "next/font/google";
@@ -112,7 +112,7 @@ export default function RootLayout({
       {/* </body> */}
 
       <ToastProvider>
-          <Flex as="body" fillWidth direction="column" margin="0" padding="0" className={`antialiased`}>
+          <Flex as="body" fillWidth direction="column" margin="0" padding="0" className={`antialiased`} gap="m">
             <Background
               position="absolute"
               mask={{
@@ -122,22 +122,45 @@ export default function RootLayout({
               }}
               gradient={{
                 display: true,
-                x: 100,
-                y: 60,
+                x: 50,
+                y: 110,
                 width: 70,
-                height: 50,
-                tilt: -40,
+                height: 150,
+                tilt: 0,
                 opacity: 90,
                 colorStart: "accent-background-strong",
                 colorEnd: "page-background",
               }}
               grid={{
                 display: true,
-                opacity: 100,
+                opacity: 50,
                 width: "0.25rem",
                 color: "neutral-alpha-medium",
                 height: "0.25rem",
               }}
+            />
+            <SmartImage 
+              // src="/robdaycrop.jpeg"
+              src="/robdayvert.jpeg"
+              objectFit='cover'
+              // sizes="100vw"
+              position="absolute"
+              // height={30}
+              zIndex={-1}
+              // height={20}
+              // width={25}
+              // fillWidth
+              // height={"90%"}
+              heightPercentage={80}
+              opacity={10}
+              background='transparent'
+              style={{paddingTop: "4.5rem"}}
+              // paddingTop="xl"
+              // style={{maskImage: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%)'}}
+              // radius="s-8"
+              // paddingRight="xl"
+              // aspectRatio='160:117'
+              // style={{opacity: 50, objectFit: 'fill', height: '100vh', transform: 'translateX(-20%)'}}
             />
             {/* <Flex
 						  fillWidth

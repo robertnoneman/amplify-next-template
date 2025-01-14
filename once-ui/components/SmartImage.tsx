@@ -8,6 +8,7 @@ import { Flex, Skeleton } from "@/once-ui/components";
 interface SmartImageProps extends React.ComponentProps<typeof Flex> {
   aspectRatio?: string;
   height?: number;
+  heightPercentage?: number;
   alt?: string;
   isLoading?: boolean;
   objectFit?: CSSProperties["objectFit"];
@@ -21,6 +22,7 @@ interface SmartImageProps extends React.ComponentProps<typeof Flex> {
 const SmartImage: React.FC<SmartImageProps> = ({
   aspectRatio,
   height,
+  heightPercentage,
   alt = "",
   isLoading = false,
   objectFit = "cover",
@@ -29,6 +31,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
   unoptimized = false,
   priority,
   sizes = "100vw",
+  style,
   ...rest
 }) => {
   const [isEnlarged, setIsEnlarged] = useState(false);
@@ -79,7 +82,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
         ? `translate(${translateX}px, ${translateY}px) scale(${scale})`
         : "translate(0, 0) scale(1)",
       transition: "all 0.3s ease-in-out",
-      zIndex: isEnlarged ? 2 : 1,
+      zIndex: isEnlarged ? 2 : undefined,
     };
   };
 
@@ -101,6 +104,11 @@ const SmartImage: React.FC<SmartImageProps> = ({
   const isVideo = src?.endsWith(".mp4");
   const isYouTube = isYouTubeVideo(src);
 
+  const combinedStyle: CSSProperties = {
+        objectFit: objectFit,
+        ...style,
+      };
+
   return (
     <>
       <Flex
@@ -113,7 +121,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
         style={{
           outline: "none",
           isolation: "isolate",
-          height: aspectRatio ? "" : height ? `${height}rem` : "100%",
+          height: aspectRatio ? "" : height ? `${height}rem` : heightPercentage ? `${heightPercentage}%` : "100%",
           aspectRatio,
           borderRadius: isEnlarged ? "0" : undefined,
           ...calculateTransform(),
@@ -150,6 +158,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
           />
         )}
         {!isLoading && !isVideo && !isYouTube && (
+          
           <Image
             src={src}
             alt={alt}
@@ -157,9 +166,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
             sizes={sizes}
             unoptimized={unoptimized}
             fill
-            style={{
-              objectFit: objectFit,
-            }}
+            style={combinedStyle}
           />
         )}
       </Flex>
