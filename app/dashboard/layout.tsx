@@ -1,3 +1,5 @@
+"use client";
+
 import "@/once-ui/styles/index.scss";
 import "@/once-ui/tokens/index.scss";
 
@@ -111,7 +113,7 @@ export default function RootLayout({
               }}
             />
           </head> */}
-          <Flex fillWidth direction="column" margin="0" padding="0" zIndex={1}>
+          <Flex fillWidth direction="column" margin="0" padding="0">
             <Background
               position="absolute"
               mask={{

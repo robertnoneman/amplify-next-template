@@ -116,7 +116,7 @@ export default function Page() {
       <Dialog
           isOpen={!isRobDay()}
           onClose={() => setIsRedirectDialogOpen(false)}
-          title="It's actually Robday! 🤩"
+          title="It's actually Robday!"
           description="Heck yeah man."
           fillHeight
           footer={
