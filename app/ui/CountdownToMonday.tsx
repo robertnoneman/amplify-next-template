@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { roboto } from '@/app/ui/fonts';
-import { Flex, ToggleButton } from "@/once-ui/components"
+import { Flex, ToggleButton, Text, Column, Row } from "@/once-ui/components"
 
 interface TimeLeft {
   days: number;
@@ -54,10 +54,7 @@ function calculateTimeLeft(endTime: number): TimeLeft {
 }
 
 export default function CountdownToMonday() {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => {
-    const nextMondayTime = getNextMonday().getTime();
-    return calculateTimeLeft(nextMondayTime);
-  });
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>({days: 0, hours: 0, minutes: 0, seconds: 0});
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -72,52 +69,158 @@ export default function CountdownToMonday() {
   }, []);
 
   return (
-    <Flex fillWidth justifyContent="center" alignItems="center" width={8}>
-        <Flex
-          paddingX="12"
-          justifyContent="flex-end" 
-          alignItems="center"
-          textVariant="body-default-xs"
-          direction="column"
-          overflow="hidden"
-          // maxHeight={1}
-          gap="-1">
-            <Flex hide="m" fillWidth minWidth={8} justifyContent="space-around" style={{fontSize: "9px"}} >
-              <div className="hidden md:flex">
-                THE NEXT ROBDAY IS IN
-              </div>
-            </Flex>
-            <Flex justifyContent="space-evenly" fillWidth>
-              <Flex direction="column" gap="-1" alignItems="center" justifyContent="flex-end" maxWidth={1}>
-                <Flex fillWidth justifyContent="center">0{timeLeft.days}</Flex>
-                <div className="hidden md:flex">
-                  <Flex style={{fontSize: "8px"}}>{timeLeft.days > 1 ? `days` : "day"}</Flex>
-                </div>
-              </Flex>
+    <Column 
+    fillWidth 
+    // justifyContent="flex-end" 
+    alignItems="center" 
+    // width={12}
+    background="surface"
+    borderBottom="neutral-alpha-strong"
+    borderTop="neutral-alpha-strong"
+    radius="xs"
+    // fillHeight
+    >
+      <Column
+        paddingX="12"
+        justifyContent="center" 
+        alignItems="center"
+        textVariant="body-default-xs"
+        overflow="hidden"
+        // maxHeight={1}
+        gap="-1"
+        >
+          <Row fillWidth 
+            // minWidth={8} 
+            // justifyContent="stretch" 
+            // style={{fontSize: "8px", textAlign: "justify", }}
+            alignItems="center"
+            // width={12}
+            justifyContent="space-around"
+          >
+            {/* <div className="hidden md:flex"> */}
+              <Text variant="code-default-xs"
+              style={{
+                // fontSize: "8px", 
+                textAlign: "justify",  
+              }}
+              >
+              THE NEXT ROBDAY IS IN
+              </Text>
+              {/* <Text variant="code-default-xs"
+              style={{fontSize: "8px", textAlign: "justify",  }}
+              >
+              NEXT 
+              </Text>
+              <Text variant="code-default-xs"
+              style={{fontSize: "8px", textAlign: "justify",  }}
+              >
+              ROBDAY
+              </Text>
+              <Text variant="code-default-xs"
+              style={{fontSize: "8px", textAlign: "justify",  }}
+              >
+              IS IN
+              </Text> */}
+            {/* </div> */}
+          </Row>
+          <Row fillWidth 
+            // justifyContent="stretch" 
+            // gap="0" 
+            // style={{fontSize: "8px", textAlign: "justify",  }}
+            alignItems="center"
+            // width={12}
+            justifyContent="space-around"
+          >
+            <Text variant="code-default-xs" 
+              // style={{fontSize: "8px", textAlign: "justify", }}
+              >
+            0{timeLeft.days}
+            </Text> 
+            <Text variant="code-default-xs" >
+              : 
+            </Text>
+            <Text variant="code-default-xs" >
+            {timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}
+            </Text> 
+            <Text variant="code-default-xs" >
               :
-              <Flex direction="column" gap="-1" alignItems="center" justifyContent="flex-end"  maxWidth={1}>
-                <Flex fillWidth alignItems="center" justifyContent="center">{timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}</Flex>
-                <div className="hidden md:flex">
-                  <Flex style={{fontSize: "8px"}}>{timeLeft.hours > 1 ? "hours" : "hour"}</Flex>
-                </div>
-              </Flex>
-              :
-              <Flex direction="column" gap="-1" alignItems="center" justifyContent="flex-end" maxWidth={1}>
-                <Flex fillWidth justifyContent="center">{timeLeft.minutes < 10 ? `0${timeLeft.minutes}` : timeLeft.minutes}</Flex>
-                <div className="hidden md:flex">
-                  <Flex style={{fontSize: "8px"}} alignItems="flex-start">min</Flex>
-                </div>
-              </Flex>
-              :
-              <Flex direction="column" gap="-1" alignItems="center" justifyContent="flex-end" maxWidth={1}>
-                <Flex fillWidth justifyContent="center">{timeLeft.seconds < 10 ? `0${timeLeft.seconds}` : timeLeft.seconds}</Flex>
-                <div className="hidden md:flex">
-                  <Flex style={{fontSize: "8px"}}>sec</Flex>
-                </div>
-              </Flex>
-            </Flex>
-      </Flex>
-    </Flex>
+            </Text>
+            <Text variant="code-default-xs" >
+            {timeLeft.minutes < 10 ? `0${timeLeft.minutes}` : timeLeft.minutes} 
+            </Text>
+            <Text variant="code-default-xs" >
+            : 
+            </Text>
+            <Text variant="code-default-xs" >
+            {timeLeft.seconds < 10 ? `0${timeLeft.seconds}` : timeLeft.seconds}
+            </Text>
+          </Row>
+
+          {/* <Row fillWidth 
+            // justifyContent="stretch" 
+            // gap="0" 
+            // style={{fontSize: "8px", textAlign: "justify",  display: "inline-block"}}
+            alignItems="center"
+            // width={12}
+          >
+            <Text variant="code-default-xs" 
+              // style={{fontSize: "8px", textAlign: "justify",  display: "inline-block"}}
+            >
+              {/* {timeLeft.days > 1 ? `days` : "day"} {timeLeft.hours > 1 ? "hours" : "hour"} {timeLeft.minutes > 1 ? "minutes" : "minute"} {timeLeft.seconds > 1 ? "seconds" : "second"} */}
+            {/* </Text> */}
+          {/* </Row> */} 
+
+          {/* <Row justifyContent="space-evenly" fillWidth alignItems="center">
+            <Column direction="column" gap="-1" alignItems="center" justifyContent="center" >
+              <Text variant="code-default-xs">
+                THE
+              </Text>
+              <Row fillWidth justifyContent="center">
+                0{timeLeft.days}
+              </Row>
+                <Text variant="code-default-xs" style={{fontSize: "8px"}}>
+                  {timeLeft.days > 1 ? `days` : "day"}
+                </Text>
+            </Column>
+            :
+            <Column direction="column" gap="-1" alignItems="center" justifyContent="center"  >
+              <Text variant="code-default-xs">
+                NEXT
+              </Text>
+              <Row fillWidth alignItems="center" justifyContent="center">
+                {timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}
+              </Row>
+              <Text variant="code-default-xs" style={{fontSize: "8px"}}>
+                {timeLeft.hours > 1 ? "hours" : "hour"}
+              </Text>
+            </Column>
+            :
+            <Column direction="column" gap="-1" alignItems="center" justifyContent="center" >
+              <Text variant="code-default-xs">
+                ROBDAY
+              </Text>
+              <Row fillWidth justifyContent="center">
+                {timeLeft.minutes < 10 ? `0${timeLeft.minutes}` : timeLeft.minutes}
+              </Row>
+              <Text variant="code-default-xs" style={{fontSize: "8px"}}>
+                {timeLeft.minutes > 1 ? "minutes" : "minute"}
+              </Text>
+            </Column>
+            :
+            <Column direction="column" gap="-1" alignItems="center" justifyContent="center" >
+              <Text variant="code-default-xs">
+                IS IN
+              </Text>
+              <Row fillWidth justifyContent="center">
+                {timeLeft.seconds < 10 ? `0${timeLeft.seconds}` : timeLeft.seconds}
+              </Row>
+              <Text variant="code-default-xs" style={{fontSize: "8px"}}>
+                {timeLeft.seconds > 1 ? "seconds" : "second"}
+              </Text>
+            </Column>
+          </Row> */}
+      </Column>
+    </Column>
 //     <div className="flex flex-col items-center justify-center space-y-0" suppressHydrationWarning>
 //       <h1 className={`${roboto.className} text-white mb-0 text-xl md:text-2xl`}>The next Robday is in</h1>
 //       <div className={`${roboto.className} text-white flex space-x-4`}>
