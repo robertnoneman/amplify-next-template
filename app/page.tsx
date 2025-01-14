@@ -67,8 +67,14 @@ export default function Page() {
         fillWidth
         fillHeight
       >
-        <Row height={5} fillWidth background="accent-strong" alignItems="flex-end" justifyContent='space-between'>
-            <RobLogo />
+        <Row height={10} fillWidth background="accent-strong" alignItems="flex-end" justifyContent='space-between'>
+            <RobLogo isRobDay={isRobDay()}/>
+        </Row>
+        
+        <Row style={{height: "95%"}} />
+        
+        <Row justifyContent='center' alignItems='center'>
+          <CountdownToMonday/>
         </Row>
         <Column 
           fillHeight 
@@ -76,47 +82,55 @@ export default function Page() {
           // fillWidth 
           // minHeight={5}
         >
-          <Column 
-            // height={50} 
-            background="surface" 
-            justifyContent='flex-end' 
-            paddingX="0" paddingY="0" gap="0" alignItems="left"
-          >
-            <Column paddingX="12" paddingY="12">
-              <Text variant="display-default-m" onSolid="brand-strong">
-                Happy Robday!<br></br><br/>
-              </Text>
-              <Text>
-                When it's not Robday, try <br/>
-              </Text>
-              <SmartLink href="https://itsnotrobday.com" style={{color: "#0070f3", margin: 0}}>
-                <b>itsnotrobday.com</b>
-              </SmartLink>
-                <br></br>
-                <Button
-                  id="trigger"
-                  variant="primary"
-                  size="l"
-                  href="/dashboard"
-                  style={{backgroundColor: "#0070f3"}}
-                >
-                  <Flex fillHeight justifyContent='center' alignItems='center'>
-                    Explore
-                    <Arrow
-                      trigger="#trigger"
-                      color="onBackground"
-                      />
-                  </Flex>
-                </Button>
-            </Column>
+            <Column 
+              // height={50} 
+              background="surface" 
+              justifyContent='flex-end' 
+              paddingX="0" paddingY="0" gap="0" alignItems="left"
+              >
+              <Row justifyContent='space-within' alignItems='center' paddingX="12" paddingY="12">
+                <Column paddingX="12" paddingY="12">
+                  <Text variant="display-default-m" onSolid="brand-strong">
+                    {isRobDay() ? "Happy Robday!" : "It's not Robday ☹️"}
+                    <br></br><br/>
+                  </Text>
+                  <Text>
+                    {isRobDay() ? "It's Robday! 🎉" : "Bummer..."}<br/>
+                    When it's Robday, try <br/>
+                  </Text>
+                  <SmartLink href="https://itsnotrobday.com" style={{color: "#0070f3", margin: 0}}>
+                    <b>itsrobday.com</b>
+                  </SmartLink>
+                    <br></br>
+                    <Button
+                      id="trigger"
+                      variant="primary"
+                      size="l"
+                      href="/dashboard"
+                      style={{backgroundColor: "#0070f3"}}
+                    >
+                      <Flex fillHeight justifyContent='center' alignItems='center'>
+                        Explore
+                        <Arrow
+                          trigger="#trigger"
+                          color="onBackground"
+                          />
+                      </Flex>
+                    </Button>
+                </Column>
+              {/* <Column>
+                <CountdownToMonday/>
+              </Column> */}
+            </Row>
           </Column>
         </Column>
-        <Pride autorun={{ speed: 60, duration: 5000 }} />
+        
+        {/* <Pride autorun={{ speed: 60, duration: 5000 }} /> */}
       </Column>
       <Dialog
-          isOpen={!isRobDay()}
+          isOpen={isRobDay()}
           onClose={() => setIsRedirectDialogOpen(false)}
-          title="It's not Robday 🙁"
+          title="It's not Robday "
           description="Bummer man."
           fillHeight
           footer={
