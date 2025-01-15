@@ -48,32 +48,7 @@ export default function Page() {
   const [commonOptions2, setCommonOptions2] = useState({});
 
   // const { width, height } = useWindowSize()
-  // const commonOptions = {
-  //   spread: 55,
-  //   // ticks: 200,
-  //   gravity: .8,
-  //   // decay: 0.9,
-  //   startVelocity: 20,
-  //   colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
-  //   particleCount: 3,
-  //   // shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text:"😒"})],
-  //   scalar: 3,
-  //   // flat: true,
-  //   origin: {x: 0.0, y: 0.3 }
-  // };
-  // const commonOptions2 = {
-  //   spread: 55,
-  //   // ticks: 200,
-  //   gravity: .8,
-  //   // decay: 0.9,
-  //   startVelocity: 30,
-  //   colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
-  //   particleCount: 10,
-  //   // shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text: "😒"})],
-  //   scalar: 2,
-  //   origin: {x: 1.0, y: 0.3 },
-  //   flat: true
-  // };
+
   const angles = [60, 120];
   const doubleAngles = angles.concat(angles);
 
