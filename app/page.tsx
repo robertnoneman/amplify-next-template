@@ -44,33 +44,36 @@ import ReactCanvasConfetti from "react-canvas-confetti";
 
 export default function Page() {
   const [isRedirectDialogOpen, setIsRedirectDialogOpen] = useState(false);
-  const { width, height } = useWindowSize()
-  const commonOptions = {
-    spread: 55,
-    // ticks: 200,
-    gravity: .8,
-    // decay: 0.9,
-    startVelocity: 20,
-    colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
-    particleCount: 3,
-    shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text:"😒"})],
-    scalar: 3,
-    // flat: true,
-    origin: {x: 0.0, y: 0.3 }
-  };
-  const commonOptions2 = {
-    spread: 55,
-    // ticks: 200,
-    gravity: .8,
-    // decay: 0.9,
-    startVelocity: 30,
-    colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
-    particleCount: 10,
-    shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text: "😒"})],
-    scalar: 2,
-    origin: {x: 1.0, y: 0.3 },
-    flat: true
-  };
+  const [commonOptions, setCommonOptions] = useState({});
+  const [commonOptions2, setCommonOptions2] = useState({});
+
+  // const { width, height } = useWindowSize()
+  // const commonOptions = {
+  //   spread: 55,
+  //   // ticks: 200,
+  //   gravity: .8,
+  //   // decay: 0.9,
+  //   startVelocity: 20,
+  //   colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+  //   particleCount: 3,
+  //   // shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text:"😒"})],
+  //   scalar: 3,
+  //   // flat: true,
+  //   origin: {x: 0.0, y: 0.3 }
+  // };
+  // const commonOptions2 = {
+  //   spread: 55,
+  //   // ticks: 200,
+  //   gravity: .8,
+  //   // decay: 0.9,
+  //   startVelocity: 30,
+  //   colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+  //   particleCount: 10,
+  //   // shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text: "😒"})],
+  //   scalar: 2,
+  //   origin: {x: 1.0, y: 0.3 },
+  //   flat: true
+  // };
   const angles = [60, 120];
   const doubleAngles = angles.concat(angles);
 
@@ -107,12 +110,38 @@ export default function Page() {
     if (!isRobDay()) {
       setIsRedirectDialogOpen(true);
     };
-    fire();
+    setCommonOptions({
+      spread: 55,
+      // ticks: 200,
+      gravity: .8,
+      // decay: 0.9,
+      startVelocity: 20,
+      colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+      particleCount: 3,
+      shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text:"😒"})],
+      scalar: 3,
+      // flat: true,
+      origin: {x: 0.0, y: 0.3 }
+    });
+    setCommonOptions2({
+      spread: 55,
+      // ticks: 200,
+      gravity: .8,
+      // decay: 0.9,
+      startVelocity: 30,
+      colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+      particleCount: 10,
+      shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text: "😒"})],
+      scalar: 2,
+      origin: {x: 1.0, y: 0.3 },
+      flat: true
+    });
+    // fire();
   }, []);
 
 
   return (
-    <Column fillWidth paddingY="0" paddingX="0" alignItems="center" flex={1}>
+    <Column fillWidth paddingY="0" paddingX="0" alignItems="center" flex={1} onClick={() => fire()}>
       <Column
         overflow="hidden"
         as="main"
@@ -144,6 +173,7 @@ export default function Page() {
               background="surface" 
               justifyContent='flex-end' 
               paddingX="0" paddingY="0" gap="0" alignItems="left"
+              // onClick={() => fire()}
               >
               <Row justifyContent='space-within' alignItems='center' paddingX="12" paddingY="12">
                 <Column paddingX="12" paddingY="12">
@@ -185,7 +215,7 @@ export default function Page() {
         {/* <Pride autorun={{ speed: 60, duration: 5000, shapes: [confetti.shapeFromText({text: "☹️"})] }} /> */}
         <ReactCanvasConfetti onInit={onInit} />
       </Column>
-      <Dialog
+      {/* <Dialog
           isOpen={isRobDay()}
           onClose={() => setIsRedirectDialogOpen(false)}
           title="It's not Robday "
@@ -206,7 +236,7 @@ export default function Page() {
           >
             <CountdownToMonday/>
           </Flex>
-        </Dialog>
+        </Dialog> */}
     </Column>
   );
 }
