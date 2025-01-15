@@ -1,7 +1,7 @@
 "use client";
 
 import RobLogo from '@/app/ui/rob-logo';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { lusitana, roboto } from '@/app/ui/fonts';
@@ -37,22 +37,79 @@ import {
   import { isRobDay } from "@/app/lib/utils";
 import { Arrow } from '@/once-ui/components/Arrow';
 import { useWindowSize } from 'react-use';
-import Confetti from 'react-confetti';
+// import Confetti from 'react-confetti';
+import confetti from "canvas-confetti";
 import Pride from "react-canvas-confetti/dist/presets/pride";
+import ReactCanvasConfetti from "react-canvas-confetti";
 
 export default function Page() {
   const [isRedirectDialogOpen, setIsRedirectDialogOpen] = useState(false);
   const { width, height } = useWindowSize()
+  const commonOptions = {
+    spread: 55,
+    // ticks: 200,
+    gravity: .8,
+    // decay: 0.9,
+    startVelocity: 20,
+    colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+    particleCount: 3,
+    shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text:"😒"})],
+    scalar: 3,
+    // flat: true,
+    origin: {x: 0.0, y: 0.3 }
+  };
+  const commonOptions2 = {
+    spread: 55,
+    // ticks: 200,
+    gravity: .8,
+    // decay: 0.9,
+    startVelocity: 30,
+    colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+    particleCount: 10,
+    shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text: "😒"})],
+    scalar: 2,
+    origin: {x: 1.0, y: 0.3 },
+    flat: true
+  };
+  const angles = [60, 120];
+  const doubleAngles = angles.concat(angles);
+
+  function onRedirect() {
+    console.log("Redirecting to itsnotrobday.com");
+  };
+
+  const instance = useRef<any>(null);
+  
+  const onInit = ({ confetti }: { confetti: any }) => {
+    instance.current = confetti;
+  };
+  
+  const fire = () => {
+    doubleAngles.forEach((angle, index) => {
+      setTimeout(() => {
+        instance.current && instance.current({
+          ...commonOptions,
+          angle
+        });
+      }, index * 200);
+    });
+    doubleAngles.forEach((angle, index) => {
+      setTimeout(() => {
+        instance.current && instance.current({
+          ...commonOptions2,
+          angle
+        });
+      }, index * 200);
+    });
+  };
 
   useEffect(() => {
     if (!isRobDay()) {
       setIsRedirectDialogOpen(true);
-    }
+    };
+    fire();
   }, []);
 
-  function onRedirect() {
-    console.log("Redirecting to itsnotrobday.com");
-  }
 
   return (
     <Column fillWidth paddingY="0" paddingX="0" alignItems="center" flex={1}>
@@ -125,7 +182,8 @@ export default function Page() {
           </Column>
         </Column>
         
-        {/* <Pride autorun={{ speed: 60, duration: 5000 }} /> */}
+        {/* <Pride autorun={{ speed: 60, duration: 5000, shapes: [confetti.shapeFromText({text: "☹️"})] }} /> */}
+        <ReactCanvasConfetti onInit={onInit} />
       </Column>
       <Dialog
           isOpen={isRobDay()}
