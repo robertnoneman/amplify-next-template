@@ -36,12 +36,14 @@ const schema = a.schema({
     //    with the reference of `postId`
     tags: a.hasMany('PostTag', 'postId'),
   }).authorization((allow) => [allow.publicApiKey()]),
+
   Tag: a.model({
     name: a.string(),
     // 4. Add relationship field to the join model
     //    with the reference of `tagId`
     posts: a.hasMany('PostTag', 'tagId'),
   }).authorization((allow) => [allow.publicApiKey()]),
+
   RobdaylogActivity: a
     .model({
       robdaylogId: a.id().required(),
@@ -54,6 +56,7 @@ const schema = a.schema({
     .model({
       // robDayLogId: a.id(),
       // activityId: a.id(),
+
       date: a.date().required(),
       robDayNumber: a.integer(),
       notes: a.string().array(),
@@ -62,7 +65,8 @@ const schema = a.schema({
       rating: a.integer(),
       cost: a.float(),
       duration: a.time(),
-      activities: a.hasMany("RobdaylogActivity", "activityId"),
+
+      activities: a.hasMany("RobdaylogActivity", "robdaylogId"),
     }).authorization((allow) => [allow.publicApiKey()]),
   Activity: a
     .model({
@@ -81,7 +85,8 @@ const schema = a.schema({
       location: a.string(),
       isOnNextRobDay: a.boolean(),
       // robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
-      robdaylogs: a.hasMany("RobdaylogActivity", "robdaylogId")
+
+      robdaylogs: a.hasMany("RobdaylogActivity", "activityId")
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 
