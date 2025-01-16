@@ -29,7 +29,7 @@ const schema = a.schema({
       activityId: a.id(),
       date: a.date().required(),
       robDayNumber: a.integer(),
-      activities: a.hasMany("Activity", "activityId"),
+      activity: a.hasMany("Activity", "activityId"),
       notes: a.string().array(),
       weatherCondition: a.string(),
       temperature: a.float(),
