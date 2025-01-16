@@ -26,6 +26,7 @@ const schema = a.schema({
   RobDayLog: a
     .model({
       robDayLogId: a.id(),
+      activityId: a.id(),
       date: a.date().required(),
       robDayNumber: a.integer(),
       activities: a.hasMany("Activity", "activityId"),
@@ -39,6 +40,7 @@ const schema = a.schema({
   Activity: a
     .model({
       activityId: a.id(),
+      robDayLogId: a.id(),
       name: a.string(),
       description: a.string(),
       count: a.integer(),
