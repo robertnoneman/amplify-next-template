@@ -28,15 +28,7 @@ const schema = a.schema({
     post: a.belongsTo('Post', 'postId'),
     tag: a.belongsTo('Tag', 'tagId'),
   }).authorization((allow) => [allow.publicApiKey()]),
-  RobDayLogActivity: a
-    .model({
-      robDayLogId: a.id().required(),
-      activityId: a.id().required(),
-      
-      robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
-      activity: a.belongsTo("Activity", "activityId"),
-    }).authorization((allow) => [allow.publicApiKey()]),
-
+  
   Post: a.model({
     title: a.string(),
     content: a.string(),
@@ -50,7 +42,15 @@ const schema = a.schema({
     //    with the reference of `tagId`
     posts: a.hasMany('PostTag', 'tagId'),
   }).authorization((allow) => [allow.publicApiKey()]),
-  RobDayLog: a
+  RobdaylogActivity: a
+    .model({
+      robdaylogId: a.id().required(),
+      activityId: a.id().required(),
+
+      robdaylog: a.belongsTo("Robdaylog", "robdaylogId"),
+      activity: a.belongsTo("Activity", "activityId"),
+    }).authorization((allow) => [allow.publicApiKey()]),
+  Robdaylog: a
     .model({
       // robDayLogId: a.id(),
       // activityId: a.id(),
@@ -62,7 +62,7 @@ const schema = a.schema({
       rating: a.integer(),
       cost: a.float(),
       duration: a.time(),
-      activities: a.hasMany("Activity", "activityId"),
+      activities: a.hasMany("RobdaylogActivity", "activityId"),
     }).authorization((allow) => [allow.publicApiKey()]),
   Activity: a
     .model({
@@ -81,7 +81,7 @@ const schema = a.schema({
       location: a.string(),
       isOnNextRobDay: a.boolean(),
       // robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
-      robDayLogs: a.hasMany("RobDayLog", "robDayLogId")
+      robdaylogs: a.hasMany("RobdaylogActivity", "robdaylogId")
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 
