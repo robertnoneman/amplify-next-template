@@ -16,15 +16,16 @@ const schema = a.schema({
   Category: a.customType({
     category: a.enum(["Game", "Food", "Craft", "Music", "Movie", "Exercise", "Outdoor", "Indoor", "Other"])
   }),
-  // RobDayLogActivity: a
-  //   .model({
-  //     robDayLogId: a.id().required(),
-  //     activityId: a.id().required(),
-  //     robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
-  //     activity: a.belongsTo("Activity", "activityId"),
-  //   }).authorization((allow) => [allow.publicApiKey()]),
+  RobDayLogActivity: a
+    .model({
+      robDayLogId: a.id().required(),
+      activityId: a.id().required(),
+      robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
+      activity: a.belongsTo("Activity", "activityId"),
+    }).authorization((allow) => [allow.publicApiKey()]),
   RobDayLog: a
     .model({
+      robDayLogId: a.id(),
       date: a.date().required(),
       robDayNumber: a.integer(),
       activities: a.hasMany("Activity", "activityId"),
@@ -37,6 +38,7 @@ const schema = a.schema({
     }).authorization((allow) => [allow.publicApiKey()]),
   Activity: a
     .model({
+      activityId: a.id(),
       name: a.string(),
       description: a.string(),
       count: a.integer(),
