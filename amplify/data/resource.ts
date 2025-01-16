@@ -18,7 +18,7 @@ const schema = a.schema({
   }),
   RobDayLogActivity: a
     .model({
-      robDayId: a.id().required(),
+      robDayLogId: a.id().required(),
       activityId: a.id().required(),
       robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
       activity: a.belongsTo("Activity", "activityId"),
