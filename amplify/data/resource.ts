@@ -29,7 +29,7 @@ const schema = a.schema({
       activityId: a.id(),
       date: a.date().required(),
       robDayNumber: a.integer(),
-      // activities: a.hasMany("Activity", "activityId"),
+      activities: a.hasMany("Activity", "activityId"),
       notes: a.string().array(),
       weatherCondition: a.string(),
       temperature: a.float(),
@@ -53,6 +53,7 @@ const schema = a.schema({
       costMax: a.integer(),
       location: a.string(),
       isOnNextRobDay: a.boolean(),
+      robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
       // robDayLogs: a.hasMany("RobDayLog", "robDayLogId")
     }).authorization((allow) => [allow.publicApiKey()]),
 });
