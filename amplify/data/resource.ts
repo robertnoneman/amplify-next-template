@@ -16,13 +16,13 @@ const schema = a.schema({
   Category: a.customType({
     category: a.enum(["Game", "Food", "Craft", "Music", "Movie", "Exercise", "Outdoor", "Indoor", "Other"])
   }),
-  RobDayLogActivity: a
-    .model({
-      robDayLogId: a.id().required(),
-      activityId: a.id().required(),
-      robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
-      activity: a.belongsTo("Activity", "activityId"),
-    }).authorization((allow) => [allow.publicApiKey()]),
+  // RobDayLogActivity: a
+  //   .model({
+  //     robDayLogId: a.id().required(),
+  //     activityId: a.id().required(),
+  //     robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
+  //     activity: a.belongsTo("Activity", "activityId"),
+  //   }).authorization((allow) => [allow.publicApiKey()]),
   RobDayLog: a
     .model({
       date: a.date().required(),
