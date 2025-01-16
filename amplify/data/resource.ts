@@ -23,13 +23,37 @@ const schema = a.schema({
   //     robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
   //     activity: a.belongsTo("Activity", "activityId"),
   //   }).authorization((allow) => [allow.publicApiKey()]),
+  PostTag: a.model({
+    // 1. Create reference fields to both ends of
+    //    the many-to-many relationship
+    postId: a.id().required(),
+    tagId: a.id().required(),
+    // 2. Create relationship fields to both ends of
+    //    the many-to-many relationship using their
+    //    respective reference fields
+    post: a.belongsTo('Post', 'postId'),
+    tag: a.belongsTo('Tag', 'tagId'),
+  }).authorization((allow) => [allow.publicApiKey()]),
+  Post: a.model({
+    title: a.string(),
+    content: a.string(),
+    // 3. Add relationship field to the join model
+    //    with the reference of `postId`
+    tags: a.hasMany('PostTag', 'postId'),
+  }).authorization((allow) => [allow.publicApiKey()]),
+  Tag: a.model({
+    name: a.string(),
+    // 4. Add relationship field to the join model
+    //    with the reference of `tagId`
+    posts: a.hasMany('PostTag', 'tagId'),
+  }).authorization((allow) => [allow.publicApiKey()]),
   RobDayLog: a
     .model({
       robDayLogId: a.id(),
       activityId: a.id(),
       date: a.date().required(),
       robDayNumber: a.integer(),
-      activity: a.hasMany("Activity", "activityId"),
+      // activity: a.hasMany("Activity", "activityId"),
       notes: a.string().array(),
       weatherCondition: a.string(),
       temperature: a.float(),
@@ -53,7 +77,7 @@ const schema = a.schema({
       costMax: a.integer(),
       location: a.string(),
       isOnNextRobDay: a.boolean(),
-      robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
+      // robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
       // robDayLogs: a.hasMany("RobDayLog", "robDayLogId")
     }).authorization((allow) => [allow.publicApiKey()]),
 });
