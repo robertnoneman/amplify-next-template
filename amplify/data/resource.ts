@@ -16,13 +16,7 @@ const schema = a.schema({
   Category: a.customType({
     category: a.enum(["Game", "Food", "Craft", "Music", "Movie", "Exercise", "Outdoor", "Indoor", "Other"])
   }),
-  // RobDayLogActivity: a
-  //   .model({
-  //     robDayLogId: a.id().required(),
-  //     activityId: a.id().required(),
-  //     robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
-  //     activity: a.belongsTo("Activity", "activityId"),
-  //   }).authorization((allow) => [allow.publicApiKey()]),
+
   PostTag: a.model({
     // 1. Create reference fields to both ends of
     //    the many-to-many relationship
@@ -34,6 +28,15 @@ const schema = a.schema({
     post: a.belongsTo('Post', 'postId'),
     tag: a.belongsTo('Tag', 'tagId'),
   }).authorization((allow) => [allow.publicApiKey()]),
+  RobDayLogActivity: a
+    .model({
+      robDayLogId: a.id().required(),
+      activityId: a.id().required(),
+      
+      robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
+      activity: a.belongsTo("Activity", "activityId"),
+    }).authorization((allow) => [allow.publicApiKey()]),
+
   Post: a.model({
     title: a.string(),
     content: a.string(),
@@ -49,22 +52,22 @@ const schema = a.schema({
   }).authorization((allow) => [allow.publicApiKey()]),
   RobDayLog: a
     .model({
-      robDayLogId: a.id(),
-      activityId: a.id(),
+      // robDayLogId: a.id(),
+      // activityId: a.id(),
       date: a.date().required(),
       robDayNumber: a.integer(),
-      // activity: a.hasMany("Activity", "activityId"),
       notes: a.string().array(),
       weatherCondition: a.string(),
       temperature: a.float(),
       rating: a.integer(),
       cost: a.float(),
-      duration: a.time()
+      duration: a.time(),
+      activities: a.hasMany("Activity", "activityId"),
     }).authorization((allow) => [allow.publicApiKey()]),
   Activity: a
     .model({
-      activityId: a.id(),
-      robDayLogId: a.id(),
+      // activityId: a.id(),
+      // robDayLogId: a.id(),
       name: a.string(),
       description: a.string(),
       count: a.integer(),
@@ -78,7 +81,7 @@ const schema = a.schema({
       location: a.string(),
       isOnNextRobDay: a.boolean(),
       // robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
-      // robDayLogs: a.hasMany("RobDayLog", "robDayLogId")
+      robDayLogs: a.hasMany("RobDayLog", "robDayLogId")
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 
