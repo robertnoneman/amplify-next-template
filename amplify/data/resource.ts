@@ -16,6 +16,25 @@ const schema = a.schema({
   Category: a.customType({
     category: a.enum(["Game", "Food", "Craft", "Music", "Movie", "Exercise", "Outdoor", "Indoor", "Other"])
   }),
+  RobDayLogActivity: a
+    .model({
+      robDayId: a.id().required(),
+      activityId: a.id().required(),
+      robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
+      activity: a.belongsTo("Activity", "activityId"),
+    }).authorization((allow) => [allow.publicApiKey()]),
+  RobDayLog: a
+    .model({
+      date: a.date().required(),
+      robDayNumber: a.integer(),
+      activities: a.hasMany("Activity", "activityId"),
+      notes: a.string().array(),
+      weatherCondition: a.string(),
+      temperature: a.float(),
+      rating: a.integer(),
+      cost: a.float(),
+      duration: a.time()
+    }).authorization((allow) => [allow.publicApiKey()]),
   Activity: a
     .model({
       name: a.string(),
@@ -30,6 +49,7 @@ const schema = a.schema({
       costMax: a.integer(),
       location: a.string(),
       isOnNextRobDay: a.boolean(),
+      robDayLogs: a.hasMany("RobDayLog", "robDayLogId")
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 
