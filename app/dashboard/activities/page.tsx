@@ -42,6 +42,7 @@ const client = generateClient<Schema>();
 
 export default function Page() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [hideDone, setHideDone] = useState(false);
   const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
   const [editedActivity, setEditedActivity] = useState<Schema["Activity"]["type"]>();
   const [file, setFile] = useState("");
@@ -340,7 +341,7 @@ export default function Page() {
               <Button
                 // onClick={createActivity}
                 onClick={() => setIsFirstDialogOpen(true)}
-                variant="tertiary"
+                variant="primary"
                 size="m"
                 label="Create Activity"
               />
@@ -550,6 +551,14 @@ export default function Page() {
           blur={0.25}
         />
         <h2 className={`${roboto.className} text-xl text-gray-50 md:text-3xl md:leading-normal`}>Robday Todo List</h2>
+        <Column gap="8" paddingY="s" fillWidth alignItems='flex-end'>
+          <Line height={0.1}></Line>
+          <Row fillWidth justifyContent="space-around">
+            {/* <Column fillWidth /> */}
+            <Button variant="primary" fillWidth onClick={createTodo}>Create Todo</Button>
+            <Button variant="tertiary" fillWidth onClick={() => setHideDone(!hideDone)}>{hideDone ? "Show Done" : "Hide Done"}</Button>
+          </Row>
+        </Column>
         {/* <div className={`${styles.ul} ${roboto.className} `}> */}
         <ul className={`${styles.ul}`} key={"todoList"}>
           <div className={`${styles.li} ${roboto.className} `}>
@@ -571,6 +580,7 @@ export default function Page() {
         {/* </div> */}
           {todos.map((todo) => (
             <div key={todo.id} className={`${styles.li} ${roboto.className} ${todo.isDone} `}>
+              {hideDone && todo.isDone ? null :
               <li
                 onClick={() => deleteTodo(todo.id, todo.content, todo.isDone)}
                 key={todo.id}>
@@ -594,18 +604,10 @@ export default function Page() {
                       </Text> */}
                   </Row>
               </li>
+              }
             </div>
           ))}
         </ul>
-        <Flex >
-          <Button
-            onClick={createTodo}
-            variant="secondary"
-            size="m"
-            label="Create Todo">
-          </Button>
-          {/* <button className={`${styles.button}`} onClick={createTodo}>+ new</button> */}
-        </Flex>
       </Column>
       <Line height={1}></Line>
     </main>
