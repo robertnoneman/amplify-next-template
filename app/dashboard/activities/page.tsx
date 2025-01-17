@@ -30,7 +30,8 @@ import {
   Chip,
   Tag,
   RevealFx,
-  Line
+  Line,
+  Grid
 } from "@/once-ui/components";
 import { MediaUpload } from "@/once-ui/modules";
 import { uploadData } from 'aws-amplify/storage';
@@ -225,7 +226,6 @@ export default function Page() {
     
   return (
     <main>
-      
       <Flex
           justifyContent="center"
           paddingX="32"
@@ -259,92 +259,101 @@ export default function Page() {
               colorEnd: "static-transparent",
             }}
           />
-          <Column maxWidth={36} gap="8">
-          <Column fillWidth alignItems="center" gap="32" padding="32" position="relative">
-            <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
-              Robday Activities
-            </Heading>
-          </Column>
-          {activities.map((activity) => (
-            <RevealFx translateY="16" delay={0.6} key={`${activity.id}rfx`}>
-              {/* <TiltFx fillWidth paddingX="32" paddingTop="4" key={`${activity.id}fx`}> */}
-                <Row
-                    background="page"
-                    radius={undefined}
-                    bottomRadius="l"
-                    topRadius='l'
-                    overflow="hidden"
-                    position="relative"
-                    fillWidth
-                    alignItems="center"
-                    border="neutral-medium"
-                    mobileDirection='column'
-                    key={`${activity.id}flex0`}
-                    // onClick={() => populateActivity(activity)}
-                    // onDoubleClick={() => populateActivity(activity)}
-                  > 
-                    <SmartImage
-                      src={urls[activities.indexOf(activity)]}
-                      aspectRatio="16/9"
-                      radius="l"
-                      objectFit="cover"
-                      sizes='s'
-                    />
-                    <Column
-                      // paddingTop="160"
-                      paddingX="16"
-                      paddingBottom="16"
-                      fillWidth
+          <Column maxWidth="l" gap="8">
+            <Column fillWidth alignItems="center" gap="32" padding="32" position="relative">
+              <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
+                Robday Activities
+              </Heading>
+            </Column>
+            <Grid
+              fillWidth
+              columns="3"
+              padding="16"
+              gap="8"
+              mobileColumns='1'
+            >
+              {activities.map((activity) => (
+              <RevealFx translateY="16" delay={0.6} key={`${activity.id}rfx`}>
+                {/* <TiltFx fillWidth paddingX="32" paddingTop="4" key={`${activity.id}fx`}> */}
+                  <Row
+                      background="page"
+                      radius={undefined}
+                      bottomRadius="l"
+                      topRadius='l'
+                      overflow="hidden"
                       position="relative"
-                      alignItems="flex-start"
-                      justifyContent="flex-start"
-                      overflow='hidden'
-                      // marginTop="xl"
-                      gap="0"
-                      key={`${activity.id}c0`}
-                    >
-                      <Heading marginTop="xs" variant="heading-default-xs" key={`${activity.id}h0`}>
-                        {activity.name}
-                      </Heading>
-                      <Row>
-                        {(activity.categories ?? []).map((tag) => (
-                          <Tag
-                            key={`${activity.categories?.indexOf(tag)}tag`}
-                            label={tag?.toString()}
-                            size="s"
-                            variant="info"
-                            />
-                        ))}
-                      </Row>
-                      <Text align="left" onBackground="neutral-medium" variant='body-default-xs' key={`${activity.id}t1`}>
-                        {activity.description}
-                      </Text>
-                    </Column>
-                    <Row position="absolute" justifyContent='flex-end' fillHeight fillWidth padding="4" zIndex={9}>
-                      <Column fillHeight justifyContent="flex-start" direction="column">
-                        <IconButton
-                          onClick={() => populateActivity(activity)}
-                          // name="HiOutlinePencil"
-                          icon="edit"
-                          size="m"
-                          variant="tertiary"
-                          // onBackground="brand-weak"
-                        ></IconButton>
+                      fillWidth
+                      alignItems="center"
+                      border="neutral-medium"
+                      mobileDirection='column'
+                      key={`${activity.id}flex0`}
+                      // onClick={() => populateActivity(activity)}
+                      // onDoubleClick={() => populateActivity(activity)}
+                    > 
+                      <SmartImage
+                        src={urls[activities.indexOf(activity)]}
+                        aspectRatio="16/9"
+                        radius="l"
+                        objectFit="cover"
+                        sizes='s'
+                      />
+                      <Column
+                        // paddingTop="160"
+                        paddingX="16"
+                        paddingBottom="16"
+                        fillWidth
+                        position="relative"
+                        alignItems="flex-start"
+                        justifyContent="flex-start"
+                        overflow='hidden'
+                        // marginTop="xl"
+                        gap="0"
+                        key={`${activity.id}c0`}
+                      >
+                        <Heading marginTop="xs" variant="heading-default-xs" key={`${activity.id}h0`}>
+                          {activity.name}
+                        </Heading>
+                        <Row>
+                          {(activity.categories ?? []).map((tag) => (
+                            <Tag
+                              key={`${activity.categories?.indexOf(tag)}tag`}
+                              label={tag?.toString()}
+                              size="s"
+                              variant="info"
+                              />
+                          ))}
+                        </Row>
+                        <Text align="left" onBackground="neutral-medium" variant='body-default-xs' key={`${activity.id}t1`}>
+                          {activity.description}
+                        </Text>
                       </Column>
-                    </Row>
-                </Row>
-                {/* </TiltFx> */}
-              </RevealFx>
-              
-            ))}
+                      <Row position="absolute" justifyContent='flex-end' fillHeight fillWidth padding="4" zIndex={9}>
+                        <Column fillHeight justifyContent="flex-start" direction="column">
+                          <IconButton
+                            onClick={() => populateActivity(activity)}
+                            // name="HiOutlinePencil"
+                            icon="edit"
+                            size="m"
+                            variant="tertiary"
+                            // onBackground="brand-weak"
+                          ></IconButton>
+                        </Column>
+                      </Row>
+                  </Row>
+                  {/* </TiltFx> */}
+                </RevealFx>
+              ))}
+            </Grid>
             <Flex>
+              <Row fillWidth justifyContent="center">
               <Button
                 // onClick={createActivity}
                 onClick={() => setIsFirstDialogOpen(true)}
                 variant="primary"
-                size="m"
+                // size="m"
                 label="Create Activity"
               />
+              </Row>
             </Flex>
           </Column>
           <Dialog
