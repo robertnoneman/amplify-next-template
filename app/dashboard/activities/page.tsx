@@ -29,7 +29,8 @@ import {
   TiltFx,
   Chip,
   Tag,
-  RevealFx
+  RevealFx,
+  Line
 } from "@/once-ui/components";
 import { MediaUpload } from "@/once-ui/modules";
 import { uploadData } from 'aws-amplify/storage';
@@ -223,110 +224,7 @@ export default function Page() {
     
   return (
     <main>
-      <Column fillWidth paddingY="80" paddingX="xs" alignItems="center" flex={1}>
-        <Fade
-          zIndex={3}
-          pattern={{
-            display: true,
-            size: "4",
-          }}
-          position="fixed"
-          top="0"
-          left="0"
-          to="bottom"
-          height={5}
-          fillWidth
-          blur={0.25}
-        />
-        {/* <Row position="fixed" top="0" fillWidth justifyContent="center" zIndex={3}>
-          <Row
-            data-border="rounded"
-            justifyContent="space-between"
-            maxWidth="l"
-            paddingRight="64"
-            paddingLeft="32"
-            paddingY="20"
-          >
-            <Logo size="m" icon={false} href="https://itsrobday.com" />
-            <Row gap="12" hide="s">
-              <Button
-                href="https://github.com/robertnoneman/amplify-next-template"
-                prefixIcon="github"
-                size="s"
-                label="GitHub"
-                weight="default"
-                variant="tertiary"
-              />
-              <StyleOverlay top="20" right="24" />
-            </Row>
-            <Row gap="16" show="s" alignItems="center" paddingRight="24">
-              <IconButton
-                href="https://github.com/robertnoneman/amplify-next-template"
-                icon="github"
-                variant="tertiary"
-              />
-              <StyleOverlay top="20" right="24" />
-            </Row>
-          </Row>
-        </Row> */}
-        <h2 className={`${roboto.className} text-xl text-gray-50 md:text-3xl md:leading-normal`}>Robday Activity List</h2>
-        {/* <div className={`${styles.ul} ${roboto.className} `}> */}
-        <ul className={`${styles.ul}`} key={"todoList"}>
-          <div className={`${styles.li} ${roboto.className} `}>
-            {/* <li key={"todoheader"}> */}
-              <Flex background="surface" fillWidth >
-                <Column alignItems="left" paddingTop="4" fillWidth gap="0">
-                  <Row fillWidth justifyContent="space-around">
-                    <Text variant="body-default-xl" align="left"> 
-                      Activity
-                    </Text>
-                    <Text variant="body-default-xl" align="left"> 
-                      Status
-                    </Text>
-                  </Row>
-                </Column>
-              </Flex>
-            {/* </li> */}
-          </div>
-        {/* </div> */}
-          {todos.map((todo) => (
-            <div key={todo.id} className={`${styles.li} ${roboto.className} ${todo.isDone} `}>
-              <li
-                onClick={() => deleteTodo(todo.id, todo.content, todo.isDone)}
-                key={todo.id}>
-                  <Row fillWidth gap="-1" alignItems="center" justifyContent="space-between">
-                    <Input 
-                      id="content"
-                      label={`${todo.content}`}
-                      labelAsPlaceholder
-                      radius="left"
-                      defaultValue={`${todo.content}`}
-                    />
-                    <Input
-                      id="isDone"
-                      label="Status"
-                      labelAsPlaceholder
-                      radius="right"
-                      defaultValue={`${todo.isDone ? "Done" : "Not Done"}`}
-                    />
-                    {/* <Text variant="body-default-m"> 
-                      {todo.isDone ? "Done" : "Not Done"}
-                      </Text> */}
-                  </Row>
-              </li>
-            </div>
-          ))}
-        </ul>
-        <Flex >
-          <Button
-            onClick={createTodo}
-            variant="secondary"
-            size="m"
-            label="Create Todo">
-          </Button>
-          {/* <button className={`${styles.button}`} onClick={createTodo}>+ new</button> */}
-        </Flex>
-      </Column>
+      
       <Flex
           justifyContent="center"
           paddingX="32"
@@ -361,6 +259,11 @@ export default function Page() {
             }}
           />
           <Column maxWidth={36} gap="8">
+          <Column fillWidth alignItems="center" gap="32" padding="32" position="relative">
+            <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
+              Robday Activities
+            </Heading>
+          </Column>
           {activities.map((activity) => (
             <RevealFx translateY="16" delay={0.6} key={`${activity.id}rfx`}>
               {/* <TiltFx fillWidth paddingX="32" paddingTop="4" key={`${activity.id}fx`}> */}
@@ -378,19 +281,7 @@ export default function Page() {
                     key={`${activity.id}flex0`}
                     // onClick={() => populateActivity(activity)}
                     // onDoubleClick={() => populateActivity(activity)}
-                  >
-                    {/* <MediaUpload
-                      border={undefined}
-                      emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
-                      position="relative"
-                      aspectRatio="16 / 9"
-                      sizes="l"
-                      radius={undefined}
-                      initialPreviewImage={activity.image ? poopGetImageUrl(activity.image) : ""}
-                      key={`${activity.id}mu`}
-                      onFileUpload={handleUploadData}
-                    ></MediaUpload> */}
-                    
+                  > 
                     <SmartImage
                       src={urls[activities.indexOf(activity)]}
                       aspectRatio="16/9"
@@ -416,10 +307,6 @@ export default function Page() {
                       </Heading>
                       <Row>
                         {(activity.categories ?? []).map((tag) => (
-                          // <Text align="center" onBackground="accent-medium" variant='body-default-xs' key={`${activity.categories?.indexOf(tag)}tag`} >
-                          //   - {tag}, 
-                          // </Text>
-                          // {const tagString = tag.toString()}
                           <Tag
                             key={`${activity.categories?.indexOf(tag)}tag`}
                             label={tag?.toString()}
@@ -428,9 +315,6 @@ export default function Page() {
                             />
                         ))}
                       </Row>
-                      {/* <Text align="center" onBackground="neutral-weak" marginBottom="2" variant='body-default-xs' key={`${activity.id}t0`}>
-                        Outdoors, Other
-                      </Text> */}
                       <Text align="left" onBackground="neutral-medium" variant='body-default-xs' key={`${activity.id}t1`}>
                         {activity.description}
                       </Text>
@@ -452,53 +336,6 @@ export default function Page() {
               </RevealFx>
               
             ))}
-            {/* <TiltFx fillWidth paddingX="32" paddingTop="64">
-              <Flex
-                background="page"
-                radius={undefined}
-                bottomRadius="l"
-                topRadius='l'
-                overflow="hidden"
-                position="relative"
-                fillWidth
-                alignItems="center"
-                border="neutral-medium"
-                mobileDirection='column'
-              >
-                <MediaUpload
-                  border={undefined}
-                  emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
-                  position="relative"
-                  aspectRatio="16 / 9"
-                  sizes="l"
-                  radius={undefined}
-                  initialPreviewImage="/tunnies.png"
-                  onFileUpload={undefined}
-                ></MediaUpload>
-                <Column
-                  // paddingTop="160"
-                  paddingX="16"
-                  paddingBottom="16"
-                  fillWidth
-                  position="relative"
-                  alignItems="flex-start"
-                  justifyContent="flex-start"
-                  overflow='hidden'
-                  // marginTop="xl"
-                  gap="0"
-                >
-                  <Heading marginTop="xs" variant="heading-default-xs">
-                    Go to Tunnies
-                  </Heading>
-                  <Text align="center" onBackground="neutral-weak" marginBottom="2" variant='body-default-xs'>
-                    Indoors, Food
-                  </Text>
-                  <Text align="left" onBackground="neutral-medium" variant='body-default-xs'>
-                    I'm yet another ass-sized description of the activity and all the shit that the Robs are gonna do
-                  </Text>
-                </Column>
-              </Flex>
-            </TiltFx> */}
             <Flex>
               <Button
                 // onClick={createActivity}
@@ -697,6 +534,80 @@ export default function Page() {
           </Column>
         </Dialog>
       </Flex>
+      <Column fillWidth paddingY="80" paddingX="xs" alignItems="center" flex={1}>
+        <Fade
+          zIndex={3}
+          pattern={{
+            display: true,
+            size: "4",
+          }}
+          position="fixed"
+          top="0"
+          left="0"
+          to="bottom"
+          height={5}
+          fillWidth
+          blur={0.25}
+        />
+        <h2 className={`${roboto.className} text-xl text-gray-50 md:text-3xl md:leading-normal`}>Robday Todo List</h2>
+        {/* <div className={`${styles.ul} ${roboto.className} `}> */}
+        <ul className={`${styles.ul}`} key={"todoList"}>
+          <div className={`${styles.li} ${roboto.className} `}>
+            {/* <li key={"todoheader"}> */}
+              <Flex background="surface" fillWidth >
+                <Column alignItems="left" paddingTop="4" fillWidth gap="0">
+                  <Row fillWidth justifyContent="space-around">
+                    <Text variant="body-default-xl" align="left"> 
+                      Activity
+                    </Text>
+                    <Text variant="body-default-xl" align="left"> 
+                      Status
+                    </Text>
+                  </Row>
+                </Column>
+              </Flex>
+            {/* </li> */}
+          </div>
+        {/* </div> */}
+          {todos.map((todo) => (
+            <div key={todo.id} className={`${styles.li} ${roboto.className} ${todo.isDone} `}>
+              <li
+                onClick={() => deleteTodo(todo.id, todo.content, todo.isDone)}
+                key={todo.id}>
+                  <Row fillWidth gap="-1" alignItems="center" justifyContent="space-between">
+                    <Input 
+                      id="content"
+                      label={`${todo.content}`}
+                      labelAsPlaceholder
+                      radius="left"
+                      defaultValue={`${todo.content}`}
+                    />
+                    <Input
+                      id="isDone"
+                      label="Status"
+                      labelAsPlaceholder
+                      radius="right"
+                      defaultValue={`${todo.isDone ? "Done" : "Not Done"}`}
+                    />
+                    {/* <Text variant="body-default-m"> 
+                      {todo.isDone ? "Done" : "Not Done"}
+                      </Text> */}
+                  </Row>
+              </li>
+            </div>
+          ))}
+        </ul>
+        <Flex >
+          <Button
+            onClick={createTodo}
+            variant="secondary"
+            size="m"
+            label="Create Todo">
+          </Button>
+          {/* <button className={`${styles.button}`} onClick={createTodo}>+ new</button> */}
+        </Flex>
+      </Column>
+      <Line height={1}></Line>
     </main>
   )
 }
