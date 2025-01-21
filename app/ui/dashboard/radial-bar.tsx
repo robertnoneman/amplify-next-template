@@ -1,86 +1,91 @@
 "use client";
 
 
-import ReactApexChart from 'react-apexcharts';
+// import ReactApexChart from 'react-apexcharts';
+const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 
 
 interface MyComponentProps {}
 
 export default function RadialBar(){
-  const chartOptions = {
-    // Define your chart options here
-    chart: {
-      type: 'radialBar' as 'radialBar',
-    },
-    series: [15],
-    offsetY: -20,
-      sparkline: {
-        enabled: true
+    // const [isLoaded, setIsLoaded] = useState(false);
+    const [chartOptions, setChartOptions] = useState({ chart: {
+        type: 'radialBar' as 'radialBar',
       },
-      plotOptions: {
-        radialBar: {
-          startAngle: -90,
-          endAngle: 90,
-          track: {
-            background: "#e7e7e7",
-            strokeWidth: '97%',
-            margin: 5, // margin is in pixels
-            dropShadow: {
-              enabled: true,
-              top: 2,
-              left: 0,
-              color: '#444',
-              opacity: 1,
-              blur: 2
-            }
-          },
-          dataLabels: {
-            name: {
-              show: true,
-              offsetY: 25,
-              color: '#fff',
-              fontFamily: "__Roboto_1e0c0b",
-              fontSize: "21px"
+      series: [15],
+      offsetY: -20,
+        sparkline: {
+          enabled: true
+        },
+        plotOptions: {
+          radialBar: {
+            startAngle: -90,
+            endAngle: 90,
+            track: {
+              background: "#e7e7e7",
+              strokeWidth: '97%',
+              margin: 5, // margin is in pixels
+              dropShadow: {
+                enabled: true,
+                top: 2,
+                left: 0,
+                color: '#444',
+                opacity: 1,
+                blur: 2
+              }
             },
-            style: {colors: ["#fff"], fill: "#fff"},
-            value: {
-              offsetY: -25,
-              fontSize: '22px',
-              color: "#fff",
-              fill: "#fff",
-              fontFamily: "__Roboto_1e0c0b",
-              formatter: function (val: number): string{
-                return val + "";
+            dataLabels: {
+              name: {
+                show: true,
+                offsetY: 25,
+                color: '#fff',
+                fontFamily: "__Roboto_1e0c0b",
+                fontSize: "21px"
+              },
+              style: {colors: ["#fff"], fill: "#fff"},
+              value: {
+                offsetY: -25,
+                fontSize: '22px',
+                color: "#fff",
+                fill: "#fff",
+                fontFamily: "__Roboto_1e0c0b",
+                formatter: function (val: number): string{
+                  return val + "";
+                }
               }
             }
           }
-        }
-      },
-      grid: {
-        padding: {
-          top: -10
-        }
-      },
-      fill: {
-        colors: ["#E90507"],
-        type: 'gradient',
-        gradient: {
-          shade: 'light',
-          shadeIntensity: 0.4,
-          inverseColors: false,
-          opacityFrom: 1,
-          opacityTo: 1,
-          stops: [0, 50, 53, 91]
         },
-      },
-      labels: ['ROBDAYS COMPLETED'],
-  };
-
-  // };
+        grid: {
+          padding: {
+            top: -10
+          }
+        },
+        fill: {
+          colors: ["#E90507"],
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            shadeIntensity: 0.4,
+            inverseColors: false,
+            opacityFrom: 1,
+            opacityTo: 1,
+            stops: [0, 50, 53, 91]
+          },
+        },
+        labels: ['ROBDAYS COMPLETED'],
+    });
+    // useEffect(() => {
+    //     // Your effect code here
+    //     // setIsLoaded((typeof window !== 'undefined'));
+    //     // console.log("isLoaded", isLoaded);
+    // }, []);
 
   return (
     <div>
-      <ReactApexChart
+      <ApexChart
         options={chartOptions}
         series={chartOptions.series}
         type="radialBar"
