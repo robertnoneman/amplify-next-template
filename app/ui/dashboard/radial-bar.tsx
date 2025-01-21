@@ -7,14 +7,20 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 
-interface MyComponentProps {}
+interface MyComponentProps {
+    labels: string[];
+    series: number[];
+    colors?: string[];
+    height?: number;
+    fontSize?: string;
+}
 
-export default function RadialBar(){
+export default function RadialBar({ labels, series, colors=["#E90507"], height=350, fontSize="22px" }: MyComponentProps) {
     // const [isLoaded, setIsLoaded] = useState(false);
     const [chartOptions, setChartOptions] = useState({ chart: {
         type: 'radialBar' as 'radialBar',
       },
-      series: [15],
+      series: series,
       offsetY: -20,
         sparkline: {
           enabled: true
@@ -42,12 +48,12 @@ export default function RadialBar(){
                 offsetY: 25,
                 color: '#fff',
                 fontFamily: "__Roboto_1e0c0b",
-                fontSize: "21px"
+                fontSize: fontSize
               },
               style: {colors: ["#fff"], fill: "#fff"},
               value: {
                 offsetY: -25,
-                fontSize: '22px',
+                fontSize: fontSize,
                 color: "#fff",
                 fill: "#fff",
                 fontFamily: "__Roboto_1e0c0b",
@@ -64,7 +70,7 @@ export default function RadialBar(){
           }
         },
         fill: {
-          colors: ["#E90507"],
+          colors: colors,
           type: 'gradient',
           gradient: {
             shade: 'light',
@@ -75,7 +81,7 @@ export default function RadialBar(){
             stops: [0, 50, 53, 91]
           },
         },
-        labels: ['ROBDAYS COMPLETED'],
+        labels: labels,
     });
     // useEffect(() => {
     //     // Your effect code here
@@ -89,7 +95,7 @@ export default function RadialBar(){
         options={chartOptions}
         series={chartOptions.series}
         type="radialBar"
-        height={350}
+        height={height}
       />
     </div>
   );
