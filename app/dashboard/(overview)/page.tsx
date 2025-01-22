@@ -11,17 +11,10 @@ import RadialBar from '@/app/ui/dashboard/radial-bar';
 import ActivitiesTable from '@/app/ui/dashboard/activities-table';
 
 
-interface MyComponentProps {
-  labels: string[];
-  series: number[];
-}
+
 
 
 export default async function Page() {
-  const myComponentProps = {
-    labels: ["ROBDAYS COMPLETED"],
-    series: [15]
-  };
 
   return (
     <main>

@@ -27,8 +27,9 @@ export default function Page() {
           radius="xl"
           paddingTop="80"
           position="relative"
+          background="surface"
         >
-          <Background
+          {/* <Background
             mask={{
               x: 0,
               y: 48,
@@ -40,12 +41,12 @@ export default function Page() {
               color: "neutral-alpha-medium",
               height: "0.25rem",
             }}
-          />
+          /> */}
           <Background
             mask={{
               x: 80,
               y: 0,
-              radius: 100,
+              radius: 200,
             }}
             position="absolute"
             gradient={{
@@ -63,7 +64,7 @@ export default function Page() {
             mask={{
               x: 100,
               y: 0,
-              radius: 100,
+              radius: 200,
             }}
             position="absolute"
             gradient={{
@@ -84,9 +85,6 @@ export default function Page() {
           </Column>
         </Column>
         <Column fillWidth alignItems="center" gap="32" padding="32" position="relative">
-          <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
-            GALLERY
-          </Heading>
           HERE'S WHERE ALL THE PRETTY PICTURES WILL BE!
         </Column>
       </Column>

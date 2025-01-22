@@ -52,11 +52,17 @@ const schema = a.schema({
       robdaylog: a.belongsTo("Robdaylog", "robdaylogId"),
       activity: a.belongsTo("Activity", "activityId"),
     }).authorization((allow) => [allow.publicApiKey()]),
+  RobdaylogLocation: a
+    .model({
+      robdaylogId: a.id().required(),
+      locationId: a.id().required(),
+
+      robdaylog: a.belongsTo("Robdaylog", "robdaylogId"),
+      location: a.belongsTo("Location", "locationId"),
+    }).authorization((allow) => [allow.publicApiKey()]),
+
   Robdaylog: a
     .model({
-      // robDayLogId: a.id(),
-      // activityId: a.id(),
-
       date: a.date().required(),
       robDayNumber: a.integer(),
       notes: a.string().array(),
@@ -65,9 +71,10 @@ const schema = a.schema({
       rating: a.integer(),
       cost: a.float(),
       duration: a.time(),
-
+      locations: a.hasMany("RobdaylogLocation", "robdaylogId"),
       activities: a.hasMany("RobdaylogActivity", "robdaylogId"),
     }).authorization((allow) => [allow.publicApiKey()]),
+
   Activity: a
     .model({
       // activityId: a.id(),
@@ -84,9 +91,24 @@ const schema = a.schema({
       costMax: a.integer(),
       location: a.string(),
       isOnNextRobDay: a.boolean(),
-      // robDayLog: a.belongsTo("RobDayLog", "robDayLogId"),
-
+      locations: a.hasMany("ActivityLocation", "activityId"),
       robdaylogs: a.hasMany("RobdaylogActivity", "activityId")
+    }).authorization((allow) => [allow.publicApiKey()]),
+  ActivityLocation: a
+    .model({
+      activityId: a.id().required(),
+      locationId: a.id().required(),
+      location: a.belongsTo("Location", "locationId"),
+      activity: a.belongsTo("Activity", "activityId"),
+    }).authorization((allow) => [allow.publicApiKey()]),
+  Location: a
+    .model({
+      name: a.string(),
+      description: a.string(),
+      address: a.string(),
+      latitude: a.float(),
+      longitude: a.float(),
+      activities: a.hasMany("ActivityLocation", "locationId")
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 
