@@ -44,6 +44,7 @@ const schema = a.schema({
     posts: a.hasMany('PostTag', 'tagId'),
   }).authorization((allow) => [allow.publicApiKey()]),
 
+  // Relational tables
   RobdaylogActivity: a
     .model({
       robdaylogId: a.id().required(),
@@ -60,6 +61,13 @@ const schema = a.schema({
       robdaylog: a.belongsTo("Robdaylog", "robdaylogId"),
       location: a.belongsTo("Location", "locationId"),
     }).authorization((allow) => [allow.publicApiKey()]),
+    ActivityLocation: a
+      .model({
+        activityId: a.id().required(),
+        locationId: a.id().required(),
+        location: a.belongsTo("Location", "locationId"),
+        activity: a.belongsTo("Activity", "activityId"),
+      }).authorization((allow) => [allow.publicApiKey()]),
 
   Robdaylog: a
     .model({
@@ -71,14 +79,15 @@ const schema = a.schema({
       rating: a.integer(),
       cost: a.float(),
       duration: a.time(),
+      startTime: a.timestamp(),
+      endTime: a.timestamp(),
+      totalTime: a.float(),
       locations: a.hasMany("RobdaylogLocation", "robdaylogId"),
       activities: a.hasMany("RobdaylogActivity", "robdaylogId"),
     }).authorization((allow) => [allow.publicApiKey()]),
 
   Activity: a
     .model({
-      // activityId: a.id(),
-      // robDayLogId: a.id(),
       name: a.string(),
       description: a.string(),
       count: a.integer(),
@@ -91,15 +100,9 @@ const schema = a.schema({
       costMax: a.integer(),
       location: a.string(),
       isOnNextRobDay: a.boolean(),
+      duration: a.float(),
       locations: a.hasMany("ActivityLocation", "activityId"),
       robdaylogs: a.hasMany("RobdaylogActivity", "activityId")
-    }).authorization((allow) => [allow.publicApiKey()]),
-  ActivityLocation: a
-    .model({
-      activityId: a.id().required(),
-      locationId: a.id().required(),
-      location: a.belongsTo("Location", "locationId"),
-      activity: a.belongsTo("Activity", "activityId"),
     }).authorization((allow) => [allow.publicApiKey()]),
   Location: a
     .model({
@@ -108,7 +111,8 @@ const schema = a.schema({
       address: a.string(),
       latitude: a.float(),
       longitude: a.float(),
-      activities: a.hasMany("ActivityLocation", "locationId")
+      activities: a.hasMany("ActivityLocation", "locationId"),
+      robdaylogs: a.hasMany("RobdaylogLocation", "locationId")
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 
