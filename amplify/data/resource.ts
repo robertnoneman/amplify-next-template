@@ -58,7 +58,7 @@ const schema = a.schema({
     .model({
       robdaylogId: a.id().required(),
       locationId: a.id().required(),
-
+      name: a.string().required(),
       robdaylog: a.belongsTo("Robdaylog", "robdaylogId"),
       location: a.belongsTo("Location", ["locationId", "name"]),
     }).authorization((allow) => [allow.publicApiKey()]),
@@ -67,6 +67,7 @@ const schema = a.schema({
       .model({
         activityId: a.id().required(),
         locationId: a.id().required(),
+        name: a.string().required(),
         location: a.belongsTo("Location", ["locationId", "name"]),
         activity: a.belongsTo("Activity", "activityId"),
       }).authorization((allow) => [allow.publicApiKey()]),
