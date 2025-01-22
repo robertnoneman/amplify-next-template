@@ -53,22 +53,19 @@ const schema = a.schema({
       robdaylog: a.belongsTo("Robdaylog", "robdaylogId"),
       activity: a.belongsTo("Activity", "activityId"),
     }).authorization((allow) => [allow.publicApiKey()]),
-
   RobdaylogLocation: a
     .model({
       robdaylogId: a.id().required(),
       locationId: a.id().required(),
-      name: a.string().required(),
-      robdaylog: a.belongsTo("Robdaylog", "robdaylogId"),
-      location: a.belongsTo("Location", ["locationId", "name"]),
-    }).authorization((allow) => [allow.publicApiKey()]),
 
+      robdaylog: a.belongsTo("Robdaylog", "robdaylogId"),
+      location: a.belongsTo("Location", "locationId"),
+    }).authorization((allow) => [allow.publicApiKey()]),
     ActivityLocation: a
       .model({
         activityId: a.id().required(),
         locationId: a.id().required(),
-        name: a.string().required(),
-        location: a.belongsTo("Location", ["locationId", "name"]),
+        location: a.belongsTo("Location", "locationId"),
         activity: a.belongsTo("Activity", "activityId"),
       }).authorization((allow) => [allow.publicApiKey()]),
 
@@ -109,15 +106,14 @@ const schema = a.schema({
     }).authorization((allow) => [allow.publicApiKey()]),
   Location: a
     .model({
-      locationId: a.id().required(),
-      name: a.string().required(),
+      name: a.string(),
       description: a.string(),
       address: a.string(),
       latitude: a.float(),
       longitude: a.float(),
-      activities: a.hasMany("ActivityLocation", ["locationId", "name"]),
-      robdaylogs: a.hasMany("RobdaylogLocation", ["locationId", "name"]),
-    }).identifier(['locationId', 'name']).authorization((allow) => [allow.publicApiKey()]),
+      activities: a.hasMany("ActivityLocation", "locationId"),
+      robdaylogs: a.hasMany("RobdaylogLocation", "locationId")
+    }).authorization((allow) => [allow.publicApiKey()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
