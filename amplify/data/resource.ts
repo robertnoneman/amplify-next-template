@@ -121,6 +121,7 @@ const schema = a.schema({
       image: a.string(),
       activityId: a.id().required(),
       locationId: a.id(),
+      robdaylogId: a.id(),
       activity: a.belongsTo("Activity", "activityId"),
       location: a.belongsTo("Location", "locationId"),
       robdayLog: a.belongsTo("Robdaylog", "robdaylogId")
