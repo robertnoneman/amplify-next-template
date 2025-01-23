@@ -30,7 +30,9 @@ import {
   HiOutlineSparkles,
   HiOutlinePencil,
   HiOutlineCalendarDays,
-  HiOutlineTrophy
+  HiOutlineTrophy,
+  HiOutlinePlay,
+  HiOutlineStop,
 } from "react-icons/hi2";
 
 import {
@@ -41,6 +43,7 @@ import {
 	PiImageDuotone,
   PiNotebookDuotone,
   PiTrendUpDuotone,
+  PiRewindCircleDuotone
 } from "react-icons/pi";
 
 import { RiVisaLine } from "react-icons/ri";
@@ -89,4 +92,7 @@ export const iconLibrary: Record<string, IconType> = {
   game: HiOutlineTrophy,
   notebook: PiNotebookDuotone,
   trendUp: PiTrendUpDuotone,
+  play: HiOutlinePlay,
+  stop: HiOutlineStop,
+  rewind: PiRewindCircleDuotone,
 };

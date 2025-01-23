@@ -161,8 +161,18 @@ export default function Page() {
     setIsFirstDialogOpen(true);
   }
 
+  function onRemoveActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
+    setRemovedActivityInstance(activityInstance);
+    setIsFirstDialogOpen(true);
+  }
+
   function onEditActivity(activity: Schema["Activity"]["type"]) {
     setEditedActivity(activity);
+    setIsSecondDialogOpen(true);
+  }
+
+  function onEditActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
+    setEditedActivityInstance(activityInstance);
     setIsSecondDialogOpen(true);
   }
 
@@ -176,6 +186,11 @@ export default function Page() {
 
   function onCompleteActivity(activity: Schema["Activity"]["type"]) {
     setCompletedActivity(activity);
+    setIsCompleteDialogOpen(true);
+  }
+
+  function onCompleteActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
+    setCompletedActivityInstance(activityInstance);
     setIsCompleteDialogOpen(true);
   }
 
@@ -207,7 +222,12 @@ export default function Page() {
       editActivityInstance(activInst);
     }
     else {
-      console.log("Activity Instance not found");
+      if (editedActivityInstance) {
+        editActivityInstance(editedActivityInstance);
+      }
+      else {
+        console.log("Activity Instance not found");
+      }
     }
     // editededActivity ? editActivityInstance() : null;
     setIsSecondDialogOpen(false);
@@ -262,13 +282,13 @@ export default function Page() {
       startTime: 0,
       endTime: 0,
       totalTime: 0,
-      notes: [],
+      notes: [activity.description? activity.description : ""],
       weatherCondition: "",
       temperature: 0,
       rating: 0,
       loe: 0,
       cost: 0,
-      images: [],
+      images: [activity.image? activity.image : ""],
       activityId: activity.id,
       locationId: "pending",
       robdaylogId: "pending",
@@ -279,6 +299,23 @@ export default function Page() {
     const activityInstance = client.models.ActivityInstance.create({ ...newActivityInstance });
     // activityInstance ? setAddedActivityInstance(activityInstance) : setAddedActivityInstance(undefined);
     console.log("Activity Instance created: ", activityInstance);
+  }
+
+  function startActivity(activity: Schema["ActivityInstance"]["type"]) {
+    const startTime = new Date().getTime();
+    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: startTime });
+    console.log("Activity Instance started: ", startTime, result);
+  }
+
+  function stopActivity(activity: Schema["ActivityInstance"]["type"]) {
+    const endTime = new Date().getTime();
+    const result = client.models.ActivityInstance.update({ id: activity.id, endTime: endTime });
+    console.log("Activity Instance stopped: ", endTime, result);
+  }
+
+  function resetActivityTime(activity: Schema["ActivityInstance"]["type"]) {
+    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: 0, endTime: 0 });
+    console.log("Activity Instance reset: ", result);
   }
 
   // function editActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
@@ -297,6 +334,17 @@ export default function Page() {
     completedActivity ? completedActivity.count? completedActivity.count = newCount : completedActivity.count = 1 : 1;
     completedActivity ? client.models.Activity.update({ ...completedActivity }) : null;
     setCompletedActivity(undefined);
+    setIsCompleteDialogOpen(false);
+    completeActivityInstance();
+  }
+
+  function completeActivityInstance() {
+    const endTime = new Date().getTime();
+    completedActivityInstance ? completedActivityInstance.endTime = endTime : null;
+    completedActivityInstance ? completedActivityInstance.isOnNextRobDay = false : null;
+    completedActivityInstance ? completedActivityInstance.completed = true : null;
+    completedActivityInstance ? client.models.ActivityInstance.update({ ...completedActivityInstance }) : null;
+    setCompletedActivityInstance(undefined);
     setIsCompleteDialogOpen(false);
   }
 
@@ -505,7 +553,177 @@ export default function Page() {
               <Line height={0.1}/>
               
               <Column>
-                {selectedActivities.map((activity, index) => (
+                {selectedActivityInstances.map((activityInstance, index) => (
+                  <Column key={`${activityInstance.id}`} fillWidth>
+                    <Row 
+                    fillWidth
+                    padding="xs"
+                    gap="m"
+                    position="relative"
+                    // height="xs"
+                    mobileDirection="column"
+                    overflow="hidden"
+                    radius={undefined}
+                    // key={`${activityInstance.id}`}
+                    // bottomRadius="l"
+                    // topRadius='l'
+                    // alignItems="md:center"
+                    // overflow="scroll"
+                    // border="brand-medium"
+                    // background="page"
+                    // radius="l"
+                  >
+                    <Row fillWidth justifyContent="space-between">
+                      <Row
+                        border="brand-alpha-weak"
+                        position="relative"
+                        maxWidth={10}
+                        // aspectRatio={0.75}
+                        overflow="hidden"
+                      >
+                        <SmartImage
+                          // fitWidth
+                          src={urls[activityInstance.activityId] ?? ""}
+                          alt="Robday"
+                          aspectRatio="16/9"
+                          objectFit="cover"
+                          sizes="xs"
+                          radius="xl"
+                          // maxHeight={15}
+                        />
+                        <Fade
+                          fillWidth
+                          position="absolute"
+                          top="0"
+                          to="bottom"
+                          height={1}
+                          zIndex={3}
+                          pattern={{
+                            display: true,
+                            size: '2'
+                          }}
+                        />
+                        <Fade
+                          fillWidth
+                          position="absolute"
+                          to="top"
+                          bottom="0"
+                          height={1}
+                          zIndex={3}
+                          pattern={{
+                            display: true,
+                            size: '2'
+                          }}
+                        />
+                        <Fade
+                          // fillWidth
+                          width={1}
+                          fillHeight
+                          position="absolute"
+                          to="left"
+                          // bottom="0"
+                          right="0"
+                          // height={12}
+                          zIndex={3}
+                          pattern={{
+                            display: true,
+                            size: '2'
+                          }}
+                        />
+                        <Fade
+                          // fillWidth
+                          width={1}
+                          fillHeight
+                          position="absolute"
+                          to="right"
+                          // bottom="0"
+                          left="0"
+                          // height={12}
+                          zIndex={3}
+                          pattern={{
+                            display: true,
+                            size: '2'
+                          }}
+                        />
+                      </Row>
+                      <Column>
+                      {activityInstance.startTime === 0 && (
+                        <Row justifyContent="flex-end" fillHeight alignItems="center">
+                          <IconButton
+                            icon="play"
+                            onClick={() => startActivity(activityInstance)}
+                            variant="tertiary"
+                            size="s"
+                          />
+                        </Row>
+                      )}
+                      {activityInstance.startTime !== 0 && activityInstance.endTime === 0 && (
+                        <Row justifyContent="flex-end" fillHeight alignItems="center" >
+                          <IconButton
+                            icon="stop"
+                            onClick={() => stopActivity(activityInstance)}
+                            variant="tertiary"
+                            size="s"
+                          />
+                        </Row>
+                      )}
+                      {activityInstance.endTime !== 0 && (
+                        <Row justifyContent="flex-end" fillHeight alignItems="center">
+                          <IconButton
+                            icon="rewind"
+                            onClick={() => resetActivityTime(activityInstance)}
+                            variant="tertiary"
+                            size="l"
+                          />
+                        </Row>
+                      )}
+                      </Column>
+                    </Row>
+                    <Column fillWidth fillHeight>
+                      <Text
+                        padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs"
+                      >
+                        {activityInstance.displayName?.toUpperCase() ?? "ACTIVITY TBD"}
+                      </Text>
+                      <Text
+                        paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
+                      >
+                        {/* {activityInstance.location?.name?.toUpperCase() ?? "LOCATION TBD"} */}
+                        {locations.find((location) => location.id === activityInstance.locationId)?.name?.toUpperCase() ?? "LOCATION TBD"}
+                      </Text>
+                      <Line/>
+                        {activityInstance.notes?.map((note) => (
+                          <Text key={note} padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                            {note}
+                          </Text>
+                        ))}
+                    </Column>
+                    <Column justifyContent="space-evenly" mobileDirection="row" background="neutral-alpha-weak" border="neutral-alpha-medium" radius="s">
+                    <IconButton
+                        icon="close"
+                        onClick={() => onRemoveActivityInstance(activityInstance)}
+                        variant="tertiary"
+                        size="s"
+                        />
+                        <IconButton
+                          icon="edit"
+                          onClick={() => onEditActivityInstance(activityInstance)}
+                          variant="tertiary"
+                          size="s"
+                        />
+                        <IconButton
+                          icon="check"
+                          onClick={() => onCompleteActivityInstance(activityInstance)}
+                          variant="tertiary"
+                          size="s"
+                        />
+                      </Column>
+                    {/* </Background> */}
+                  </Row>
+                  <Line height={0.1}/>
+                </Column>
+                ))}
+                {/* {selectedActivities.map((activity, index) => (
                   <Column key={`${activity.id}`}>
                     <Row 
                     fillWidth
@@ -608,7 +826,6 @@ export default function Page() {
                         paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
                       >
                         {activity.location?.toUpperCase() ?? "LOCATION TBD"}
-                        {/* {selectedActivityInstances && (selectedActivityInstances[selectedActivities.indexOf(activity)].location?.name?.toUpperCase() ?? "LOCATION TBD")} */}
                       </Text>
                       <Line/>
                       <Text
@@ -638,11 +855,10 @@ export default function Page() {
                           size="s"
                           />
                       </Column>
-                    {/* </Background> */}
                   </Row>
                   <Line height={0.1}/>
                 </Column>
-                ))}
+                ))} */}
               </Column>
               <Row fillWidth justifyContent="center">
                 <Button
