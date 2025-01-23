@@ -84,6 +84,7 @@ const schema = a.schema({
       totalTime: a.float(),
       locations: a.hasMany("RobdaylogLocation", "robdaylogId"),
       activities: a.hasMany("RobdaylogActivity", "robdaylogId"),
+      activityInstances: a.hasMany("ActivityInstance", "robdaylogId")
     }).authorization((allow) => [allow.publicApiKey()]),
 
   Activity: a
@@ -102,7 +103,27 @@ const schema = a.schema({
       isOnNextRobDay: a.boolean(),
       duration: a.float(),
       locations: a.hasMany("ActivityLocation", "activityId"),
-      robdaylogs: a.hasMany("RobdaylogActivity", "activityId")
+      robdaylogs: a.hasMany("RobdaylogActivity", "activityId"),
+      activityInstances: a.hasMany("ActivityInstance", "activityId")
+    }).authorization((allow) => [allow.publicApiKey()]),
+  ActivityInstance: a
+    .model({
+      date: a.date().required(),
+      displayName: a.string(),
+      startTime: a.timestamp(),
+      endTime: a.timestamp(),
+      totalTime: a.float(),
+      notes: a.string().array(),
+      weatherCondition: a.string(),
+      temperature: a.float(),
+      rating: a.integer(),
+      cost: a.float(),
+      image: a.string(),
+      activityId: a.id().required(),
+      locationId: a.id(),
+      activity: a.belongsTo("Activity", "activityId"),
+      location: a.belongsTo("Location", "locationId"),
+      robdayLog: a.belongsTo("Robdaylog", "robdaylogId")
     }).authorization((allow) => [allow.publicApiKey()]),
   Location: a
     .model({
@@ -112,7 +133,8 @@ const schema = a.schema({
       latitude: a.float(),
       longitude: a.float(),
       activities: a.hasMany("ActivityLocation", "locationId"),
-      robdaylogs: a.hasMany("RobdaylogLocation", "locationId")
+      robdaylogs: a.hasMany("RobdaylogLocation", "locationId"),
+      activityInstances: a.hasMany("ActivityInstance", "locationId")
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 
