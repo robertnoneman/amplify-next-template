@@ -144,19 +144,6 @@ export default function Page() {
     // client.models.Todo.update.arguments = { id: id, isDone: true, content: content }
   }
 
-  function createActivity() {
-    client.models.Activity.create({
-      name: window.prompt("Activity name"),
-      description: window.prompt("Activity description"),
-      count: 0,
-      rating: 0,
-      notes: [],
-      image: "https://via.placeholder.com/150",
-      lever_of_effort: 0,
-      categories: []
-    });
-  }
-
   function createNewActivity() {
     console.log("Creating new activty");
     const result = client.models.Activity.create({

@@ -25,7 +25,9 @@ interface RobdayLogProps {
   robdayLogTemperature: number;
   robdayLogActivities: Schema["RobdaylogActivity"]["type"][];
   activitiesDict: Record<string, Schema["Activity"]["type"]>;
+  activityInstances: Schema["ActivityInstance"]["type"][];
   urlsDict: Record<string, string>;
+  notes: Array<string>;
 }
 
 
@@ -48,6 +50,11 @@ export default function Page() {
         const robdayLogProps: Array<RobdayLogProps> = [];
         await Promise.all(data.items.map(async (robdayLog) => {
           const robdayLogActivities = await robdayLog.activities();
+          const robdayLogActivityInstances = await robdayLog.activityInstances();
+          // const robdayLogActivityInstances = robdayLog.activityInstances;
+          // console.log("LOGGING ACTIVITY INSTANCES");
+          console.log("ACTIVITY INSTANCES: ", robdayLogActivityInstances.data);
+          // console.log("DONE LOGGING ACTIVITY INSTANCES");
           const activitiesDict: Record<string, Schema["Activity"]["type"]> = {};
           const urlsDict: Record<string, string> = {};
           await Promise.all(robdayLogActivities.data.map(async (robdayLogActivity) => {
@@ -70,7 +77,9 @@ export default function Page() {
             robdayLogTemperature: robdayLog.temperature?.valueOf() || 0,
             robdayLogActivities: robdayLogActivities.data,
             activitiesDict: activitiesDict,
-            urlsDict: urlsDict
+            activityInstances: robdayLogActivityInstances.data,
+            urlsDict: urlsDict,
+            notes: Array.isArray(robdayLog.notes) ? robdayLog.notes.filter(note => note !== null) : []
           });
         }));
         setRobdayLogs([...data.items]);
@@ -175,7 +184,9 @@ export default function Page() {
               robdayLogTemperature={robdayLogProp.robdayLogTemperature}
               robdayLogActivities={robdayLogProp.robdayLogActivities} 
               activitiesDict={robdayLogProp.activitiesDict}
+              activityInstances={robdayLogProp.activityInstances}
               urlsDict={robdayLogProp.urlsDict}
+              notes={robdayLogProp.notes}
               />
           ))}
         </Column>

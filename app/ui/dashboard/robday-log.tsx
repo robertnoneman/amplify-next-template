@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 
 import {
   Heading,
@@ -70,7 +70,9 @@ export default function RobdayLog({
   robdayLogTemperature,
   robdayLogActivities,
   activitiesDict,
-  urlsDict
+  activityInstances,
+  urlsDict,
+  notes
 }: { 
   robdayLogNumber: string; 
   robdayLogDate: string;
@@ -78,8 +80,13 @@ export default function RobdayLog({
   robdayLogTemperature: number;
   robdayLogActivities: Schema["RobdaylogActivity"]["type"][];
   activitiesDict: Record<string, Schema["Activity"]["type"]>;
+  activityInstances: Schema["ActivityInstance"]["type"][];
   urlsDict: Record<string, string>;
+  notes: Array<string>;
 }) {
+
+  const [location, setLocation] = useState<string | null>(null);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   const getImageUrl = async (key: string): Promise<string> => {
       const url = getUrl({
@@ -92,6 +99,20 @@ export default function RobdayLog({
     return new Date(date).toLocaleDateString();
   }
 
+  useEffect(() => {
+    activityInstances?.forEach(async (activityInstance) => {
+      const location = await activityInstance.location();
+      setLocation(location.data?.name ?? null);
+      activityInstance.images?.forEach(async (image) => {
+        if (image) {
+          const url = await getImageUrl(image);
+          setImageUrls((imageUrls) => [...imageUrls, url]);
+        }
+      }
+      );
+    });
+  }, [activityInstances]);
+
   return (
     <Row
       fillWidth 
@@ -101,7 +122,7 @@ export default function RobdayLog({
       overflow="hidden"
     >
       <Column
-        background="brand-weak"
+        background="accent-alpha-weak"
         padding="m"
         gap="xs"
         border="neutral-medium"
@@ -130,10 +151,85 @@ export default function RobdayLog({
         {robdayLogWeather} - {robdayLogTemperature}°<br></br>
 
         <Line height={0.1}/>
+        {notes.map((note) => (
+          <Text
+            key={note}
+            padding="xs"
+            align="left"
+            onBackground="neutral-strong"
+            variant="body-default-s"
+          >
+            {note}
+          </Text>
+        ))}
         <Line height={0.1}/>
         
         <Column>
-          {activitiesDict && Object.entries(activitiesDict).map(([id, activity]) => (
+          {activityInstances && Object.entries(activityInstances).map(([id, activityInstance]) => (
+            <Column key={`${activityInstance.id}`} fillWidth>
+              <Row>
+              {/* <Column
+                position="relative"
+                overflow="hidden"
+                width={20}
+              > */}
+                {/* <SmartImage
+                  src={urlsDict[id] ?? ""}
+                  alt="Robday"
+                  aspectRatio="1/1"
+                  objectFit="contain"
+                  sizes="s"
+                  radius="xl"
+                  width={10}
+                  height={10}
+                /> */}
+              {/* </Column> */}
+              <Column fillWidth >
+                <Text
+                  padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs"
+                >
+                  {activityInstance.displayName?.toUpperCase() ?? "ACTIVITY TBD"}
+                </Text>
+                <Line/>
+                <Text
+                  paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
+                >
+                  {location?.toUpperCase() ?? "LOCATION TBD"}
+                </Text>
+                
+              </Column>
+              <Line vertical width={0.1}/>
+              <Column fillWidth justifyContent="center">
+                <Text
+                    padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
+                  >
+                  {activityInstance.notes}
+                </Text>
+              </Column>
+            </Row>
+            <Line height={0.1}/>
+            <Row fillWidth justifyContent="space-around" padding="s">
+              {imageUrls.map((url) => (
+                <SmartImage
+                  key={`${imageUrls.indexOf(url)}-${id}`}
+                  src={url}
+                  alt="Robday"
+                  // aspectRatio="1/1"
+                  objectFit="cover"
+                  sizes="s"
+                  radius="xl"
+                  // width={15}
+                  // fillWidth
+                  maxWidth="l"
+                  minHeight="l"
+                  // height={15}
+                />
+              ))}
+            </Row>
+            <Line height={0.1}/>
+          </Column>
+          ))}
+          {/* {activitiesDict && Object.entries(activitiesDict).map(([id, activity]) => (
             <Column key={`${activity.id}`} fillWidth>
               <Row>
               <Column
@@ -142,7 +238,6 @@ export default function RobdayLog({
                 width={20}
               >
                 <SmartImage
-                  // src={activity.image ?? ""}
                   src={urlsDict[id] ?? ""}
                   alt="Robday"
                   aspectRatio="1/1"
@@ -153,7 +248,6 @@ export default function RobdayLog({
                   height={10}
                 />
               </Column>
-              {/* </Background> */}
               <Column fillWidth >
                 <Text
                   padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs"
@@ -179,7 +273,7 @@ export default function RobdayLog({
             </Row>
             <Line height={0.1}/>
           </Column>
-          ))}
+          ))} */}
         </Column>
       </Column>
     </Row>

@@ -59,40 +59,35 @@ Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', current: true },
-  { name: 'Activities', href: '/dashboard/activities', current: false },
-  { name: 'Planner', href: '/dashboard/planner', current: false },
-  { name: 'Archive', href: '#', current: false },
-]
-
-interface Dictionarty {
-  activity: Schema["Activity"]["type"];
-  url: string;
-}
-type ActivityType = Schema["Activity"]["type"];
 
 export default function Page() {
   const [selectedValue, setSelectedValue] = useState("");
   const [selectedValueLabel, setSelectedValueLabel] = useState("Choose an activity");
+  const [selectedLocationValue, setSelectedLocationValue] = useState("");
+  const [selectedLocationValueLabel, setSelectedLocationValueLabel] = useState("Choose a location");
   const [selectedRange, setSelectedRange] = useState<DateRange>();
+  const [robDayDate, setRobDayDate] = useState<Date>();
   const [isFirstDialogOpen, setIsFirstDialogOpen] = useState(false);
   const [isSecondDialogOpen, setIsSecondDialogOpen] = useState(false);
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
   const [isAddActivityDialogOpen, setIsAddActivityDialogOpen] = useState(false);
   const [firstDialogHeight, setFirstDialogHeight] = useState<number>();
   // const { addToast } = useToast();
-  const [intro, setIntro] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [tags, setTags] = useState<string[]>(["UX / UI", "Design systems", "AI / ML"]);
-  const [twoFA, setTwoFA] = useState(false);
   const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
+  const [locations, setLocations] = useState<Array<Schema["Location"]["type"]>>([]);
+  const [selectedLocation, setSelectedLocation] = useState<Schema["Location"]["type"]>();
+  const [activityInstances, setActivityInstances] = useState<Array<Schema["ActivityInstance"]["type"]>>([]);
   const [selectedActivities, setSelectedActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
+  const [selectedActivityInstances, setSelectedActivityInstances] = useState<Array<Schema["ActivityInstance"]["type"]>>([]);
   const [removedActivity, setRemovedActivity] = useState<Schema["Activity"]["type"]>();
+  const [removedActivityInstance, setRemovedActivityInstance] = useState<Schema["ActivityInstance"]["type"]>();
   const [editededActivity, setEditedActivity] = useState<Schema["Activity"]["type"]>();
+  const [editedActivityInstance, setEditedActivityInstance] = useState<Schema["ActivityInstance"]["type"]>();
   const [completedActivity, setCompletedActivity] = useState<Schema["Activity"]["type"]>();
+  const [completedActivityInstance, setCompletedActivityInstance] = useState<Schema["ActivityInstance"]["type"]>();
   const [addedActivity, setAddedActivity] = useState<Schema["Activity"]["type"]>();
+  const [addedLocation, setAddedLocation] = useState<Schema["Location"]["type"]>();
+  const [addedActivityInstance, setAddedActivityInstance] = useState<Schema["ActivityInstance"]["type"]>();
   // const [urls, setUrls] = useState<Array<string>>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
 
@@ -102,6 +97,13 @@ export default function Page() {
     setSelectedValueLabel(activity.location ?? "");
     setAddedActivity(activity);
   };
+
+  const handleSelectLocation = (location: Schema["Location"]["type"]) => {
+    console.log("Selected option:", location.name);
+    setSelectedLocationValue(location.name ?? "");
+    setSelectedLocationValueLabel(location.address ?? "");
+    setSelectedLocation(location);
+  }
 
   const printSelect = (value: string) => {
     setSelectedValue(value);
@@ -136,6 +138,24 @@ export default function Page() {
     })
   }
 
+  function listLocations() {
+    client.models.Location.observeQuery().subscribe({
+      next: async (data) => {
+        setLocations([...data.items]);
+      },
+    })
+  }
+
+  function listActivityInstances() {
+    client.models.ActivityInstance.observeQuery().subscribe({
+      next: async (data) => {
+        setActivityInstances([...data.items]);
+        const selected = data.items.filter((activityInstance) => activityInstance.isOnNextRobDay);
+        setSelectedActivityInstances(selected);
+      },
+    })
+  }
+
   function onRemoveActivity(activity: Schema["Activity"]["type"]) {
     setRemovedActivity(activity);
     setIsFirstDialogOpen(true);
@@ -161,25 +181,115 @@ export default function Page() {
 
   function removeActivity() {
     removedActivity ? removedActivity.isOnNextRobDay = false : null;
+    const activInstance = selectedActivityInstances.find((activityInstance) => activityInstance.displayName === removedActivity?.name);
+    if (activInstance) {
+      console.log("Activity Instance found: ", activInstance);
+      setRemovedActivityInstance(activInstance);
+      const result = client.models.ActivityInstance.delete({ id: activInstance.id });
+      console.log("Activity Instance removed: ", result);
+      // removeActivityInstance(activInstance);
+    }
+    else {
+      console.log("Activity Instance not found");
+    }
     removedActivity ? client.models.Activity.update({ ...removedActivity }) : null;
     setRemovedActivity(undefined);
+    setRemovedActivityInstance(undefined);
     setIsFirstDialogOpen(false);
   }
 
   function editActivity() {
-    editededActivity ? client.models.Activity.update({ ...editededActivity }) : null;
-    setEditedActivity(undefined);
+    // editededActivity ? client.models.Activity.update({ ...editededActivity }) : null;
+    const activInst = selectedActivityInstances.find((activityInstance) => activityInstance.displayName === editededActivity?.name);
+    if (activInst) {
+      console.log("Activity Instance found: ", activInst);
+      setEditedActivityInstance(activInst);
+      editActivityInstance(activInst);
+    }
+    else {
+      console.log("Activity Instance not found");
+    }
+    // editededActivity ? editActivityInstance() : null;
     setIsSecondDialogOpen(false);
+  }
+
+  function editActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
+    if (activityInstance) {
+      // editedActivityInstance.date = robDayDate ? robDayDate.toDateString() : "";
+      console.log("Selected location: ", selectedLocation);
+      selectedLocation ? activityInstance.locationId = selectedLocation.id : null;
+      // const test = await client.models.ActivityInstance.get({ id: activityInstance.id });
+      // console.log("Activity Instance found: ", test);
+      // console.log("Location of test: ", test.location().data);
+      // const result = client.models.ActivityInstance.update({ ...activityInstance });
+      if (selectedLocation) {
+        const result = client.models.ActivityInstance.update({ id: activityInstance.id, locationId: selectedLocation.id });
+        console.log("Activity Instance updated: ", result);
+      }
+    }
+    else {
+      console.log("No Activity Instance found for som efucking reason... ", activityInstance);
+    }
+    if (editededActivity) {
+      const activ = selectedActivities.find((activity) => activity.id === editededActivity.id);
+      if (activ) {
+        activ.location = selectedLocation ? selectedLocation.name : "";
+        selectedActivities[selectedActivities.indexOf(activ)] = activ;
+      }
+    }
+    setEditedActivityInstance(undefined);
+    setEditedActivity(undefined);
+    setSelectedLocation(undefined);
+    setIsSecondDialogOpen(false);
+    setSelectedLocationValue("");
+    setSelectedLocationValueLabel("Choose a location");
   }
 
   function addActivity() {
     addedActivity ? addedActivity.isOnNextRobDay = true : null;
     addedActivity ? client.models.Activity.update({ ...addedActivity }) : null;
+    addedActivity ? createActivityInstance({ ...addedActivity}) : null;
     setAddedActivity(undefined);
     setIsAddActivityDialogOpen(false);
     setSelectedValue("");
     setSelectedValueLabel("Choose an activity");
   }
+
+  function createActivityInstance(activity: Schema["Activity"]["type"]) {
+    const newActivityInstance = {
+      date: robDayDate ? robDayDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+      displayName: activity.name,
+      startTime: 0,
+      endTime: 0,
+      totalTime: 0,
+      notes: [],
+      weatherCondition: "",
+      temperature: 0,
+      rating: 0,
+      loe: 0,
+      cost: 0,
+      images: [],
+      activityId: activity.id,
+      locationId: "pending",
+      robdaylogId: "pending",
+      activity: activity,
+      completed: false,
+      isOnNextRobDay: true,
+    };
+    const activityInstance = client.models.ActivityInstance.create({ ...newActivityInstance });
+    // activityInstance ? setAddedActivityInstance(activityInstance) : setAddedActivityInstance(undefined);
+    console.log("Activity Instance created: ", activityInstance);
+  }
+
+  // function editActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
+  //   const updatedActivityInstance = {
+  //     ...activityInstance,
+  //     date: robDayDate ? robDayDate.toDateString() : "",
+  //   };
+  //   const editedActivityInstance = client.models.ActivityInstance.update({ ...updatedActivityInstance });
+  //   // editedActivityInstance ? setEditedActivityInstance(editedActivityInstance) : setEditedActivityInstance(undefined);
+  //   console.log("Activity Instance updated: ", editedActivityInstance);
+  // }
 
   function completeActivity() {
     completedActivity ? completedActivity.isOnNextRobDay = false : null;
@@ -192,6 +302,9 @@ export default function Page() {
 
   useEffect(() => {
     listActivities();
+    listLocations();
+    listActivityInstances();
+    setRobDayDate(getNextRobDay());
   }, []);
 
   const pathname = usePathname();
@@ -376,7 +489,10 @@ export default function Page() {
                 <DateInput
                   id="date-input"
                   label="Date"
-                  value={getNextRobDay()}>
+                  // value={getNextRobDay()}
+                  value={robDayDate}
+                  onChange={(date) => setRobDayDate(date)}
+                  >
                 </DateInput>
                 <Icon
                   name="calendarDays"
@@ -492,6 +608,7 @@ export default function Page() {
                         paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
                       >
                         {activity.location?.toUpperCase() ?? "LOCATION TBD"}
+                        {/* {selectedActivityInstances && (selectedActivityInstances[selectedActivities.indexOf(activity)].location?.name?.toUpperCase() ?? "LOCATION TBD")} */}
                       </Text>
                       <Line/>
                       <Text
@@ -509,7 +626,8 @@ export default function Page() {
                         />
                         <IconButton
                           icon="edit"
-                          onClick={() => setIsSecondDialogOpen(true)}
+                          // onClick={() => setIsSecondDialogOpen(true)}
+                          onClick={() => onEditActivity(activity)}
                           variant="tertiary"
                           size="s"
                         />
@@ -569,6 +687,7 @@ export default function Page() {
             Are you sure you want to remove this activity from the Robday agenda?
           </Text>  
         </Dialog>
+
         <Dialog
         isOpen={isSecondDialogOpen}
         onClose={() => setIsSecondDialogOpen(false)}
@@ -585,8 +704,20 @@ export default function Page() {
           >
           <Text variant="body-default-s">
             Ability to edit activity here coming soon...
-          </Text>  
+          </Text>
+          <Select
+            searchable
+            id="location"
+            label={selectedLocationValueLabel}
+            minHeight={300}
+            options={locations.map((location) => {
+              return { value: location.id, label: location.name, description: location.address }
+            })}
+            onSelect={(value) => handleSelectLocation(locations.find((location) => location.id === value ) ?? locations[0])}
+            value={selectedLocationValue}
+          />
         </Dialog>
+
         <Dialog
         isOpen={isCompleteDialogOpen}
         onClose={() => setIsCompleteDialogOpen(false)}
