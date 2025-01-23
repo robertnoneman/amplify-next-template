@@ -125,7 +125,9 @@ const schema = a.schema({
       robdaylogId: a.id(),
       activity: a.belongsTo("Activity", "activityId"),
       location: a.belongsTo("Location", "locationId"),
-      robdayLog: a.belongsTo("Robdaylog", "robdaylogId")
+      robdayLog: a.belongsTo("Robdaylog", "robdaylogId"),
+      completed: a.boolean(),
+      isOnNextRobDay: a.boolean(),
     }).authorization((allow) => [allow.publicApiKey()]),
   Location: a
     .model({
