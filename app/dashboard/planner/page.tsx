@@ -48,13 +48,13 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import clsx from 'clsx';
 import { roboto } from '@/app/ui/fonts';
 import { usePathname } from 'next/navigation';
-import { getNextRobDay } from "@/app/lib/utils";
+import { getNextRobDay, getWeather, getCurrentLocation } from "@/app/lib/utils";
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json"
 import { getUrl } from 'aws-amplify/storage';
-import { start } from "repl";
+
 
 Amplify.configure(outputs);
 
@@ -101,6 +101,12 @@ export default function Page() {
   // Because I'm young and dumb and scared
   const [failSafeBool, setFailSafeBool] = useState(false);
   const [urls, setUrls] = useState<Record<string, string>>({});
+  const [forecastTemp, setForecastTemp] = useState<string>();
+  const [forecastWeather, setForecastWeather] = useState<string>();
+  const [currentTemp, setCurrentTemp] = useState<string>();
+  const [currentWeather, setCurrentWeather] = useState<string>();
+  const [currentLat, setCurrentLat] = useState<number>();
+  const [currentLong, setCurrentLong] = useState<number>();
 
   const handleSelect = (activity: Schema["Activity"]["type"]) => {
     console.log("Selected option:", activity.name);
@@ -508,7 +514,25 @@ export default function Page() {
       const result = client.models.Robdaylog.update({ id: robDayLog.id, endTime: endTime, totalTime: duration });
       console.log("Robday Log completed: ", result);
     }
+  }
 
+  const getCurrentandForecastWeather = async () => {
+    const myDate = robDayDate? robDayDate : getNextRobDay();
+    if (myDate) {
+      const forecast = await getWeather(38.9143, -77.0102, myDate.toISOString().split("T")[0]);
+      console.log("Forecast Weather: ", forecast);
+      setForecastTemp(forecast.temperature);
+      setForecastWeather(forecast.conditions);
+    }
+    const current = await getWeather(38.9143, -77.0102);
+    console.log("Current Weather: ", current);
+    setCurrentTemp(current.temperature);
+    setCurrentWeather(current.conditions);
+
+    console.log("Forecast Temp: ", forecastTemp);
+    console.log("Forecast Weather: ", forecastWeather);
+    console.log("Current Temp: ", currentTemp);
+    console.log("Current Weather: ", currentWeather);
   }
 
 
@@ -518,6 +542,7 @@ export default function Page() {
     listActivityInstances();
     setRobDayDate(getNextRobDay());
     listRobDayLogs();
+    getCurrentandForecastWeather();
   }, []);
 
   const pathname = usePathname();
@@ -698,7 +723,7 @@ export default function Page() {
                 ROBDAY AGENDA
               </Heading>
               <Line height={0.25}/>
-              <Row fillWidth justifyContent="space-between">
+              <Column fillWidth justifyContent="space-between" alignItems="center" mobileDirection="column" gap="2">
                 <DateInput
                   id="date-input"
                   label="Date"
@@ -707,12 +732,23 @@ export default function Page() {
                   onChange={(date) => setRobDayDate(date)}
                   >
                 </DateInput>
-                <Icon
+                <Row padding="2" justifyContent="space-between" alignItems="center" fillWidth>
+                <Text variant="body-default-xs">
+                  Current Weather: <br></br>
+                  {currentTemp?.split(" F")[0]}°F, {currentWeather}.
+                </Text>
+                <Line width={0.1} vertical/>
+                <Text variant="body-default-xs" align="right">
+                  Forcast Weather: <br></br>
+                  {forecastTemp?.split(" F")[0]}°F, {forecastWeather?.split(".")[0]}°F.
+                </Text>
+                </Row>
+                {/* <Icon
                   name="calendarDays"
                   size="l"
                   onBackground="neutral-medium"
-                />
-              </Row>
+                /> */}
+              </Column>
 
               <Line height={0.1}/>
               {!failSafeBool && (
