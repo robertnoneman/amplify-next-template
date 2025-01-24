@@ -2,8 +2,17 @@
 
 import {
     Column,
+    Row,
     Heading,
-    Background
+    Background,
+    Dialog,
+    Button,
+    Flex,
+    Input,
+    Textarea,
+    Switch,
+    TagInput,
+    Select
   } from "@/once-ui/components";
 
 import RobdayLog from "@/app/ui/dashboard/robday-log";
@@ -13,6 +22,8 @@ import { data, type Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json"
 import { act, useEffect, useState } from "react";
 import { getUrl } from 'aws-amplify/storage';
+import { uploadData } from 'aws-amplify/storage';
+import { MediaUpload } from "@/once-ui/modules";
 
 Amplify.configure(outputs);
 
@@ -28,14 +39,29 @@ interface RobdayLogProps {
   activityInstances: Schema["ActivityInstance"]["type"][];
   urlsDict: Record<string, string>;
   notes: Array<string>;
+  locations: Schema["Location"]["type"][];
 }
 
 
 export default function Page() {
   const [robdayLogs, setRobdayLogs] = useState<Array<Schema["Robdaylog"]["type"]>>([]);
   const [robdayLogProps, setRobdayLogProps] = useState<Array<RobdayLogProps>>([]);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [robdayLogActivities, setRobdayLogActivities] = useState<Schema["RobdaylogActivity"]["type"][]>([]);
   const [activitiesDict, setActivitiesDict] = useState<Record<string, Schema["Activity"]["type"]>>({});
+  const [editedActivity, setEditedActivity] = useState<Schema["ActivityInstance"]["type"] | null>(null);
+  
+  const [activityDisplayName, setActivityDisplayName] = useState<string>("");
+  const [activityLocationId, setActivityLocationId] = useState<string>("");
+  const [activityNotes, setActivityNotes] = useState<string[]>([]);
+  const [activityImages, setActivityImages] = useState<string[]>([]);
+  const [activityCost, setActivityCost] = useState<number>(0);
+  const [activityRating, setActivityRating] = useState<number>(0);
+
+  const [locations, setLocations] = useState<Array<Schema["Location"]["type"]>>([]);
+  const [selectedLocationValue, setSelectedLocationValue] = useState("");
+  const [selectedLocationValueLabel, setSelectedLocationValueLabel] = useState("Choose a location");
+  const [selectedLocation, setSelectedLocation] = useState<Schema["Location"]["type"]>();
 
   const getImageUrl = async (key: string): Promise<string> => {
         const url = getUrl({
@@ -43,6 +69,14 @@ export default function Page() {
         });
           return (await url).url.toString();
     }
+
+  function listLocations() {
+    client.models.Location.observeQuery().subscribe({
+      next: async (data) => {
+        setLocations([...data.items]);
+      },
+    })
+  }
 
   async function fetchRobdayLogs() {
     client.models.Robdaylog.observeQuery().subscribe({
@@ -79,7 +113,8 @@ export default function Page() {
             activitiesDict: activitiesDict,
             activityInstances: robdayLogActivityInstances.data,
             urlsDict: urlsDict,
-            notes: Array.isArray(robdayLog.notes) ? robdayLog.notes.filter(note => note !== null) : []
+            notes: Array.isArray(robdayLog.notes) ? robdayLog.notes.filter(note => note !== null) : [],
+            locations: locations
           });
         }));
         setRobdayLogs([...data.items]);
@@ -88,9 +123,9 @@ export default function Page() {
     });
   }
   
-
   useEffect(() => {
     fetchRobdayLogs();
+    listLocations();
   }, []);
 
     return (
@@ -177,7 +212,7 @@ export default function Page() {
           ))} */}
           { robdayLogProps.map((robdayLogProp, index) => (
             <RobdayLog 
-              key={index} 
+              key={robdayLogProp.robdayLogNumber} 
               robdayLogNumber={robdayLogProp.robdayLogNumber} 
               robdayLogDate={robdayLogProp.robdayLogDate} 
               robdayLogWeather={robdayLogProp.robdayLogWeather}
@@ -187,6 +222,7 @@ export default function Page() {
               activityInstances={robdayLogProp.activityInstances}
               urlsDict={robdayLogProp.urlsDict}
               notes={robdayLogProp.notes}
+              locations={locations}
               />
           ))}
         </Column>

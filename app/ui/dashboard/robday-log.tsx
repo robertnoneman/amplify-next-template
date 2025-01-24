@@ -54,8 +54,9 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json"
 import { getUrl } from 'aws-amplify/storage';
+import { uploadData } from 'aws-amplify/storage';
 import { Nullable } from "@aws-amplify/data-schema";
-import { LazyLoader } from "@aws-amplify/data-schema/runtime";
+import { AuthMode, CustomHeaders, LazyLoader, ListReturnValue, SingularReturnValue } from "@aws-amplify/data-schema/runtime";
 import { get } from "http";
 
 Amplify.configure(outputs);
@@ -72,7 +73,8 @@ export default function RobdayLog({
   activitiesDict,
   activityInstances,
   urlsDict,
-  notes
+  notes,
+  locations
 }: { 
   robdayLogNumber: string; 
   robdayLogDate: string;
@@ -83,10 +85,29 @@ export default function RobdayLog({
   activityInstances: Schema["ActivityInstance"]["type"][];
   urlsDict: Record<string, string>;
   notes: Array<string>;
+  locations: Schema["Location"]["type"][];
 }) {
 
   const [location, setLocation] = useState<string | null>(null);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  // const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState<Record<string, string[]>>({});
+  const [defaultImageUrl, setDefaultImageUrl] = useState<string>("/poop.jpg");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editedActivity, setEditedActivity] = useState<Schema["ActivityInstance"]["type"] | null>(null);
+  const [editedImageUrl, setEditedImageUrl] = useState<string>("");
+  const [activityDisplayName, setActivityDisplayName] = useState<string>("");
+  const [activityLocationId, setActivityLocationId] = useState<string>("");
+  const [activityNotes, setActivityNotes] = useState<string[]>([]);
+  const [activityImages, setActivityImages] = useState<string[]>([]);
+  const [activityCost, setActivityCost] = useState<number>(0);
+  const [activityRating, setActivityRating] = useState<number>(0);
+
+  const [selectedLocationValue, setSelectedLocationValue] = useState("");
+  const [selectedLocationValueLabel, setSelectedLocationValueLabel] = useState("Choose a location");
+  const [selectedLocation, setSelectedLocation] = useState<Schema["Location"]["type"]>();
+
+  const [selectedActivity, setSelectedActivity] = useState<Schema["Activity"]["type"]>();
 
   const getImageUrl = async (key: string): Promise<string> => {
       const url = getUrl({
@@ -99,18 +120,144 @@ export default function RobdayLog({
     return new Date(date).toLocaleDateString();
   }
 
+  const handleUploadData = async (file: File): Promise<void> => {
+      await uploadData({
+          path: `picture-submissions/${file.name}`, 
+          data: file
+      });
+        // setActivityImages(prevImages => [...prevImages, `picture-submissions/${file.name}`])
+      setActivityImages([`picture-submissions/${file.name}`]);
+  }
+  
+  const handleSelectLocation = (location: Schema["Location"]["type"]) => {
+      console.log("Selected option:", location.name);
+      setSelectedLocationValue(location.name ?? "");
+      setSelectedLocationValueLabel(location.address ?? "");
+      setSelectedLocation(location);
+    }
+  
+  function updateActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
+    console.log(`Done Editing Activity: ${activityInstance.displayName}`);
+    activityInstance.displayName = activityDisplayName;
+    activityInstance.notes = activityNotes;
+    activityInstance.images = activityImages;
+    activityInstance.cost = activityCost;
+    activityInstance.rating = activityRating;
+    // activityInstance.locationId = activityLocationId;
+    // selectedLocation ? activityInstance.locationId = selectedLocation.id : null;
+    // if (selectedLocation) {
+    //   const result = client.models.ActivityInstance.update({ id: activityInstance.id, locationId: selectedLocation.id });
+    //   console.log("Activity Instance updated: ", result);
+    // }
+    const fullResult = client.models.ActivityInstance.update(activityInstance);
+    console.log("Activity Instance updated: ", fullResult);
+    setIsEditDialogOpen(false);
+    setActivityDisplayName("");
+    setActivityLocationId("");
+    setActivityNotes([]);
+    setActivityImages([]);
+    setActivityCost(0);
+    setActivityRating(0);
+  }
+  
+  function populateActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
+    isEditDialogOpen? console.log("returning ") :
+    setIsEditDialogOpen(true);
+    setEditedActivity(activityInstance);
+    activityInstance.displayName? setActivityDisplayName(activityInstance.displayName) : setActivityDisplayName("");
+    // activityInstance.locationId? setActivityLocationId(activityInstance.locationId) : setActivityLocationId("");
+    activityInstance.locationId? setSelectedLocationValue(locations.find((location) => location.id === activityInstance.locationId)?.name ?? "") : setSelectedLocationValue("");
+    activityInstance.locationId? setSelectedLocationValueLabel(locations.find((location) => location.id === activityInstance.locationId)?.address ?? "") : setSelectedLocationValueLabel("");
+    setActivityNotes(activityInstance.notes ? activityInstance.notes.filter((note): note is string => note !== null) : []);
+    activityInstance.images? setActivityImages(activityInstance.images.filter((image): image is string => image !== null)) : setActivityImages([]);
+    activityInstance.cost? setActivityCost(activityInstance.cost) : setActivityCost(0);
+    activityInstance.rating? setActivityRating(activityInstance.rating) : setActivityRating(0);
+    setEditedImageUrl(imageUrls[activityInstance.id][0] ?? defaultImageUrl);
+    console.log("Activity Instance populated: ", activityInstance.displayName);
+  }
+
+  async function populateNewActivityInstance(activity: Schema["Activity"]["type"]) {
+    isAddDialogOpen? console.log("returning ") :
+    setIsAddDialogOpen(true);
+    setSelectedActivity(activity);
+    setActivityDisplayName(activity?.name ?? "");
+    setSelectedLocationValue(activity?.location ?? "");
+    setSelectedLocationValueLabel(activity?.location ?? "");
+    setActivityNotes([]);
+    const imageUrl = await getImageUrl(activity.image ?? "/placeholderImage.jpg");
+    setEditedImageUrl(imageUrl);
+    setActivityImages([activity.image ?? ""]);
+    setActivityCost(activity.cost ?? 0);
+    setActivityRating(activity.rating ?? 0);
+    console.log("Activity Instance populated: ", activity.name);
+  }
+
+  function createActivityInstance() {
+    console.log(`Done Creating Activity: ${selectedActivity?.name}`);
+    const newActivityInstance = {
+      displayName: activityDisplayName,
+      notes: activityNotes,
+      images: activityImages,
+      cost: activityCost,
+      rating: activityRating,
+      activityId: selectedActivity?.id ?? "",
+      locationId: selectedLocation?.id ?? "",
+      robdaylogId: robdayLogActivities[0].robdaylogId,
+      completed: true,
+      isOnNextRobDay: false,
+      date: robdayLogDate,
+    }
+    const result = client.models.ActivityInstance.create(newActivityInstance);
+    console.log("Activity Instance created: ", result);
+    setIsAddDialogOpen(false);
+    setActivityDisplayName("");
+    setActivityLocationId("");
+    setActivityNotes([]);
+    setActivityImages([]);
+    setEditedImageUrl("/placeholderImage.jpg");
+    setActivityCost(0);
+    setActivityRating(0);
+  }
+
+
+  async function fetchDefaultImage() {
+    const defImageUrl = await getImageUrl("picture-submissions/placeholderImage.jpg");
+    setDefaultImageUrl(defImageUrl);
+  }
+
   useEffect(() => {
+    // fetchDefaultImage();
     activityInstances?.forEach(async (activityInstance) => {
       const location = await activityInstance.location();
       setLocation(location.data?.name ?? null);
+      console.log("Location: ", location.data?.name);
       activityInstance.images?.forEach(async (image) => {
         if (image) {
           const url = await getImageUrl(image);
-          setImageUrls((imageUrls) => [...imageUrls, url]);
+          setImageUrls((prevImageUrls) => ({
+            ...prevImageUrls,
+            [activityInstance.id]: [...(prevImageUrls[activityInstance.id] || []), url]
+          }));
         }
+      });
+      // activityInstance.images = imageUrls;
+      if (activityInstance.images?.length === 0) {
+        const baseActivity = await client.models.Activity.get({ id: activityInstance.activityId });
+        console.log("Base Activity: ", baseActivity);
+        const baseActivityImages = baseActivity.data?.image;
+        console.log("Base Activity Images: ", baseActivityImages);
+        const url = await getImageUrl(baseActivityImages ?? "picture-submissions/placeholderImage.jpg");
+        console.log("URL: ", url);
+        activityInstance.images = [url ?? "picture-submissions/placeholderImage.jpg"];
+        setImageUrls((prevImageUrls) => ({
+          ...prevImageUrls,
+          [activityInstance.id]: [...(prevImageUrls[activityInstance.id] || []), url]
+        }));
+        // setDefaultImageUrl(url);
+        // setImageUrls([defaultImageUrl]);
       }
-      );
     });
+    // listLocations();
   }, [activityInstances]);
 
   return (
@@ -166,7 +313,7 @@ export default function RobdayLog({
         
         <Column>
           {activityInstances && Object.entries(activityInstances).map(([id, activityInstance]) => (
-            <Column key={`${activityInstance.id}`} fillWidth>
+            <Column key={`${activityInstance.id} - ${id}`} fillWidth>
               <Row>
               {/* <Column
                 position="relative"
@@ -205,13 +352,42 @@ export default function RobdayLog({
                   >
                   {activityInstance.notes}
                 </Text>
+                <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                  Rating: {activityInstance.rating}
+                </Text>
+                <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                  Cost: {activityInstance.cost}
+                </Text>
+              </Column>
+              <Column fillHeight justifyContent="flex-start" direction="column">
+                <IconButton
+                  onClick={() => populateActivityInstance(activityInstance)}
+                  // name="HiOutlinePencil"
+                  icon="edit"
+                  size="m"
+                  variant="tertiary"
+                  // onBackground="brand-weak"
+                ></IconButton>
               </Column>
             </Row>
             <Line height={0.1}/>
             <Row fillWidth justifyContent="space-around" padding="s">
-              {imageUrls.map((url) => (
                 <SmartImage
-                  key={`${imageUrls.indexOf(url)}-${id}`}
+                  src={(imageUrls[activityInstance.id] && imageUrls[activityInstance.id][0]) ?? defaultImageUrl}
+                  alt="Robday"
+                  // aspectRatio="1/1"
+                  objectFit="cover"
+                  sizes="s"
+                  radius="xl"
+                  // width={15}
+                  // fillWidth
+                  maxWidth="l"
+                  minHeight="l"
+                  // height={15}
+                />
+              {/* {imageUrls.map((url) => (
+                <SmartImage
+                  key={`${imageUrls.indexOf(url)}-${activityInstance.id}-${url}`}
                   src={url}
                   alt="Robday"
                   // aspectRatio="1/1"
@@ -224,12 +400,12 @@ export default function RobdayLog({
                   minHeight="l"
                   // height={15}
                 />
-              ))}
+              ))} */}
             </Row>
             <Line height={0.1}/>
           </Column>
           ))}
-          {/* {activitiesDict && Object.entries(activitiesDict).map(([id, activity]) => (
+          {activitiesDict && Object.entries(activitiesDict).map(([id, activity]) => (
             <Column key={`${activity.id}`} fillWidth>
               <Row>
               <Column
@@ -237,7 +413,7 @@ export default function RobdayLog({
                 overflow="hidden"
                 width={20}
               >
-                <SmartImage
+                {/* <SmartImage
                   src={urlsDict[id] ?? ""}
                   alt="Robday"
                   aspectRatio="1/1"
@@ -246,7 +422,7 @@ export default function RobdayLog({
                   radius="xl"
                   width={10}
                   height={10}
-                />
+                /> */}
               </Column>
               <Column fillWidth >
                 <Text
@@ -270,12 +446,192 @@ export default function RobdayLog({
                   {activity.description}
                 </Text>
               </Column>
+              <Column fillHeight justifyContent="flex-start" direction="column">
+                <IconButton
+                  onClick={() => populateNewActivityInstance(activity)}
+                  // name="HiOutlinePencil"
+                  icon="plus"
+                  size="m"
+                  variant="tertiary"
+                  // onBackground="brand-weak"
+                ></IconButton>
+              </Column>
             </Row>
             <Line height={0.1}/>
           </Column>
-          ))} */}
+          ))}
         </Column>
       </Column>
+      <Dialog
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          title="Edit Robday Activity"
+          description="Edit Robday activity."
+          // onHeightChange={(height) => setFirstDialogHeight(height)}
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => editedActivity && updateActivityInstance(editedActivity)}>
+                Update
+              </Button>
+            </>
+          }
+        >
+          <Flex
+            fillWidth
+            alignItems='center'
+            justifyContent='center'
+          >
+            <Flex
+              maxWidth={20}
+              alignItems='center'
+            >
+              <MediaUpload
+                emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
+                onFileUpload={handleUploadData}
+                initialPreviewImage={editedActivity ? editedImageUrl : ""}
+              >  
+              </MediaUpload>
+            </Flex>
+          </Flex>
+          <Column paddingTop="24" fillWidth gap="24">
+            <Input
+              radius="top"
+              label="Name"
+              // labelAsPlaceholder
+              defaultValue={editedActivity?.displayName?.toString() ?? ""}
+              id="name"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityDisplayName(e.target.value)}
+            />
+            <Select
+              searchable
+              id="location"
+              label={selectedLocationValueLabel}
+              minHeight={300}
+              options={locations.map((location) => {
+                return { value: location.id, label: location.name, description: location.address }
+              })}
+              onSelect={(value) => handleSelectLocation(locations.find((location) => location.id === value ) ?? locations[0])}
+              value={selectedLocationValue}
+            />
+            <Input
+              radius="top"
+              label="Cost"
+              // labelAsPlaceholder
+              defaultValue={editedActivity?.cost?.toString()}
+              id="cost"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityCost(parseInt(e.target.value))}
+            />
+            <Input
+              radius="top"
+              label="Rating"
+              // labelAsPlaceholder
+              defaultValue={editedActivity?.rating?.toString()}
+              id="rating"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityRating(parseInt(e.target.value))}
+            />
+            {editedActivity && editedActivity.notes && editedActivity.notes.map((note) => (
+              <Textarea
+                key={`${editedActivity.id} - ${note}`}
+                id="notes"
+                label="Notes"
+                defaultValue={note?.toString() ?? ""}
+                lines={2}
+                // onChange={(e) => console.log(e.target.value)}
+                // append to notes array
+                onChange={(e) => setActivityNotes([...activityNotes, e.target.value])}
+              >
+              </Textarea>
+            ))}
+          </Column>
+        </Dialog>
+        <Dialog
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          title="Add Robday Activity"
+          description="Add Robday activity."
+          // onHeightChange={(height) => setFirstDialogHeight(height)}
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => createActivityInstance()}>
+                Add
+              </Button>
+            </>
+          }
+        >
+          <Flex
+            fillWidth
+            alignItems='center'
+            justifyContent='center'
+          >
+            <Flex
+              maxWidth={20}
+              alignItems='center'
+            >
+              <MediaUpload
+                emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
+                onFileUpload={handleUploadData}
+                initialPreviewImage={editedImageUrl ?? ""}
+              >  
+              </MediaUpload>
+            </Flex>
+          </Flex>
+          <Column paddingTop="24" fillWidth gap="24">
+            <Input
+              radius="top"
+              label="Name"
+              // labelAsPlaceholder
+              defaultValue={selectedActivity?.name ?? ""}
+              id="name"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityDisplayName(e.target.value)}
+            />
+            <Select
+              searchable
+              id="location"
+              label={selectedLocationValueLabel}
+              minHeight={300}
+              options={locations.map((location) => {
+                return { value: location.id, label: location.name, description: location.address }
+              })}
+              onSelect={(value) => handleSelectLocation(locations.find((location) => location.id === value ) ?? locations[0])}
+              value={selectedLocationValue}
+            />
+            <Input
+              radius="top"
+              label="Cost"
+              // labelAsPlaceholder
+              defaultValue={selectedActivity?.cost?.toString()}
+              id="cost"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityCost(parseInt(e.target.value))}
+            />
+            <Input
+              radius="top"
+              label="Rating"
+              // labelAsPlaceholder
+              defaultValue={selectedActivity?.rating?.toString()}
+              id="rating"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityRating(parseInt(e.target.value))}
+            />
+            {selectedActivity && selectedActivity.notes && selectedActivity.notes.map((note) => (
+              <Textarea
+                key={`${selectedActivity.id} - ${note}`}
+                id="notes"
+                label="Notes"
+                defaultValue={note?.toString() ?? ""}
+                lines={2}
+                // onChange={(e) => console.log(e.target.value)}
+                // append to notes array
+                onChange={(e) => setActivityNotes([...activityNotes, e.target.value])}
+              >
+              </Textarea>
+            ))}
+          </Column>
+        </Dialog>
     </Row>
   )
 }

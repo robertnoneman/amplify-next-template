@@ -54,6 +54,7 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json"
 import { getUrl } from 'aws-amplify/storage';
+import { start } from "repl";
 
 Amplify.configure(outputs);
 
@@ -88,6 +89,10 @@ export default function Page() {
   const [addedActivity, setAddedActivity] = useState<Schema["Activity"]["type"]>();
   const [addedLocation, setAddedLocation] = useState<Schema["Location"]["type"]>();
   const [addedActivityInstance, setAddedActivityInstance] = useState<Schema["ActivityInstance"]["type"]>();
+
+  const [activityInstanceCost, setActivityInstanceCost] = useState<number>();
+  const [activityInstanceRating, setActivityInstanceRating] = useState<number>();
+  const [robDayLog, setRobDayLog] = useState<Schema["Robdaylog"]["type"]>();
   // const [urls, setUrls] = useState<Array<string>>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
 
@@ -156,6 +161,27 @@ export default function Page() {
     })
   }
 
+  function listRobDayLogs() {
+    var myRobDayDate = getNextRobDay();
+    if (robDayDate) {
+      myRobDayDate = robDayDate;
+    }
+    client.models.Robdaylog.observeQuery().subscribe({
+      next: async (data) => {
+        var foundRobDayLog = data.items.filter((robdayLog) => robdayLog.date === myRobDayDate.toISOString().split("T")[0]);
+        if (foundRobDayLog.length > 0) {
+          setRobDayLog(foundRobDayLog[0]);
+          console.log("Robday Log found for date: ", myRobDayDate.toISOString().split("T")[0]);
+        }
+        else {
+          // setRobDayLog(undefined);
+          console.log("No Robday Log found for date: ", myRobDayDate.toISOString().split("T")[0]);
+          // createRobdayLog();
+        }
+      },
+    })
+  }
+
   function onRemoveActivity(activity: Schema["Activity"]["type"]) {
     setRemovedActivity(activity);
     setIsFirstDialogOpen(true);
@@ -205,10 +231,29 @@ export default function Page() {
       // removeActivityInstance(activInstance);
     }
     else {
-      console.log("Activity Instance not found");
+      if (removedActivityInstance) {
+        removeActivityInstance(removedActivityInstance);
+      }
+      else {
+        console.log("Activity Instance not found");
+      }
     }
     removedActivity ? client.models.Activity.update({ ...removedActivity }) : null;
     setRemovedActivity(undefined);
+    setRemovedActivityInstance(undefined);
+    setIsFirstDialogOpen(false);
+  }
+
+  function removeActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
+    const result = client.models.ActivityInstance.delete({ id: activityInstance.id });
+    console.log("Activity Instance removed: ", result);
+    if (removedActivity) {
+      const activ = selectedActivities.find((activity) => activity.id === removedActivity.id);
+      if (activ) {
+        activ.isOnNextRobDay = false;
+        selectedActivities[selectedActivities.indexOf(activ)] = activ;
+      }
+    }
     setRemovedActivityInstance(undefined);
     setIsFirstDialogOpen(false);
   }
@@ -309,24 +354,18 @@ export default function Page() {
 
   function stopActivity(activity: Schema["ActivityInstance"]["type"]) {
     const endTime = new Date().getTime();
-    const result = client.models.ActivityInstance.update({ id: activity.id, endTime: endTime });
+    var duration = 0;
+    if (activity.startTime) {
+      duration = endTime - activity.startTime;
+    }
+    const result = client.models.ActivityInstance.update({ id: activity.id, endTime: endTime, totalTime: duration });
     console.log("Activity Instance stopped: ", endTime, result);
   }
 
   function resetActivityTime(activity: Schema["ActivityInstance"]["type"]) {
-    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: 0, endTime: 0 });
+    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: 0, endTime: 0, totalTime: 0 });
     console.log("Activity Instance reset: ", result);
   }
-
-  // function editActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
-  //   const updatedActivityInstance = {
-  //     ...activityInstance,
-  //     date: robDayDate ? robDayDate.toDateString() : "",
-  //   };
-  //   const editedActivityInstance = client.models.ActivityInstance.update({ ...updatedActivityInstance });
-  //   // editedActivityInstance ? setEditedActivityInstance(editedActivityInstance) : setEditedActivityInstance(undefined);
-  //   console.log("Activity Instance updated: ", editedActivityInstance);
-  // }
 
   function completeActivity() {
     completedActivity ? completedActivity.isOnNextRobDay = false : null;
@@ -339,8 +378,6 @@ export default function Page() {
   }
 
   function completeActivityInstance() {
-    const endTime = new Date().getTime();
-    completedActivityInstance ? completedActivityInstance.endTime = endTime : null;
     completedActivityInstance ? completedActivityInstance.isOnNextRobDay = false : null;
     completedActivityInstance ? completedActivityInstance.completed = true : null;
     completedActivityInstance ? client.models.ActivityInstance.update({ ...completedActivityInstance }) : null;
@@ -348,11 +385,70 @@ export default function Page() {
     setIsCompleteDialogOpen(false);
   }
 
+  function createRobdayLog() {
+    const startTime = new Date().getTime();
+    const newRobdayLog = {
+      date: robDayDate ? robDayDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+      startTime: startTime,
+      weatherCondition: "",
+      temperature: 0,
+      activities: [],
+      locations: [],
+      activityInstances: activityInstances ? activityInstances : [],
+      notes: [],
+    };
+    const robdayLog = client.models.Robdaylog.create({ ...newRobdayLog });
+    console.log("Robday Log created: ", robdayLog);
+  }
+
+  function updateRobdayLog() {
+    if (robDayLog) {
+      const updatedRobDayLog = {
+        id: robDayLog.id,
+        date: robDayDate ? robDayDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+        startTime: robDayLog.startTime,
+        weatherCondition: robDayLog.weatherCondition,
+        temperature: robDayLog.temperature,
+        activities: robDayLog.activities,
+        locations: robDayLog.locations,
+        activityInstances: activityInstances ? activityInstances : [],
+        notes: robDayLog.notes,
+      };
+      const result = client.models.Robdaylog.update({ ...updatedRobDayLog });
+      console.log("Robday Log updated: ", result);
+    }
+  }
+
+  function completeRobDayLog() {
+    if (robDayLog) {
+      const endTime = new Date().getTime();
+      const duration = endTime - (robDayLog.startTime ?? 0);
+      const updatedRobDayLog = {
+        id: robDayLog.id,
+        date: robDayDate ? robDayDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+        startTime: robDayLog.startTime,
+        endTime: endTime,
+        totalTime: duration,
+        weatherCondition: robDayLog.weatherCondition,
+        temperature: robDayLog.temperature,
+        activities: robDayLog.activities,
+        locations: robDayLog.locations,
+        activityInstances: activityInstances ? activityInstances : [],
+        notes: robDayLog.notes,
+      };
+      const result = client.models.Robdaylog.update({ ...updatedRobDayLog });
+      console.log("Robday Log completed: ", result);
+    }
+
+  }
+
+
   useEffect(() => {
     listActivities();
     listLocations();
     listActivityInstances();
     setRobDayDate(getNextRobDay());
+    listRobDayLogs();
   }, []);
 
   const pathname = usePathname();
@@ -583,67 +679,13 @@ export default function Page() {
                       >
                         <SmartImage
                           // fitWidth
-                          src={urls[activityInstance.activityId] ?? ""}
+                          src={urls[activityInstance.activityId] ?? "https://static-00.iconduck.com/assets.00/loading-icon-1024x1024-z5lrc2lo.png"}
                           alt="Robday"
                           aspectRatio="16/9"
                           objectFit="cover"
                           sizes="xs"
                           radius="xl"
                           // maxHeight={15}
-                        />
-                        <Fade
-                          fillWidth
-                          position="absolute"
-                          top="0"
-                          to="bottom"
-                          height={1}
-                          zIndex={3}
-                          pattern={{
-                            display: true,
-                            size: '2'
-                          }}
-                        />
-                        <Fade
-                          fillWidth
-                          position="absolute"
-                          to="top"
-                          bottom="0"
-                          height={1}
-                          zIndex={3}
-                          pattern={{
-                            display: true,
-                            size: '2'
-                          }}
-                        />
-                        <Fade
-                          // fillWidth
-                          width={1}
-                          fillHeight
-                          position="absolute"
-                          to="left"
-                          // bottom="0"
-                          right="0"
-                          // height={12}
-                          zIndex={3}
-                          pattern={{
-                            display: true,
-                            size: '2'
-                          }}
-                        />
-                        <Fade
-                          // fillWidth
-                          width={1}
-                          fillHeight
-                          position="absolute"
-                          to="right"
-                          // bottom="0"
-                          left="0"
-                          // height={12}
-                          zIndex={3}
-                          pattern={{
-                            display: true,
-                            size: '2'
-                          }}
                         />
                       </Row>
                       <Column>
