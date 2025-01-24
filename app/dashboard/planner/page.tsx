@@ -93,7 +93,13 @@ export default function Page() {
   const [activityInstanceCost, setActivityInstanceCost] = useState<number>();
   const [activityInstanceRating, setActivityInstanceRating] = useState<number>();
   const [robDayLog, setRobDayLog] = useState<Schema["Robdaylog"]["type"]>();
-  // const [urls, setUrls] = useState<Array<string>>([]);
+  const [robDayLogId, setRobDayLogId] = useState<string>();
+  const [robDayLogNumber, setRobDayLogNumber] = useState<number>();
+  const [started, setStarted] = useState(false);
+  const [ended, setEnded] = useState(false);
+  const [archived, setArchived] = useState(false);
+  // Because I'm young and dumb and scared
+  const [failSafeBool, setFailSafeBool] = useState(false);
   const [urls, setUrls] = useState<Record<string, string>>({});
 
   const handleSelect = (activity: Schema["Activity"]["type"]) => {
@@ -161,6 +167,56 @@ export default function Page() {
     })
   }
 
+  async function checkRobDayLogForActivityInstances(id: string) {
+    if (!failSafeBool) {
+      console.log("Checking RobDayLog for Activity Instances");
+      setFailSafeBool(true);
+      if (!id) {
+        console.log("No RobDayLog ID found");
+        return;
+      }
+      const myRobDayLog = await client.models.Robdaylog.get({ id: id });
+      if (myRobDayLog.data) {
+        if (selectedActivityInstances.length > 0) {
+          // Check each activity instance to see that it has been assigned the current robDayLog.id, if not, assign it.
+          selectedActivityInstances.forEach((activityInstance) => {
+            if (activityInstance.robdaylogId !== myRobDayLog.data?.id) {
+              const result = client.models.ActivityInstance.update({ id: activityInstance.id, robdaylogId: myRobDayLog.data?.id });
+              console.log("Activity Instance updated: ", result);
+            }
+          });
+        }
+        else {
+          console.log("No Activity Instances found");
+        }
+        if (selectedActivities.length > 0) {
+          // Check if the current robDayLog has any activities assigned to it, if not, assign them.
+          selectedActivities.forEach(async (activity) => {
+            const activityRobDayLogs = await activity.robdaylogs();
+            if (activityRobDayLogs.data.length > 0) {
+              return;
+              const foundRobDayLog = activityRobDayLogs.data.find((robDayLog) => robDayLog.robdaylogId === id);
+              if (!foundRobDayLog) {
+                const result = client.models.RobdaylogActivity.create({ robdaylogId: id, activityId: activity.id });
+                console.log("Robday Log Activity created: ", result);
+              }
+            }
+            else {
+              const result = client.models.RobdaylogActivity.create({ robdaylogId: id, activityId: activity.id });
+              console.log("Robday Log Activity created: ", result);
+            }
+          });
+        }
+        else {
+          console.log("No Activities found");
+        }
+      }
+      else {
+        console.log("No RobDayLog found");
+      }
+    }
+  }
+
   function listRobDayLogs() {
     var myRobDayDate = getNextRobDay();
     if (robDayDate) {
@@ -168,14 +224,24 @@ export default function Page() {
     }
     client.models.Robdaylog.observeQuery().subscribe({
       next: async (data) => {
+        setRobDayLogNumber(data.items.length + 1);
+        console.log("Number of Robday Logs: ", data.items.length);
         var foundRobDayLog = data.items.filter((robdayLog) => robdayLog.date === myRobDayDate.toISOString().split("T")[0]);
         if (foundRobDayLog.length > 0) {
           setRobDayLog(foundRobDayLog[0]);
           console.log("Robday Log found for date: ", myRobDayDate.toISOString().split("T")[0]);
+          setRobDayLogId(foundRobDayLog[0].id);
+          setStarted(true);
+          if (foundRobDayLog[0].endTime) {
+            if (foundRobDayLog[0].endTime > 0) {
+              setEnded(true);
+            }
+          }
         }
         else {
           // setRobDayLog(undefined);
           console.log("No Robday Log found for date: ", myRobDayDate.toISOString().split("T")[0]);
+          setStarted(false);
           // createRobdayLog();
         }
       },
@@ -336,7 +402,7 @@ export default function Page() {
       images: [activity.image? activity.image : ""],
       activityId: activity.id,
       locationId: "pending",
-      robdaylogId: "pending",
+      robdaylogId: robDayLog? robDayLog.id : "pending",
       activity: activity,
       completed: false,
       isOnNextRobDay: true,
@@ -385,26 +451,29 @@ export default function Page() {
     setIsCompleteDialogOpen(false);
   }
 
-  function createRobdayLog() {
+  async function createRobdayLog() {
+    setStarted(true);
     const startTime = new Date().getTime();
     const newRobdayLog = {
       date: robDayDate ? robDayDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+      robDayNumber: robDayLogNumber,
       startTime: startTime,
       weatherCondition: "",
       temperature: 0,
-      activities: [],
-      locations: [],
-      activityInstances: activityInstances ? activityInstances : [],
-      notes: [],
+      // activities: activities,
+      // locations: [],
+      // activityInstances: activityInstances ? activityInstances : [],
+      // notes: [],
     };
-    const robdayLog = client.models.Robdaylog.create({ ...newRobdayLog });
-    console.log("Robday Log created: ", robdayLog);
+    const myRobdayLog = await client.models.Robdaylog.create({ ...newRobdayLog });
+    console.log("Robday Log created: ", myRobdayLog);
   }
 
   function updateRobdayLog() {
     if (robDayLog) {
       const updatedRobDayLog = {
         id: robDayLog.id,
+        robDayNumber: robDayLogNumber,
         date: robDayDate ? robDayDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
         startTime: robDayLog.startTime,
         weatherCondition: robDayLog.weatherCondition,
@@ -436,7 +505,7 @@ export default function Page() {
         activityInstances: activityInstances ? activityInstances : [],
         notes: robDayLog.notes,
       };
-      const result = client.models.Robdaylog.update({ ...updatedRobDayLog });
+      const result = client.models.Robdaylog.update({ id: robDayLog.id, endTime: endTime, totalTime: duration });
       console.log("Robday Log completed: ", result);
     }
 
@@ -646,6 +715,24 @@ export default function Page() {
               </Row>
 
               <Line height={0.1}/>
+              {!failSafeBool && (
+                <Row fillWidth justifyContent="center">
+                  <Button
+                    onClick={() => checkRobDayLogForActivityInstances(robDayLogId? robDayLogId : "")}
+                    variant="primary"
+                    size="m"
+                    id="trigger"
+                  >
+                    <Row justifyContent="center" alignItems="center">
+                      SYNC
+                      <Arrow
+                        trigger="#trigger"
+                        color="onBackground"
+                      />
+                    </Row>
+                  </Button>
+                </Row>
+              )}
               <Line height={0.1}/>
               
               <Column>
@@ -909,16 +996,51 @@ export default function Page() {
                   size="m"
                   id="trigger"
                 >
-                <Flex justifyContent="center" alignItems="center">
-                  ADD NEW ACTIVITY
-                  <Arrow
-                    trigger="#trigger"
-                    color="onBackground"
-                  />
-                </Flex>
+                  <Row justifyContent="center" alignItems="center">
+                    ADD NEW ACTIVITY
+                    <Arrow
+                      trigger="#trigger"
+                      color="onBackground"
+                    />
+                  </Row>
                 </Button>
               </Row>
-
+              {!started && (
+                <Row fillWidth justifyContent="center">
+                  <Button
+                    onClick={() => createRobdayLog()}
+                    variant="primary"
+                    size="m"
+                    id="trigger"
+                  >
+                    <Row justifyContent="center" alignItems="center">
+                      START ROB DAY
+                      <Arrow
+                        trigger="#trigger"
+                        color="onBackground"
+                      />
+                    </Row>
+                  </Button>
+                </Row>
+              )}
+              {started && !ended && (
+                <Row fillWidth justifyContent="center">
+                  <Button
+                    onClick={() => completeRobDayLog()}
+                    variant="primary"
+                    size="m"
+                    id="trigger"
+                  >
+                    <Row justifyContent="center" alignItems="center">
+                      END ROB DAY
+                      <Arrow
+                        trigger="#trigger"
+                        color="onBackground"
+                      />
+                    </Row>
+                  </Button>
+                </Row>
+              )}
             </Column>
           </Row>
           {/* </Card> */}
