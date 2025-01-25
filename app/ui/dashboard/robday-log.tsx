@@ -52,16 +52,23 @@ import { getNextRobDay } from "@/app/lib/utils";
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
-import outputs from "@/amplify_outputs.json"
+import outputs from "@/amplify_outputs.json";
 import { getUrl } from 'aws-amplify/storage';
 import { uploadData } from 'aws-amplify/storage';
 import { Nullable } from "@aws-amplify/data-schema";
 import { AuthMode, CustomHeaders, LazyLoader, ListReturnValue, SingularReturnValue } from "@aws-amplify/data-schema/runtime";
-import { get } from "http";
+import RobDayLogActivity from "./robday-log-activity";
 
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
+
+interface RobDayLogActivityProps {
+  activityInstance: Schema["ActivityInstance"]["type"];
+  location: string;
+  imageUrls: Array<string>;
+  // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
+}
 
 
 export default function RobdayLog({ 
@@ -102,6 +109,7 @@ export default function RobdayLog({
   const [activityImages, setActivityImages] = useState<string[]>([]);
   const [activityCost, setActivityCost] = useState<number>(0);
   const [activityRating, setActivityRating] = useState<number>(0);
+  const [robdayLogActivityProps, setRobdayLogActivityProps] = useState<Array<RobDayLogActivityProps>>([]);
 
   const [selectedLocationValue, setSelectedLocationValue] = useState("");
   const [selectedLocationValueLabel, setSelectedLocationValueLabel] = useState("Choose a location");
@@ -229,6 +237,26 @@ export default function RobdayLog({
     // fetchDefaultImage();
     activityInstances?.forEach(async (activityInstance) => {
       const location = await activityInstance.location();
+      const aiImages: Array<string> = [];
+      activityInstance.images?.forEach(async (image) => {
+        if (image) {
+          const url = await getImageUrl(image);
+          aiImages.push(url);
+        }
+      });
+      if (aiImages.length === 0) {
+        const baseActivity = await client.models.Activity.get({ id: activityInstance.activityId });
+        const baseActivityImages = baseActivity.data?.image;
+        const url = await getImageUrl(baseActivityImages ?? "picture-submissions/placeholderImage.jpg");
+        aiImages.push(url ?? "picture-submissions/placeholderImage.jpg");
+      }
+      const aiProp = {
+        activityInstance: activityInstance,
+        location: location.data?.name ?? "",
+        imageUrls: aiImages,
+        // populateActivityInstance: populateActivityInstance
+      }
+      setRobdayLogActivityProps([...robdayLogActivityProps, aiProp]);
       setLocation(location.data?.name ?? null);
       console.log("Location: ", location.data?.name);
       activityInstance.images?.forEach(async (image) => {
@@ -241,21 +269,21 @@ export default function RobdayLog({
         }
       });
       // activityInstance.images = imageUrls;
-      if (activityInstance.images?.length === 0) {
-        const baseActivity = await client.models.Activity.get({ id: activityInstance.activityId });
-        console.log("Base Activity: ", baseActivity);
-        const baseActivityImages = baseActivity.data?.image;
-        console.log("Base Activity Images: ", baseActivityImages);
-        const url = await getImageUrl(baseActivityImages ?? "picture-submissions/placeholderImage.jpg");
-        console.log("URL: ", url);
-        activityInstance.images = [url ?? "picture-submissions/placeholderImage.jpg"];
-        setImageUrls((prevImageUrls) => ({
-          ...prevImageUrls,
-          [activityInstance.id]: [...(prevImageUrls[activityInstance.id] || []), url]
-        }));
-        // setDefaultImageUrl(url);
-        // setImageUrls([defaultImageUrl]);
-      }
+      // if (activityInstance.images?.length === 0) {
+      //   const baseActivity = await client.models.Activity.get({ id: activityInstance.activityId });
+      //   console.log("Base Activity: ", baseActivity);
+      //   const baseActivityImages = baseActivity.data?.image;
+      //   console.log("Base Activity Images: ", baseActivityImages);
+      //   const url = await getImageUrl(baseActivityImages ?? "picture-submissions/placeholderImage.jpg");
+      //   console.log("URL: ", url);
+      //   activityInstance.images = [url ?? "picture-submissions/placeholderImage.jpg"];
+      //   setImageUrls((prevImageUrls) => ({
+      //     ...prevImageUrls,
+      //     [activityInstance.id]: [...(prevImageUrls[activityInstance.id] || []), url]
+      //   }));
+      //   // setDefaultImageUrl(url);
+      //   // setImageUrls([defaultImageUrl]);
+      // }
     });
     // listLocations();
   }, [activityInstances]);
@@ -282,19 +310,6 @@ export default function RobdayLog({
         </Heading>
         <Line height={0.25}/>
         { formatDate(robdayLogDate) } <br></br>
-        {/* <Row fillWidth justifyContent="space-between">
-          <DateInput
-            id="date-input"
-            label="Date"
-            value={new Date(robdayLog?.date ?? '')}>
-          </DateInput>
-          <Icon
-            name="calendarDays"
-            size="l"
-            onBackground="neutral-medium"
-          />
-        </Row> */}
-        
         {robdayLogWeather} - {robdayLogTemperature}°<br></br>
 
         <Line height={0.1}/>
@@ -312,98 +327,11 @@ export default function RobdayLog({
         <Line height={0.1}/>
         
         <Column>
-          {activityInstances && Object.entries(activityInstances).map(([id, activityInstance]) => (
-            <Column key={`${activityInstance.id} - ${id}`} fillWidth>
-              <Row>
-              {/* <Column
-                position="relative"
-                overflow="hidden"
-                width={20}
-              > */}
-                {/* <SmartImage
-                  src={urlsDict[id] ?? ""}
-                  alt="Robday"
-                  aspectRatio="1/1"
-                  objectFit="contain"
-                  sizes="s"
-                  radius="xl"
-                  width={10}
-                  height={10}
-                /> */}
-              {/* </Column> */}
-              <Column fillWidth >
-                <Text
-                  padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs"
-                >
-                  {activityInstance.displayName?.toUpperCase() ?? "ACTIVITY TBD"}
-                </Text>
-                <Line/>
-                <Text
-                  paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
-                >
-                  {location?.toUpperCase() ?? "LOCATION TBD"}
-                </Text>
-                
-              </Column>
-              <Line vertical width={0.1}/>
-              <Column fillWidth justifyContent="center">
-                <Text
-                    padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
-                  >
-                  {activityInstance.notes}
-                </Text>
-                <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
-                  Rating: {activityInstance.rating}
-                </Text>
-                <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
-                  Cost: {activityInstance.cost}
-                </Text>
-              </Column>
-              <Column fillHeight justifyContent="flex-start" direction="column">
-                <IconButton
-                  onClick={() => populateActivityInstance(activityInstance)}
-                  // name="HiOutlinePencil"
-                  icon="edit"
-                  size="m"
-                  variant="tertiary"
-                  // onBackground="brand-weak"
-                ></IconButton>
-              </Column>
-            </Row>
-            <Line height={0.1}/>
-            <Row fillWidth justifyContent="space-around" padding="s">
-                <SmartImage
-                  src={(imageUrls[activityInstance.id] && imageUrls[activityInstance.id][0]) ?? defaultImageUrl}
-                  alt="Robday"
-                  // aspectRatio="1/1"
-                  objectFit="cover"
-                  sizes="s"
-                  radius="xl"
-                  // width={15}
-                  // fillWidth
-                  maxWidth="l"
-                  minHeight="l"
-                  // height={15}
-                />
-              {/* {imageUrls.map((url) => (
-                <SmartImage
-                  key={`${imageUrls.indexOf(url)}-${activityInstance.id}-${url}`}
-                  src={url}
-                  alt="Robday"
-                  // aspectRatio="1/1"
-                  objectFit="cover"
-                  sizes="s"
-                  radius="xl"
-                  // width={15}
-                  // fillWidth
-                  maxWidth="l"
-                  minHeight="l"
-                  // height={15}
-                />
-              ))} */}
-            </Row>
-            <Line height={0.1}/>
-          </Column>
+          {/* {activityInstances && Object.entries(activityInstances).map(([id, activityInstance]) => (
+            <RobDayLogActivity key={`${activityInstance.id} - ${id}`} activityInstance={activityInstance} imageUrls={imageUrls}  />
+          ))} */}
+          {robdayLogActivityProps.map((props) => (
+            <RobDayLogActivity key={`${props.activityInstance.id}`} {...props} />
           ))}
           {activitiesDict && Object.entries(activitiesDict).map(([id, activity]) => (
             <Column key={`${activity.id}`} fillWidth>

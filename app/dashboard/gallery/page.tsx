@@ -205,11 +205,6 @@ export default function Page() {
           </Column>
         </Column>
         <Column fillWidth alignItems="center" gap="32" padding="xs" position="relative">
-          HERE'S WHERE ALL THE PRETTY PICTURES WILL BE!
-          {/* <RobdayLog /> */}
-          {/* {robdayLogs.map((robdayLog, index) => (
-            <RobdayLog key={index} robdayLogId={robdayLog.id} />
-          ))} */}
           { robdayLogProps.map((robdayLogProp, index) => (
             <RobdayLog 
               key={robdayLogProp.robdayLogNumber} 

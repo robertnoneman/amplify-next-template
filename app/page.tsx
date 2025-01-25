@@ -34,7 +34,7 @@ import {
     RevealFx,
     SmartLink
   } from "@/once-ui/components";
-  import { isRobDay } from "@/app/lib/utils";
+import { isRobDay } from "@/app/lib/utils";
 import { Arrow } from '@/once-ui/components/Arrow';
 import { useWindowSize } from 'react-use';
 import Confetti from 'react-confetti';

@@ -2,12 +2,25 @@
 
 import { Revenue } from './definitions';
 import axios from 'axios';
+import { getUrl } from 'aws-amplify/storage';
+
 
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
   });
+};
+
+export const getImageUrl = async (key: string): Promise<string> => {
+      const url = getUrl({
+          path: key
+      });
+        return (await url).url.toString();
+};
+
+export function formatDate(date: string) {
+    return new Date(date).toLocaleDateString();
 };
 
 export const formatDateToLocal = (
