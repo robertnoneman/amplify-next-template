@@ -252,6 +252,17 @@ export default function Page() {
                 Robday Activities
               </Heading>
             </Column>
+            <Flex>
+              <Row fillWidth justifyContent="center">
+              <Button
+                // onClick={createActivity}
+                onClick={() => setIsFirstDialogOpen(true)}
+                variant="primary"
+                // size="m"
+                label="Create Activity"
+              />
+              </Row>
+            </Flex>
             <Grid
               fillWidth
               columns="3"
@@ -331,17 +342,7 @@ export default function Page() {
                 </RevealFx>
               ))}
             </Grid>
-            <Flex>
-              <Row fillWidth justifyContent="center">
-              <Button
-                // onClick={createActivity}
-                onClick={() => setIsFirstDialogOpen(true)}
-                variant="primary"
-                // size="m"
-                label="Create Activity"
-              />
-              </Row>
-            </Flex>
+            
           </Column>
           <Dialog
             isOpen={isFirstDialogOpen}
