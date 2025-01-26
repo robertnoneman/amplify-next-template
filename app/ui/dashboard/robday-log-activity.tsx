@@ -166,8 +166,12 @@ export default function RobDayLogActivity(
         /> */}
   
       {imageUrls.map((url) => (
+        <Column key={`${imageUrls.indexOf(url)}-${activityInstance.id}-${url}col`} 
+          fillWidth 
+          justifyContent="center"
+          >
         <SmartImage
-          key={`${imageUrls.indexOf(url)}-${activityInstance.id}-${url}`}
+          key={`${imageUrls.indexOf(url)}-${activityInstance.id}-${url}img`}
           src={url ?? defaultImageUrl}
           alt="Robday"
           // aspectRatio="1/1"
@@ -177,9 +181,10 @@ export default function RobDayLogActivity(
           // width={15}
           // fillWidth
           maxWidth="l"
-          minHeight="l"
+          minHeight="xs"
           // height={15}
         />
+        </Column>
       ))}
     </Grid>
         

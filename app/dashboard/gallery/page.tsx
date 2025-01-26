@@ -63,69 +63,70 @@ export default function Page() {
   const [selectedLocationValueLabel, setSelectedLocationValueLabel] = useState("Choose a location");
   const [selectedLocation, setSelectedLocation] = useState<Schema["Location"]["type"]>();
 
-  const getImageUrl = async (key: string): Promise<string> => {
-        const url = getUrl({
-            path: key
-        });
-          return (await url).url.toString();
-    }
-
-  function listLocations() {
-    client.models.Location.observeQuery().subscribe({
-      next: async (data) => {
-        setLocations([...data.items]);
-      },
-    })
-  }
-
-  async function fetchRobdayLogs() {
-    client.models.Robdaylog.observeQuery().subscribe({
-      next: async (data) => {
-        const robdayLogProps: Array<RobdayLogProps> = [];
-        await Promise.all(data.items.map(async (robdayLog) => {
-          const robdayLogActivities = await robdayLog.activities();
-          const robdayLogActivityInstances = await robdayLog.activityInstances();
-          // const robdayLogActivityInstances = robdayLog.activityInstances;
-          // console.log("LOGGING ACTIVITY INSTANCES");
-          console.log("ACTIVITY INSTANCES: ", robdayLogActivityInstances.data);
-          // console.log("DONE LOGGING ACTIVITY INSTANCES");
-          const activitiesDict: Record<string, Schema["Activity"]["type"]> = {};
-          const urlsDict: Record<string, string> = {};
-          await Promise.all(robdayLogActivities.data.map(async (robdayLogActivity) => {
-            const activity = await robdayLogActivity.activity();
-            if (activity.data) {
-              activitiesDict[robdayLogActivity.id] = activity.data;
-              if (activity.data.image) {
-                const url = await getImageUrl(activity.data.image);
-                if (url) {
-                  urlsDict[robdayLogActivity.id] = url;
-                }
-              }
-            }
-          }));
-          console.log(robdayLogActivities.data);
-          robdayLogProps.push({
-            robdayLogNumber: robdayLog.robDayNumber?.toString() || "",
-            robdayLogDate: robdayLog.date,
-            robdayLogWeather: robdayLog.weatherCondition?.toString() || "",
-            robdayLogTemperature: robdayLog.temperature?.valueOf() || 0,
-            robdayLogActivities: robdayLogActivities.data,
-            activitiesDict: activitiesDict,
-            activityInstances: robdayLogActivityInstances.data,
-            urlsDict: urlsDict,
-            notes: Array.isArray(robdayLog.notes) ? robdayLog.notes.filter(note => note !== null) : [],
-            locations: locations
-          });
-        }));
-        setRobdayLogs([...data.items]);
-        setRobdayLogProps(robdayLogProps);    
-      }
-    });
-  }
+  
   
   useEffect(() => {
-    fetchRobdayLogs();
+    const getImageUrl = async (key: string): Promise<string> => {
+      const url = getUrl({
+          path: key
+      });
+        return (await url).url.toString();
+    }
+
+    function listLocations() {
+      client.models.Location.observeQuery().subscribe({
+        next: async (data) => {
+          setLocations([...data.items]);
+        },
+      })
+    }
+
+    async function fetchRobdayLogs() {
+      client.models.Robdaylog.observeQuery().subscribe({
+        next: async (data) => {
+          setRobdayLogs([...data.items]);
+          const robdayLogProps: Array<RobdayLogProps> = [];
+          await Promise.all(data.items.map(async (robdayLog) => {
+            const robdayLogActivities = await robdayLog.activities();
+            const robdayLogActivityInstances = await robdayLog.activityInstances();
+            // const robdayLogActivityInstances = robdayLog.activityInstances;
+            // console.log("LOGGING ACTIVITY INSTANCES");
+            // console.log("ACTIVITY INSTANCES: ", robdayLogActivityInstances.data);
+            // console.log("DONE LOGGING ACTIVITY INSTANCES");
+            const activitiesDict: Record<string, Schema["Activity"]["type"]> = {};
+            const urlsDict: Record<string, string> = {};
+            await Promise.all(robdayLogActivities.data.map(async (robdayLogActivity) => {
+              const activity = await robdayLogActivity.activity();
+              if (activity.data) {
+                activitiesDict[robdayLogActivity.id] = activity.data;
+                if (activity.data.image) {
+                  const url = await getImageUrl(activity.data.image);
+                  if (url) {
+                    urlsDict[robdayLogActivity.id] = url;
+                  }
+                }
+              }
+            }));
+            // console.log("ROBDAYLOG ACTIVITIES: ", robdayLogActivities.data);
+            robdayLogProps.push({
+              robdayLogNumber: robdayLog.robDayNumber?.toString() || "",
+              robdayLogDate: robdayLog.date,
+              robdayLogWeather: robdayLog.weatherCondition?.toString() || "",
+              robdayLogTemperature: robdayLog.temperature?.valueOf() || 0,
+              robdayLogActivities: robdayLogActivities.data,
+              activitiesDict: activitiesDict,
+              activityInstances: robdayLogActivityInstances.data,
+              urlsDict: urlsDict,
+              notes: Array.isArray(robdayLog.notes) ? robdayLog.notes.filter(note => note !== null) : [],
+              locations: locations
+            });
+          }));
+          setRobdayLogProps(robdayLogProps);    
+        }
+      });
+    }
     listLocations();
+    fetchRobdayLogs();
   }, []);
 
     return (

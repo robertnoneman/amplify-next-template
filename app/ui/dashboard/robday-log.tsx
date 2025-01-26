@@ -1,6 +1,6 @@
 "use client";
 
-import { act, useEffect, useState } from "react";
+import { act, SetStateAction, useEffect, useState } from "react";
 
 import {
   Heading,
@@ -235,58 +235,35 @@ export default function RobdayLog({
 
   useEffect(() => {
     // fetchDefaultImage();
+    const rdlaProps: SetStateAction<RobDayLogActivityProps[]> = [];
     activityInstances?.forEach(async (activityInstance) => {
       const location = await activityInstance.location();
       const aiImages: Array<string> = [];
-      activityInstance.images?.forEach(async (image) => {
+      const baseActivity = await client.models.Activity.get({ id: activityInstance.activityId });
+      const baseActivityImages = baseActivity.data?.image;
+      const url2 = await getImageUrl(baseActivityImages ?? "picture-submissions/placeholderImage.jpg");
+      aiImages.push(url2 ?? "picture-submissions/placeholderImage.jpg");
+      activityInstance.images?.forEach(async (image, index) => {
         if (image) {
           const url = await getImageUrl(image);
-          aiImages.push(url);
+          // aiImages.push(url);
+          aiImages[index] = url;
         }
       });
-      if (aiImages.length === 0) {
-        const baseActivity = await client.models.Activity.get({ id: activityInstance.activityId });
-        const baseActivityImages = baseActivity.data?.image;
-        const url = await getImageUrl(baseActivityImages ?? "picture-submissions/placeholderImage.jpg");
-        aiImages.push(url ?? "picture-submissions/placeholderImage.jpg");
-      }
       const aiProp = {
         activityInstance: activityInstance,
         location: location.data?.name ?? "",
         imageUrls: aiImages,
         // populateActivityInstance: populateActivityInstance
       }
-      setRobdayLogActivityProps([...robdayLogActivityProps, aiProp]);
+      rdlaProps.push(aiProp);
       setLocation(location.data?.name ?? null);
-      console.log("Location: ", location.data?.name);
-      activityInstance.images?.forEach(async (image) => {
-        if (image) {
-          const url = await getImageUrl(image);
-          setImageUrls((prevImageUrls) => ({
-            ...prevImageUrls,
-            [activityInstance.id]: [...(prevImageUrls[activityInstance.id] || []), url]
-          }));
-        }
-      });
-      // activityInstance.images = imageUrls;
-      // if (activityInstance.images?.length === 0) {
-      //   const baseActivity = await client.models.Activity.get({ id: activityInstance.activityId });
-      //   console.log("Base Activity: ", baseActivity);
-      //   const baseActivityImages = baseActivity.data?.image;
-      //   console.log("Base Activity Images: ", baseActivityImages);
-      //   const url = await getImageUrl(baseActivityImages ?? "picture-submissions/placeholderImage.jpg");
-      //   console.log("URL: ", url);
-      //   activityInstance.images = [url ?? "picture-submissions/placeholderImage.jpg"];
-      //   setImageUrls((prevImageUrls) => ({
-      //     ...prevImageUrls,
-      //     [activityInstance.id]: [...(prevImageUrls[activityInstance.id] || []), url]
-      //   }));
-      //   // setDefaultImageUrl(url);
-      //   // setImageUrls([defaultImageUrl]);
-      // }
+      // console.log("Location: ", location.data?.name);
     });
+    console.log("ROBDAY LOG ACTIVITY PROPS: ", rdlaProps);
+    setRobdayLogActivityProps(rdlaProps);
     // listLocations();
-  }, [activityInstances]);
+  }, []);
 
   return (
     <Row
@@ -331,10 +308,12 @@ export default function RobdayLog({
             <RobDayLogActivity key={`${activityInstance.id} - ${id}`} activityInstance={activityInstance} imageUrls={imageUrls}  />
           ))} */}
           {robdayLogActivityProps.map((props) => (
+            <Row  key={`${props.activityInstance.id}`}>
             <RobDayLogActivity key={`${props.activityInstance.id}`} {...props} />
+            </Row>
           ))}
           {activitiesDict && Object.entries(activitiesDict).map(([id, activity]) => (
-            <Column key={`${activity.id}`} fillWidth>
+            <Column key={`${activity.id}${id}`} fillWidth>
               <Row>
               <Column
                 position="relative"
