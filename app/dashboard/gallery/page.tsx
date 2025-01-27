@@ -46,6 +46,7 @@ interface RobdayLogProps {
 export default function Page() {
   const [robdayLogs, setRobdayLogs] = useState<Array<Schema["Robdaylog"]["type"]>>([]);
   const [robdayLogProps, setRobdayLogProps] = useState<Array<RobdayLogProps>>([]);
+  const [sortRecent, setSortRecent] = useState<boolean>(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [robdayLogActivities, setRobdayLogActivities] = useState<Schema["RobdaylogActivity"]["type"][]>([]);
   const [activitiesDict, setActivitiesDict] = useState<Record<string, Schema["Activity"]["type"]>>({});
@@ -121,6 +122,7 @@ export default function Page() {
               locations: locations
             });
           }));
+          robdayLogProps.sort((b, a) => Number(a.robdayLogNumber) - Number(b.robdayLogNumber));
           setRobdayLogProps(robdayLogProps);    
         }
       });
