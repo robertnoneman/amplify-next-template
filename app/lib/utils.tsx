@@ -123,11 +123,15 @@ export async function getWeather(lat: number, lon: number, date?: string): Promi
     }
 
     const forecastUrl = pointsResponse.data.properties.forecast;
+    const currentUrl = pointsResponse.data.properties.forecastHourly;
+    
     console.log('Forecast URL:', forecastUrl);
 
     // Step 2: Call the forecast endpoint to retrieve the forecast data
     const forecastResponse = await axios.get(forecastUrl);
+    const currentResponse = await axios.get(currentUrl);
     console.log('Forecast response:', forecastResponse.data);
+    console.log('Current response:', currentResponse.data);
 
     if (
       !forecastResponse.data ||
@@ -146,10 +150,12 @@ export async function getWeather(lat: number, lon: number, date?: string): Promi
      // Find the first period with name "Monday Night"
      var matchingPeriod = forecastPeriods.find((period: { name: string; }) => period.name.includes("Monday") ?? period.name.includes("Tonight"));
      if (isRobDay()) {
-      matchingPeriod = forecastPeriods.find((period: { name: string; }) => period.name.includes("Tonight"));
-     } else {
-      console.log('Matching period:', matchingPeriod);
-     }
+      matchingPeriod = forecastPeriods.find((period: { name: string; }) => period.name.includes("Today"));
+      if (!matchingPeriod) {
+        matchingPeriod = forecastPeriods.find((period: { name: string; }) => period.name.includes("Tonight"));
+      }
+     } 
+    console.log('Matching period:', matchingPeriod);
 
       if (matchingPeriod) {
         return {
@@ -160,8 +166,9 @@ export async function getWeather(lat: number, lon: number, date?: string): Promi
         throw new Error('No forecast available for the specified date.');
       }
     } else {
+      const currentPeriod = currentResponse.data.properties.periods[0];
       // Return the current forecast (first period)
-      const currentPeriod = forecastPeriods[0];
+      // const currentPeriod = forecastPeriods[0];
 
       return {
         temperature: `${currentPeriod.temperature} ${currentPeriod.temperatureUnit}`,
