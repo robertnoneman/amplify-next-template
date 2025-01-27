@@ -429,7 +429,7 @@ export default function Page() {
   function startActivity(activity: Schema["ActivityInstance"]["type"]) {
     const startTime = new Date().getTime();
     const temp = Number(currentTemp?.split(" F")[0]);
-    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: startTime, weatherCondition: currentWeather, temperature: temp });
+    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: startTime, weatherCondition: currentWeather, temperature: temp, robdaylogId: robDayLog?.id });
     console.log("Activity Instance started: ", startTime, result);
   }
 
