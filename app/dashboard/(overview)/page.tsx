@@ -23,7 +23,7 @@ export default async function Page() {
           DASHBOARD
         </Heading>
         <Row mobileDirection="column">
-          <RadialBar labels={["ROBDAYS COMPLETED"]} series={[15]} />
+          <RadialBar labels={["ROBDAYS COMPLETED"]} series={[30]} />
         </Row>
         <Row mobileDirection="column">
           <RadialBar labels={["AVERAGE ROBDAY RATING"]} series={[99]} height={200} fontSize="14px" />
