@@ -33,6 +33,8 @@ import {
   HiOutlineTrophy,
   HiOutlinePlay,
   HiOutlineStop,
+  HiOutlineLightBulb,
+  HiLightBulb
 } from "react-icons/hi2";
 
 import {
@@ -46,7 +48,11 @@ import {
   PiRewindCircleDuotone
 } from "react-icons/pi";
 
+import { AiOutlineDashboard } from "react-icons/ai";
+
 import { RiVisaLine } from "react-icons/ri";
+
+import { GiTeamIdea } from "react-icons/gi"
 
 import { FaDiscord, FaGithub, FaGoogle } from "react-icons/fa6";
 
@@ -95,4 +101,7 @@ export const iconLibrary: Record<string, IconType> = {
   play: HiOutlinePlay,
   stop: HiOutlineStop,
   rewind: PiRewindCircleDuotone,
+  dashboard: AiOutlineDashboard,
+  idea: GiTeamIdea,
+  lightbulb: HiLightBulb
 };

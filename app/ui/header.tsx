@@ -59,7 +59,7 @@ export const Header = () => {
                             )}
                             { routes['/about'] && (
                                 <ToggleButton
-                                    prefixIcon="person"
+                                    prefixIcon="dashboard"
                                     href={`/dashboard`}
                                     selected={pathname === "/dashboard"}>
                                     <Flex paddingX="2" hide="s">
@@ -69,7 +69,7 @@ export const Header = () => {
                             )}
                             { routes['/work'] && (
                                 <ToggleButton
-                                    prefixIcon="grid"
+                                    prefixIcon="lightbulb"
                                     href={`/dashboard/activities`}
                                     selected={pathname.startsWith('/dashboard/activities')}
                                     size="m">
