@@ -144,8 +144,12 @@ export async function getWeather(lat: number, lon: number, date?: string): Promi
 
     if (date) {
      // Find the first period with name "Monday Night"
-      const matchingPeriod = forecastPeriods.find((period: { name: string; }) => period.name.includes("Monday"));
+     var matchingPeriod = forecastPeriods.find((period: { name: string; }) => period.name.includes("Monday") ?? period.name.includes("Tonight"));
+     if (isRobDay()) {
+      matchingPeriod = forecastPeriods.find((period: { name: string; }) => period.name.includes("Tonight"));
+     } else {
       console.log('Matching period:', matchingPeriod);
+     }
 
       if (matchingPeriod) {
         return {
