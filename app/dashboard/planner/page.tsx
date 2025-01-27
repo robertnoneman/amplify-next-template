@@ -420,7 +420,8 @@ export default function Page() {
 
   function startActivity(activity: Schema["ActivityInstance"]["type"]) {
     const startTime = new Date().getTime();
-    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: startTime });
+    const temp = Number(currentTemp?.split(" F")[0]);
+    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: startTime, weatherCondition: currentWeather, temperature: temp });
     console.log("Activity Instance started: ", startTime, result);
   }
 
@@ -452,6 +453,9 @@ export default function Page() {
   function completeActivityInstance() {
     completedActivityInstance ? completedActivityInstance.isOnNextRobDay = false : null;
     completedActivityInstance ? completedActivityInstance.completed = true : null;
+    if (completedActivityInstance && robDayLog) {
+      completedActivityInstance.robdaylogId = robDayLog.id;
+    }
     completedActivityInstance ? client.models.ActivityInstance.update({ ...completedActivityInstance }) : null;
     setCompletedActivityInstance(undefined);
     setIsCompleteDialogOpen(false);
