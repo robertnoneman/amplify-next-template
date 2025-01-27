@@ -441,7 +441,7 @@ export default function Page() {
   }
 
   function completeActivity() {
-    completedActivity ? completedActivity.isOnNextRobDay = false : null;
+    // completedActivity ? completedActivity.isOnNextRobDay = false : null;
     const newCount = completedActivity ? completedActivity.count ? completedActivity.count + 1 : completedActivity.count = 1 : 1;
     completedActivity ? completedActivity.count? completedActivity.count = newCount : completedActivity.count = 1 : 1;
     completedActivity ? client.models.Activity.update({ ...completedActivity }) : null;
@@ -451,7 +451,7 @@ export default function Page() {
   }
 
   function completeActivityInstance() {
-    completedActivityInstance ? completedActivityInstance.isOnNextRobDay = false : null;
+    // completedActivityInstance ? completedActivityInstance.isOnNextRobDay = false : null;
     completedActivityInstance ? completedActivityInstance.completed = true : null;
     if (completedActivityInstance && robDayLog) {
       completedActivityInstance.robdaylogId = robDayLog.id;
@@ -515,6 +515,17 @@ export default function Page() {
         activityInstances: activityInstances ? activityInstances : [],
         notes: robDayLog.notes,
       };
+      selectedActivities.forEach((activity) => {
+        activity.isOnNextRobDay = false;
+        const result = client.models.Activity.update({ ...activity });
+        console.log("Activity completed: ", result);
+      });
+      selectedActivityInstances.forEach((activityInstance) => {
+        activityInstance.isOnNextRobDay = false;
+        activityInstance.completed = true;
+        const result = client.models.ActivityInstance.update({ ...activityInstance });
+        console.log("Activity Instance completed: ", result);
+      });
       const result = client.models.Robdaylog.update({ id: robDayLog.id, endTime: endTime, totalTime: duration });
       console.log("Robday Log completed: ", result);
     }
