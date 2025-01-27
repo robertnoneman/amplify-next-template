@@ -3,6 +3,8 @@
 import { Revenue } from './definitions';
 import axios from 'axios';
 import { getUrl } from 'aws-amplify/storage';
+import { Inflectors } from 'en-inflectors';
+import nlp from 'compromise';
 
 
 export const formatCurrency = (amount: number) => {
@@ -206,3 +208,42 @@ export async function getCurrentLocation(): Promise<{ lat: number; lon: number }
     );
   });
 }
+
+/**
+ * Converts a sentence in present tense to past tense.
+ * @param sentence - The input sentence in present tense.
+ * @returns The sentence converted to past tense.
+ */
+export const convertToPastTense = (sentence: string): string => {
+  // Split the sentence into words
+  const words = sentence.split(' ');
+
+  // Find the first verb and convert it to past tense
+  const convertedWords = words.map((word, index) => {
+    // Use Inflectors to handle verb conjugation
+    if (index === 0 || (index > 0 && /^(to|at|in|with|for|on|by)$/i.test(words[index - 1]))) {
+      const inflector = new Inflectors(word);
+      return inflector.toPast() || word; // Convert to past tense if possible
+    }
+    return word;
+  });
+
+  // Join the words back into a sentence
+  return convertedWords.join(' ');
+};
+
+/**
+ * Converts a sentence in present tense to past tense.
+ * @param sentence - The input sentence in present tense.
+ * @returns The sentence converted to past tense.
+ */
+export const convertToPastTense2 = (sentence: string): string => {
+  // Use compromise to parse the sentence
+  // const doc = nlp(sentence);
+
+  // Identify verbs and convert them to past tense
+  // doc.verbs().toPastTense().all().text();
+
+  // Return the updated sentence
+  return nlp(sentence).verbs().toPastTense().all().text();
+};

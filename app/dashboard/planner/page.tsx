@@ -49,7 +49,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import clsx from 'clsx';
 import { roboto } from '@/app/ui/fonts';
 import { usePathname } from 'next/navigation';
-import { getNextRobDay, getWeather, getCurrentLocation, getCurrentRobDay, isRobDay } from "@/app/lib/utils";
+import { getNextRobDay, getWeather, getCurrentLocation, getCurrentRobDay, isRobDay, convertToPastTense, convertToPastTense2 } from "@/app/lib/utils";
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
@@ -460,6 +460,8 @@ export default function Page() {
 
   function completeActivityInstance() {
     // completedActivityInstance ? completedActivityInstance.isOnNextRobDay = false : null;
+    completedActivityInstance && completedActivityInstance.displayName ? completedActivityInstance.displayName = convertToPastTense2(`${completedActivityInstance.displayName.toLocaleLowerCase()}`) : null;
+    console.log("Completed Activity Instance: ", completedActivityInstance?.displayName);
     completedActivityInstance ? completedActivityInstance.completed = true : null;
     if (completedActivityInstance && robDayLog) {
       completedActivityInstance.robdaylogId = robDayLog.id;
