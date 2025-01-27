@@ -102,9 +102,14 @@ export const isRobDay = () => {
   const now = new Date();
   const dayOfWeek = now.getDay(); // Sunday=0, Monday=1, ... Saturday=6
   return dayOfWeek === 1;
+};
+
+export const getCurrentRobDay = () => {
+  if (isRobDay()) {
+    return new Date();
+  }
+  return getNextRobDay();
 }
-
-
 
 // Define a type for the weather response
 interface WeatherResponse {

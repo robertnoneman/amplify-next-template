@@ -56,6 +56,7 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
     },
     ref,
   ) => {
+    const today = new Date();
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(value);
     const [selectedTime, setSelectedTime] = useState<
       | {
@@ -67,6 +68,22 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
     const [isPM, setIsPM] = useState(defaultTime?.hours ? defaultTime.hours >= 12 : false);
     const [isTimeSelector, setIsTimeSelector] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(true);
+
+    const [currentMonth, setCurrentMonth] = useState<number>(
+      value ? value.getMonth() : today.getMonth()
+    );
+    const [currentYear, setCurrentYear] = useState<number>(
+      value ? value.getFullYear() : today.getFullYear()
+    );
+    
+    useEffect(() => {
+      if (typeof propCurrentMonth === "number") {
+        setCurrentMonth(propCurrentMonth);
+      }
+      if (typeof propCurrentYear === "number") {
+        setCurrentYear(propCurrentYear);
+      }
+    }, [propCurrentMonth, propCurrentYear]);
 
     useEffect(() => {
       setSelectedDate(value);
@@ -87,7 +104,7 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       return () => clearTimeout(timer);
     }, []);
 
-    const today = new Date();
+    // const today = new Date();
 
     const monthNames = [
       "January",
@@ -130,7 +147,22 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
     };
 
     const handleMonthChange = (increment: number) => {
-      onMonthChange?.(increment);
+      if (onMonthChange) {
+        // Delegate to external handler
+        onMonthChange(increment);
+      } else {
+        // Fallback to internal state management
+        const newMonth = currentMonth + increment;
+        if (newMonth < 0) {
+          setCurrentMonth(11); // December
+          setCurrentYear(currentYear - 1);
+        } else if (newMonth > 11) {
+          setCurrentMonth(0); // January
+          setCurrentYear(currentYear + 1);
+        } else {
+          setCurrentMonth(newMonth);
+        }
+      }
     };
 
     const convert24to12 = (hour24: number) => {
@@ -179,7 +211,7 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       for (let i = 0; i < firstDay; i++) {
         const prevMonthDay = daysInPrevMonth - firstDay + i + 1;
         days.push(
-          <Flex width="40" height="40" key={`prev-${currentYear}-${currentMonth}-${i}`}>
+          <Flex paddingY="2" width="40" height="40" key={`prev-${currentYear}-${currentMonth}-${i}`}>
             <Button fillWidth weight="default" variant="tertiary" size="m" disabled>
               {prevMonthDay}
             </Button>
@@ -201,15 +233,18 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
         const isFirstInRange =
           range?.startDate && currentDate.getTime() === range.startDate.getTime();
         const isLastInRange = range?.endDate && currentDate.getTime() === range.endDate.getTime();
+        // Check if the current date is out of the minDate and maxDate range
+        const isDisabled = (minDate && currentDate < minDate) || (maxDate && currentDate > maxDate);
         const isRobday = currentDate.getDay() === 1;
         const isNextRobday = isRobday && currentDate.getDate() > today.getDate() && (currentDate.getDate() - today.getDate()) < 7;
+        const isCurrentRobDay = isRobday && currentDate.getDate() === today.getDate();
 
         days.push(
           <Flex paddingY="2" key={`day-${currentYear}-${currentMonth}-${day}`}>
             <Flex
               width="40"
               height="40"
-              background={isInRange(currentDate) ? "neutral-alpha-weak" : isNextRobday ? "brand-alpha-strong" : isRobday ? "brand-alpha-weak" : undefined}
+              background={isInRange(currentDate) ? "neutral-alpha-weak" : isCurrentRobDay ? "brand-alpha-strong" : isNextRobday ? "brand-alpha-strong" : isRobday ? "brand-alpha-weak" : undefined}
               borderTop={isInRange(currentDate) ? "neutral-alpha-weak" : isRobday ? "brand-alpha-strong" : "transparent"}
               borderBottom={isInRange(currentDate) ? "neutral-alpha-weak" : isRobday ? "brand-alpha-strong" : "transparent"}
               leftRadius={isFirstInRange || isRobday ? "m" : undefined}
@@ -218,7 +253,7 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
               <Button
                 fillWidth
                 weight={isRobday ? "strong" : "default"}
-                variant={isSelected ? "primary" : "tertiary"}
+                variant={(!isRobday && isSelected) ? "secondary" : isSelected ? "primary" : "tertiary"}
                 size="m"
                 onClick={() => handleDateSelect(currentDate)}
                 onMouseEnter={() => onHover?.(currentDate)}
@@ -236,7 +271,7 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
 
       for (let i = 1; i <= remainingDays; i++) {
         days.push(
-          <Flex width="40" height="40" key={`next-${currentYear}-${currentMonth}-${i}`}>
+          <Flex marginTop="2" width="40" height="40" key={`next-${currentYear}-${currentMonth}-${i}`}>
             <Button fillWidth weight="default" variant="tertiary" size="m" disabled>
               {i}
             </Button>
@@ -247,8 +282,8 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       return days;
     };
 
-    const currentMonth = propCurrentMonth ?? value?.getMonth() ?? today.getMonth();
-    const currentYear = propCurrentYear ?? value?.getFullYear() ?? today.getFullYear();
+    // const currentMonth = propCurrentMonth ?? value?.getMonth() ?? today.getMonth();
+    // const currentYear = propCurrentYear ?? value?.getFullYear() ?? today.getFullYear();
 
     return (
       <Flex

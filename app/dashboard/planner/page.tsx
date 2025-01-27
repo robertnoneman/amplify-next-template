@@ -29,6 +29,7 @@ import {
   StatusIndicator,
   DateRangePicker,
   DateRange,
+  DatePicker,
   TiltFx,
   HoloFx,
   IconButton,
@@ -48,7 +49,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import clsx from 'clsx';
 import { roboto } from '@/app/ui/fonts';
 import { usePathname } from 'next/navigation';
-import { getNextRobDay, getWeather, getCurrentLocation } from "@/app/lib/utils";
+import { getNextRobDay, getWeather, getCurrentLocation, getCurrentRobDay, isRobDay } from "@/app/lib/utils";
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
@@ -67,7 +68,8 @@ export default function Page() {
   const [selectedLocationValue, setSelectedLocationValue] = useState("");
   const [selectedLocationValueLabel, setSelectedLocationValueLabel] = useState("Choose a location");
   const [selectedRange, setSelectedRange] = useState<DateRange>();
-  const [robDayDate, setRobDayDate] = useState<Date>();
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [robDayDate, setRobDayDate] = useState<Date>(getCurrentRobDay());
   const [isFirstDialogOpen, setIsFirstDialogOpen] = useState(false);
   const [isSecondDialogOpen, setIsSecondDialogOpen] = useState(false);
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
@@ -120,6 +122,12 @@ export default function Page() {
     setSelectedLocationValue(location.name ?? "");
     setSelectedLocationValueLabel(location.address ?? "");
     setSelectedLocation(location);
+  }
+
+  const handleSelectedDateChange = (date: Date) => {
+    console.log("Selected date:", date);
+    setSelectedDate(date);
+    setRobDayDate(date);
   }
 
   const printSelect = (value: string) => {
@@ -224,7 +232,7 @@ export default function Page() {
   }
 
   function listRobDayLogs() {
-    var myRobDayDate = getNextRobDay();
+    var myRobDayDate = getCurrentRobDay();
     if (robDayDate) {
       myRobDayDate = robDayDate;
     }
@@ -532,7 +540,7 @@ export default function Page() {
   }
 
   const getCurrentandForecastWeather = async () => {
-    const myDate = robDayDate? robDayDate : getNextRobDay();
+    const myDate = robDayDate? robDayDate : getCurrentRobDay();
     if (myDate) {
       const forecast = await getWeather(38.9143, -77.0102, myDate.toISOString().split("T")[0]);
       console.log("Forecast Weather: ", forecast);
@@ -555,7 +563,7 @@ export default function Page() {
     listActivities();
     listLocations();
     listActivityInstances();
-    setRobDayDate(getNextRobDay());
+    // setRobDayDate(getCurrentRobDay());
     listRobDayLogs();
     getCurrentandForecastWeather();
   }, []);
@@ -700,8 +708,8 @@ export default function Page() {
               gap="40"
               position="relative"
             >
-              <Row fillWidth justifyContent="center">
-                <DateRangePicker
+              <Row fillWidth justifyContent="center" mobileDirection="column">
+                {/* <DateRangePicker
                   data-scaling="100"
                   size="l"
                   fitWidth
@@ -709,6 +717,16 @@ export default function Page() {
                   mobileDirection="column"
                   onChange={(range) => setSelectedRange(range)}
                   value={selectedRange}
+                /> */}
+                <DatePicker
+                  data-scaling="100"
+                  size="l"
+                  fitWidth
+                  gap="40"
+                  mobileDirection="column"
+                  // onChange={(date) => setSelectedDate(date)}
+                  onChange={(date) => handleSelectedDateChange(date)}
+                  value={selectedDate}
                 />
               </Row>
             </Column>
@@ -789,118 +807,121 @@ export default function Page() {
               <Column>
                 {selectedActivityInstances.map((activityInstance, index) => (
                   <Column key={`${activityInstance.id}`} fillWidth>
-                    <Row 
-                    fillWidth
-                    padding="xs"
-                    gap="m"
-                    position="relative"
-                    // height="xs"
-                    mobileDirection="column"
-                    overflow="hidden"
-                    radius={undefined}
-                    // key={`${activityInstance.id}`}
-                    // bottomRadius="l"
-                    // topRadius='l'
-                    // alignItems="md:center"
-                    // overflow="scroll"
-                    // border="brand-medium"
-                    // background="page"
-                    // radius="l"
-                  >
-                    <Row fillWidth justifyContent="space-between">
-                      <Row
-                        border="brand-alpha-weak"
-                        position="relative"
-                        maxWidth={10}
-                        // aspectRatio={0.75}
-                        overflow="hidden"
-                      >
-                        <SmartImage
-                          // fitWidth
-                          src={urls[activityInstance.activityId] ?? "https://static-00.iconduck.com/assets.00/loading-icon-1024x1024-z5lrc2lo.png"}
-                          alt="Robday"
-                          aspectRatio="16/9"
-                          objectFit="cover"
-                          sizes="xs"
-                          radius="xl"
-                          // maxHeight={15}
-                        />
+                    {activityInstance.date === robDayDate.toISOString().split("T")[0] && (
+                      <Row 
+                      fillWidth
+                      padding="xs"
+                      gap="m"
+                      position="relative"
+                      // height="xs"
+                      mobileDirection="column"
+                      overflow="hidden"
+                      radius={undefined}
+                      // key={`${activityInstance.id}`}
+                      // bottomRadius="l"
+                      // topRadius='l'
+                      // alignItems="md:center"
+                      // overflow="scroll"
+                      // border="brand-medium"
+                      // background="page"
+                      // radius="l"
+                    >
+                      <Row fillWidth justifyContent="space-between">
+                        <Row
+                          border="brand-alpha-weak"
+                          position="relative"
+                          maxWidth={10}
+                          // aspectRatio={0.75}
+                          overflow="hidden"
+                        >
+                          <SmartImage
+                            // fitWidth
+                            src={urls[activityInstance.activityId] ?? "https://static-00.iconduck.com/assets.00/loading-icon-1024x1024-z5lrc2lo.png"}
+                            alt="Robday"
+                            aspectRatio="16/9"
+                            objectFit="cover"
+                            sizes="xs"
+                            radius="xl"
+                            // maxHeight={15}
+                          />
+                        </Row>
+                        <Column>
+                        {activityInstance.startTime === 0 && (
+                          <Row justifyContent="flex-end" fillHeight alignItems="center">
+                            <IconButton
+                              icon="play"
+                              onClick={() => startActivity(activityInstance)}
+                              variant="tertiary"
+                              size="s"
+                            />
+                          </Row>
+                        )}
+                        {activityInstance.startTime !== 0 && activityInstance.endTime === 0 && (
+                          <Row justifyContent="flex-end" fillHeight alignItems="center" >
+                            <IconButton
+                              icon="stop"
+                              onClick={() => stopActivity(activityInstance)}
+                              variant="tertiary"
+                              size="s"
+                            />
+                          </Row>
+                        )}
+                        {activityInstance.endTime !== 0 && (
+                          <Row justifyContent="flex-end" fillHeight alignItems="center">
+                            <IconButton
+                              icon="rewind"
+                              onClick={() => resetActivityTime(activityInstance)}
+                              variant="tertiary"
+                              size="l"
+                            />
+                          </Row>
+                        )}
+                        </Column>
                       </Row>
-                      <Column>
-                      {activityInstance.startTime === 0 && (
-                        <Row justifyContent="flex-end" fillHeight alignItems="center">
-                          <IconButton
-                            icon="play"
-                            onClick={() => startActivity(activityInstance)}
-                            variant="tertiary"
-                            size="s"
-                          />
-                        </Row>
-                      )}
-                      {activityInstance.startTime !== 0 && activityInstance.endTime === 0 && (
-                        <Row justifyContent="flex-end" fillHeight alignItems="center" >
-                          <IconButton
-                            icon="stop"
-                            onClick={() => stopActivity(activityInstance)}
-                            variant="tertiary"
-                            size="s"
-                          />
-                        </Row>
-                      )}
-                      {activityInstance.endTime !== 0 && (
-                        <Row justifyContent="flex-end" fillHeight alignItems="center">
-                          <IconButton
-                            icon="rewind"
-                            onClick={() => resetActivityTime(activityInstance)}
-                            variant="tertiary"
-                            size="l"
-                          />
-                        </Row>
-                      )}
+                      <Column fillWidth fillHeight>
+                        <Text
+                          padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs"
+                        >
+                          {activityInstance.displayName?.toUpperCase() ?? "ACTIVITY TBD"}
+                        </Text>
+                        <Text
+                          paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
+                        >
+                          {/* {activityInstance.location?.name?.toUpperCase() ?? "LOCATION TBD"} */}
+                          {locations.find((location) => location.id === activityInstance.locationId)?.name?.toUpperCase() ?? "LOCATION TBD"}
+                        </Text>
+                        <Line/>
+                          {activityInstance.notes?.map((note) => (
+                            <Text key={note} padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                              {note}
+                            </Text>
+                          ))}
                       </Column>
+                      <Column justifyContent="space-evenly" mobileDirection="row" background="neutral-alpha-weak" border="neutral-alpha-medium" radius="s">
+                      <IconButton
+                          icon="close"
+                          onClick={() => onRemoveActivityInstance(activityInstance)}
+                          variant="tertiary"
+                          size="s"
+                          />
+                          <IconButton
+                            icon="edit"
+                            onClick={() => onEditActivityInstance(activityInstance)}
+                            variant="tertiary"
+                            size="s"
+                          />
+                          <IconButton
+                            icon="check"
+                            onClick={() => onCompleteActivityInstance(activityInstance)}
+                            variant="tertiary"
+                            size="s"
+                          />
+                        </Column>
+                      {/* </Background> */}
                     </Row>
-                    <Column fillWidth fillHeight>
-                      <Text
-                        padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs"
-                      >
-                        {activityInstance.displayName?.toUpperCase() ?? "ACTIVITY TBD"}
-                      </Text>
-                      <Text
-                        paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
-                      >
-                        {/* {activityInstance.location?.name?.toUpperCase() ?? "LOCATION TBD"} */}
-                        {locations.find((location) => location.id === activityInstance.locationId)?.name?.toUpperCase() ?? "LOCATION TBD"}
-                      </Text>
-                      <Line/>
-                        {activityInstance.notes?.map((note) => (
-                          <Text key={note} padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
-                            {note}
-                          </Text>
-                        ))}
-                    </Column>
-                    <Column justifyContent="space-evenly" mobileDirection="row" background="neutral-alpha-weak" border="neutral-alpha-medium" radius="s">
-                    <IconButton
-                        icon="close"
-                        onClick={() => onRemoveActivityInstance(activityInstance)}
-                        variant="tertiary"
-                        size="s"
-                        />
-                        <IconButton
-                          icon="edit"
-                          onClick={() => onEditActivityInstance(activityInstance)}
-                          variant="tertiary"
-                          size="s"
-                        />
-                        <IconButton
-                          icon="check"
-                          onClick={() => onCompleteActivityInstance(activityInstance)}
-                          variant="tertiary"
-                          size="s"
-                        />
-                      </Column>
-                    {/* </Background> */}
-                  </Row>
+                    )}
                   <Line height={0.1}/>
+                    
                 </Column>
                 ))}
                 {/* {selectedActivities.map((activity, index) => (
