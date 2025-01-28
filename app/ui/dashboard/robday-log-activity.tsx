@@ -54,7 +54,13 @@ import outputs from "@/amplify_outputs.json";
 
 
 interface RobDayLogActivityProps {
-  activityInstance: Schema["ActivityInstance"]["type"];
+  // activityInstance: Schema["ActivityInstance"]["type"];
+  activityInstanceId: string;
+  activityInstanceDisplayName: string;
+  activityInstanceNotes: string[];
+  activityInstanceRating: number;
+  activityInstanceCost: number;
+  images: string[];
   // locations: Schema["Location"]["type"][];
   location: string;
   imageUrls: string[];
@@ -69,7 +75,13 @@ const client = generateClient<Schema>();
 
 export default function RobDayLogActivity(
   {
-    activityInstance,
+    // activityInstance,
+    activityInstanceId,
+    activityInstanceDisplayName,
+    activityInstanceNotes,
+    activityInstanceRating,
+    activityInstanceCost,
+    images,
     location,
     imageUrls,
     // populateActivityInstance
@@ -91,8 +103,10 @@ export default function RobDayLogActivity(
   async function updateActivityInstance() {
     console.log("Updating activity instance");
     const result = await client.models.ActivityInstance.update({
-      id: activityInstance.id,
-      images: [...(activityInstance.images ?? []), ...newImageUrl]
+      // id: activityInstance.id,
+      id: activityInstanceId,
+      // images: [...(activityInstance.images ?? []), ...newImageUrl]
+      images: [...(images ?? []), ...newImageUrl]
     }
     );
     console.log("Update result:", result);
@@ -106,7 +120,7 @@ export default function RobDayLogActivity(
           <Text
               padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs"
           >
-            {activityInstance.displayName?.toUpperCase() ?? "ACTIVITY TBD"}
+            {activityInstanceDisplayName?.toUpperCase() ?? "ACTIVITY TBD"}
           </Text>
           <Line/>
           <Text
@@ -121,16 +135,16 @@ export default function RobDayLogActivity(
           <Text
               padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
               >
-              {activityInstance.notes}
+              {activityInstanceNotes}
           </Text>
           <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
-              Rating: {activityInstance.rating}
+              Rating: {activityInstanceRating}
           </Text>
           <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
-              Cost: {activityInstance.cost}
+              Cost: {activityInstanceCost}
           </Text>
         </Column>
-        <Column fillHeight justifyContent="flex-start" direction="column">
+        {/* <Column fillHeight justifyContent="flex-start" direction="column">
           <IconButton
               // onClick={() => populateActivityInstance(activityInstance)}
               // name="HiOutlinePencil"
@@ -139,7 +153,7 @@ export default function RobDayLogActivity(
               variant="tertiary"
               // onBackground="brand-weak"
           />
-        </Column>
+        </Column> */}
       </Row>
       <Line height={0.1}/>
       <Row fillWidth justifyContent="space-around" padding="s">
@@ -166,12 +180,12 @@ export default function RobDayLogActivity(
         /> */}
   
       {imageUrls.map((url) => (
-        <Column key={`${imageUrls.indexOf(url)}-${activityInstance.id}-${url}col`} 
+        <Column key={`${imageUrls.indexOf(url)}-${activityInstanceId}-${url}col`} 
           fillWidth 
           justifyContent="center"
           >
         <SmartImage
-          key={`${imageUrls.indexOf(url)}-${activityInstance.id}-${url}img`}
+          key={`${imageUrls.indexOf(url)}-${activityInstanceId}-${url}img`}
           src={url ?? defaultImageUrl}
           alt="Robday"
           // aspectRatio="1/1"
