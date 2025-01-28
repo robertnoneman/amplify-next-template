@@ -30,6 +30,7 @@ import {
   DateRangePicker,
   DateRange,
   TiltFx,
+  RevealFx,
   HoloFx,
   IconButton,
   TagInput,
@@ -391,15 +392,17 @@ export default function RobdayLog({
               >
               <RobDayLogActivity key={`${props.activityInstanceId}`} {...props} />
               {editVisible && (
-                <Column fillHeight justifyContent="flex-start" direction="column">
-                  <IconButton
-                      onClick={() => populateActivityInstance(props)}
-                      // name="HiOutlinePencil"
-                      icon="edit"
-                      size="m"
-                      variant="tertiary"
-                      // onBackground="brand-weak"
-                  />
+                <Column style={{width: "90%"}} justifyContent="center" direction="column" position="absolute" alignItems="flex-end">
+                  <RevealFx>
+                    <IconButton
+                        onClick={() => populateActivityInstance(props)}
+                        // name="HiOutlinePencil"
+                        icon="edit"
+                        size="m"
+                        variant="tertiary"
+                        // onBackground="brand-weak"
+                    />
+                  </RevealFx>
                 </Column>
               )}
               {/* <Column fillHeight justifyContent="flex-start" direction="column">
