@@ -211,7 +211,7 @@ export default async function Page() {
           </Column>
         </Column>
         <Column fillWidth alignItems="center" gap="32" padding="xs" position="relative">
-          <Suspense fallback={<Skeleton shape="circle" width="xl" height="xl" />}>
+          <Suspense fallback={<Skeleton shape="block" width="xl" height="m" />}>
             <RobdaylogWrapper />
           </Suspense>
           {/* { robdayLogProps.map((robdayLogProp, index) => (

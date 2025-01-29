@@ -61,6 +61,12 @@ Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
+interface LocationData {
+  id: string;
+  name: string;
+  address: string;
+}
+
 
 export default function Page() {
   const [selectedValue, setSelectedValue] = useState("");
@@ -74,6 +80,9 @@ export default function Page() {
   const [isSecondDialogOpen, setIsSecondDialogOpen] = useState(false);
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
   const [isAddActivityDialogOpen, setIsAddActivityDialogOpen] = useState(false);
+  const [isCreateNewLocationDialogOpen, setIsCreateNewLocationDialogOpen] = useState(false);
+  const [newLocationName, setNewLocationName] = useState("");
+  const [newLocationAddress, setNewLocationAddress] = useState("");
   const [firstDialogHeight, setFirstDialogHeight] = useState<number>();
   // const { addToast } = useToast();
   const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
@@ -558,6 +567,26 @@ export default function Page() {
     console.log("Forecast Weather: ", forecastWeather);
     console.log("Current Temp: ", currentTemp);
     console.log("Current Weather: ", currentWeather);
+  }
+
+  function createNewLocation() {
+    const newLocation = {
+      name: newLocationName,
+      address: newLocationAddress,
+    };
+    const location = client.models.Location.create({ ...newLocation });
+    console.log("Location created: ", location);
+    // setAddedLocation(location);
+    // setSelectedLocation(location);
+    // setSelectedLocationValue("");
+    // setSelectedLocationValueLabel("Choose a location");
+    setIsCreateNewLocationDialogOpen(false);
+  }
+
+  function handleCreateNewLocation() {
+    setSelectedLocationValue("");
+    setSelectedLocationValueLabel("Choose a location");
+    setIsCreateNewLocationDialogOpen(true);
   }
 
 
@@ -1164,15 +1193,57 @@ export default function Page() {
             id="location"
             label={selectedLocationValueLabel}
             minHeight={300}
-            options={locations.map((location) => {
-              return { value: location.id, label: location.name, description: location.address }
-            })}
-            onSelect={(value) => handleSelectLocation(locations.find((location) => location.id === value ) ?? locations[0])}
+            options={[
+              ...locations.map((location) => ({
+                value: location.id,
+                label: location.name,
+                description: location.address,
+              })),
+              { value: "create-new", label: "Create New", description: "Add a new location" },
+            ]}
+            onSelect={(value) => {
+              if (value === "create-new") {
+                // Handle the "create new" action here
+                // console.log("Create new location");
+                handleCreateNewLocation();
+                // You can open a modal or navigate to a different page to create a new location
+              } else {
+                handleSelectLocation(locations.find((location) => location.id === value) ?? locations[0]);
+              }
+            }}
             value={selectedLocationValue}
           />
         </Dialog>
+      <Dialog
+       isOpen={isCreateNewLocationDialogOpen}
+        onClose={() => setIsCreateNewLocationDialogOpen(false)}
+        title="Create New Location"
+        description=""
+        style={{marginBottom: "50%"}}
+        // onHeightChange={(height) => setFirstDialogHeight(height)}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => createNewLocation()}>
+              CREATE
+            </Button>
+          </>
+        }
+          >
+          <Input
+            id="location"
+            label="Location Name"
+            value={newLocationName}
+            onChange={(value) => setNewLocationName(value.target.value)}
+          />
+          <Input
+            id="address"
+            label="Location Address"
+            value={newLocationAddress}
+            onChange={(value) => setNewLocationAddress(value.target.value)}
+          />
+        </Dialog>
 
-        <Dialog
+      <Dialog
         isOpen={isCompleteDialogOpen}
         onClose={() => setIsCompleteDialogOpen(false)}
         title="Mark Robday Activity as Complete?"
@@ -1190,8 +1261,8 @@ export default function Page() {
           <Text variant="body-default-s">
             Are you sure you want to mark this activity as complete?
           </Text>
-        </Dialog>
-        <Dialog
+      </Dialog>
+      <Dialog
         isOpen={isAddActivityDialogOpen}
         onClose={() => setIsAddActivityDialogOpen(false)}
         title="Add Robday Activity"
@@ -1206,27 +1277,28 @@ export default function Page() {
           </>
         }
         >
-          <Column >
-            <Text variant="body-default-s">
-              Ability to add a new activity if it hasn't been created yet here coming soon...
-            </Text>
-            <Select
-              searchable
-              id="activity"
-              label={selectedValueLabel}
-              minHeight={300}
-              options={activities.map((activity) => {
-                return { value: activity.id, label: activity.name, description: activity.description }
-              })}
-              // onChange={(value) => setSelectedValue(activities.find((activity) => activity.id === value.target.value)?.id ?? "")}
-              // onChange={(value) => handleSelect(activities.find((activity) => activity.name === value.target.value ) ?? activities[0])}
-              // onSelect={(value) => printSelect(value)}
-              onSelect={(value) => handleSelect(activities.find((activity) => activity.id === value ) ?? activities[0])}
-              value={selectedValue}
-              // value=""
-            />
-          </Column>
-        </Dialog>
+        <Column >
+          <Text variant="body-default-s">
+            Ability to add a new activity if it hasn't been created yet here coming soon...
+          </Text>
+          <Select
+            searchable
+            id="activity"
+            label={selectedValueLabel}
+            minHeight={300}
+            options={activities.map((activity) => {
+              return { value: activity.id, label: activity.name, description: activity.description }
+            })}
+            // onChange={(value) => setSelectedValue(activities.find((activity) => activity.id === value.target.value)?.id ?? "")}
+            // onChange={(value) => handleSelect(activities.find((activity) => activity.name === value.target.value ) ?? activities[0])}
+            // onSelect={(value) => printSelect(value)}
+            onSelect={(value) => handleSelect(activities.find((activity) => activity.id === value ) ?? activities[0])}
+            value={selectedValue}
+            // value=""
+          />
+        </Column>
+      </Dialog>
+      
         
     </Column>
   );
