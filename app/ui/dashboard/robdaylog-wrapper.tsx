@@ -26,6 +26,7 @@ interface RobdayLogProps {
     robdayLogTemperature: number;
     robdayLogActivities: Schema["RobdaylogActivity"]["type"][];
     // activitiesDict: Record<string, Schema["Activity"]["type"]>;
+    baseActivities: RobDayLogBaseActivityProps[];
     activityInstances: Schema["ActivityInstance"]["type"][];
     aiProps: RobDayLogActivityProps[];
     urlsDict: Record<string, string>;
@@ -45,6 +46,14 @@ interface RobdayLogProps {
     location: string;
     imageUrls: Array<string>;
     // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
+  }
+
+  interface RobDayLogBaseActivityProps {
+    activityId: string;
+    activityName: string;
+    activityDescription: string;
+    activityCategories: string[];
+    activityImageUrl: string;
   }
 
   interface LocationData {
@@ -88,6 +97,19 @@ export default async function RobdaylogWrapper() {
             const robdayLogActivities = await robdayLog.activities();
             const robdayLogActivityInstances = await robdayLog.activityInstances();
             const robdayLogActivityInstanceProps: RobDayLogActivityProps[] = [];
+            const robdayLogBaseActivityProps: RobDayLogBaseActivityProps[] = [];
+            robdayLogActivities.data.forEach(async (robdayLogActivity) => {
+                const activity = await robdayLogActivity.activity();
+                if (activity.data) {
+                    robdayLogBaseActivityProps.push({
+                        activityId: activity.data.id,
+                        activityName: activity.data.name ?? "",
+                        activityDescription: activity.data.description ?? "",
+                        activityCategories: (activity.data.categories ?? []).filter((category): category is string => category !== null),
+                        activityImageUrl: activity.data.image ?? ""
+                    });
+                }
+            });
             robdayLogActivityInstances.data.forEach(async (activityInstance) => {
                 const location = await activityInstance.location();
                 const imageUrls: Array<string> = [];
@@ -104,7 +126,7 @@ export default async function RobdaylogWrapper() {
                         }
                         }
                     }));
-                }
+                };
                 robdayLogActivityInstanceProps.push({
                     // activityInstance: activityInstance,
                     activityInstanceId: activityInstance.id,
@@ -140,6 +162,7 @@ export default async function RobdaylogWrapper() {
                 robdayLogTemperature: robdayLog.temperature?.valueOf() || 0,
                 robdayLogActivities: robdayLogActivities.data,
                 // activitiesDict: activitiesDict,
+                baseActivities: robdayLogBaseActivityProps,
                 activityInstances: robdayLogActivityInstances.data,
                 aiProps: robdayLogActivityInstanceProps,
                 urlsDict: urlsDict,
@@ -164,6 +187,7 @@ export default async function RobdaylogWrapper() {
                 // robdayLogActivities={robdayLogProp.robdayLogActivities} 
                 // activitiesDict={robdayLogProp.activitiesDict}
                 // activityInstances={robdayLogProp.activityInstances}
+                baseActivities={robdayLogProp.baseActivities}
                 robdayLogActivityProps={robdayLogProp.aiProps}
                 urlsDict={robdayLogProp.urlsDict}
                 notes={robdayLogProp.notes}

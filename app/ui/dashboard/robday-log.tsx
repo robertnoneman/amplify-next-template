@@ -83,6 +83,14 @@ interface LocationData {
   address: string;
 }
 
+interface RobDayLogBaseActivityProps {
+  activityId: string;
+  activityName: string;
+  activityDescription: string;
+  activityCategories: string[];
+  activityImageUrl: string;
+}
+
 
 export default function RobdayLog({ 
   robdayLogNumber,
@@ -93,6 +101,7 @@ export default function RobdayLog({
   // robdayLogActivities,
   // activitiesDict,
   // activityInstances,
+  baseActivities,
   robdayLogActivityProps,
   urlsDict,
   notes,
@@ -108,6 +117,7 @@ export default function RobdayLog({
   // activitiesDict: Record<string, Schema["Activity"]["type"]>;
   // activityInstances: Schema["ActivityInstance"]["type"][];
   robdayLogActivityProps: RobDayLogActivityProps[];
+  baseActivities: RobDayLogBaseActivityProps[];
   urlsDict: Record<string, string>;
   notes: Array<string>;
   locationData: LocationData[];
@@ -136,8 +146,12 @@ export default function RobdayLog({
   // const [selectedLocation, setSelectedLocation] = useState<Schema["Location"]["type"]>();
   const [selectedLocation, setSelectedLocation] = useState<LocationData>();
 
-  const [selectedActivity, setSelectedActivity] = useState<Schema["Activity"]["type"]>();
+  // const [selectedActivity, setSelectedActivity] = useState<Schema["Activity"]["type"]>();
+  const [selectedActivity, setSelectedActivity] = useState<RobDayLogBaseActivityProps>();
   const [editVisible, setEditVisible] = useState(false);
+  const [isCreateNewLocationDialogOpen, setIsCreateNewLocationDialogOpen] = useState(false);
+  const [newLocationName, setNewLocationName] = useState("");
+  const [newLocationAddress, setNewLocationAddress] = useState("");
   
 
   const getImageUrl = async (key: string): Promise<string> => {
@@ -260,31 +274,75 @@ export default function RobdayLog({
     console.log("Activity Instance populated: ", activityInstance.activityInstanceDisplayName);
   }
 
-  async function populateNewActivityInstance(activity: Schema["Activity"]["type"]) {
+  // async function populateNewActivityInstance(activity: Schema["Activity"]["type"]) {
+  //   isAddDialogOpen? console.log("returning ") :
+  //   setIsAddDialogOpen(true);
+  //   setSelectedActivity(activity);
+  //   setActivityDisplayName(activity?.name ?? "");
+  //   setSelectedLocationValue(activity?.location ?? "");
+  //   setSelectedLocationValueLabel(activity?.location ?? "");
+  //   setActivityNotes([]);
+  //   const imageUrl = await getImageUrl(activity.image ?? "/placeholderImage.jpg");
+  //   setEditedImageUrl(imageUrl);
+  //   setActivityImages([activity.image ?? ""]);
+  //   setActivityCost(activity.cost ?? 0);
+  //   setActivityRating(activity.rating ?? 0);
+  //   console.log("Activity Instance populated: ", activity.name);
+  // }
+
+  async function populateNewActivityInstance(activity: RobDayLogBaseActivityProps) {
     isAddDialogOpen? console.log("returning ") :
     setIsAddDialogOpen(true);
     setSelectedActivity(activity);
-    setActivityDisplayName(activity?.name ?? "");
-    setSelectedLocationValue(activity?.location ?? "");
-    setSelectedLocationValueLabel(activity?.location ?? "");
+    setActivityDisplayName(activity?.activityName ?? "");
+    // setSelectedLocationValue(activity?.activityLocation ?? "");
+    // setSelectedLocationValueLabel(activity?.location ?? "");
     setActivityNotes([]);
-    const imageUrl = await getImageUrl(activity.image ?? "/placeholderImage.jpg");
-    setEditedImageUrl(imageUrl);
-    setActivityImages([activity.image ?? ""]);
-    setActivityCost(activity.cost ?? 0);
-    setActivityRating(activity.rating ?? 0);
-    console.log("Activity Instance populated: ", activity.name);
+    // const imageUrl = await getImageUrl(activity.image ?? "/placeholderImage.jpg");
+    // setEditedImageUrl(imageUrl);
+    // setActivityImages([activity.image ?? ""]);
+    // setActivityCost(activity.act ?? 0);
+    // setActivityRating(activity.rating ?? 0);
+    console.log("Activity Instance populated: ", activity.activityName);
   }
 
+  // function createActivityInstance() {
+  //   console.log(`Done Creating Activity: ${selectedActivity?.name}`);
+  //   const newActivityInstance = {
+  //     displayName: activityDisplayName,
+  //     notes: activityNotes,
+  //     images: activityImages,
+  //     cost: activityCost,
+  //     rating: activityRating,
+  //     activityId: selectedActivity?.id ?? "",
+  //     locationId: selectedLocation?.id ?? "",
+  //     // robdaylogId: robdayLogActivities[0].robdaylogId,
+  //     robdaylogId: robdayLogId,
+  //     completed: true,
+  //     isOnNextRobDay: false,
+  //     date: robdayLogDate,
+  //   }
+  //   const result = client.models.ActivityInstance.create(newActivityInstance);
+  //   console.log("Activity Instance created: ", result);
+  //   setIsAddDialogOpen(false);
+  //   setActivityDisplayName("");
+  //   setActivityLocationId("");
+  //   setActivityNotes([]);
+  //   setActivityImages([]);
+  //   setEditedImageUrl("/placeholderImage.jpg");
+  //   setActivityCost(0);
+  //   setActivityRating(0);
+  // }
+
   function createActivityInstance() {
-    console.log(`Done Creating Activity: ${selectedActivity?.name}`);
+    console.log(`Done Creating Activity: ${selectedActivity?.activityName}`);
     const newActivityInstance = {
       displayName: activityDisplayName,
       notes: activityNotes,
       images: activityImages,
       cost: activityCost,
       rating: activityRating,
-      activityId: selectedActivity?.id ?? "",
+      activityId: selectedActivity?.activityId ?? "",
       locationId: selectedLocation?.id ?? "",
       // robdaylogId: robdayLogActivities[0].robdaylogId,
       robdaylogId: robdayLogId,
@@ -308,6 +366,26 @@ export default function RobdayLog({
   async function fetchDefaultImage() {
     const defImageUrl = await getImageUrl("picture-submissions/placeholderImage.jpg");
     setDefaultImageUrl(defImageUrl);
+  }
+
+  function createNewLocation() {
+    const newLocation = {
+      name: newLocationName,
+      address: newLocationAddress,
+    };
+    const location = client.models.Location.create({ ...newLocation });
+    console.log("Location created: ", location);
+    // setAddedLocation(location);
+    // setSelectedLocation(location);
+    // setSelectedLocationValue("");
+    // setSelectedLocationValueLabel("Choose a location");
+    setIsCreateNewLocationDialogOpen(false);
+  }
+
+  function handleCreateNewLocation() {
+    setSelectedLocationValue("");
+    setSelectedLocationValueLabel("Choose a location");
+    setIsCreateNewLocationDialogOpen(true);
   }
 
   // useEffect(() => {
@@ -415,6 +493,46 @@ export default function RobdayLog({
                     // onBackground="brand-weak"
                 />
                 </Column> */}
+            </Row>
+          ))}
+          <Heading variant="display-default-xs" align="center">
+            AGENDA ACTIVITIES
+          </Heading>
+          <Line/>
+          { baseActivities.map((activity) => (
+            <Row key={`${activity.activityId}`}>
+              <Column>
+              <Text
+                padding="xs"
+                align="left"
+                onBackground="neutral-strong"
+                variant="body-default-m"
+              >
+                {activity.activityName}
+              </Text>
+              <Line/>
+              <Text
+                paddingLeft="xs"
+                align="left"
+                onBackground="neutral-medium"
+                variant="body-default-s"
+              >
+                {activity.activityDescription}
+              </Text>
+              <Line/>
+              </Column>
+              {robdayLogActivityProps.length !== baseActivities.length && (
+              <Column fillHeight justifyContent="flex-start" direction="column">
+                <IconButton
+                  onClick={() => populateNewActivityInstance(activity)}
+                  // name="HiOutlinePencil"
+                  icon="plus"
+                  size="m"
+                  variant="tertiary"
+                  // onBackground="brand-weak"
+                ></IconButton>
+              </Column>
+              )}
             </Row>
           ))}
           {/* {activitiesDict && Object.entries(activitiesDict).map(([id, activity]) => (
@@ -596,11 +714,20 @@ export default function RobdayLog({
             </Flex>
           </Flex>
           <Column paddingTop="24" fillWidth gap="24">
-            <Input
+            {/* <Input
               radius="top"
               label="Name"
               // labelAsPlaceholder
               defaultValue={selectedActivity?.name ?? ""}
+              id="name"
+              // onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => setActivityDisplayName(e.target.value)}
+            /> */}
+            <Input
+              radius="top"
+              label="Name"
+              // labelAsPlaceholder
+              defaultValue={selectedActivity?.activityName ?? ""}
               id="name"
               // onChange={(e) => console.log(e.target.value)}
               onChange={(e) => setActivityDisplayName(e.target.value)}
@@ -610,17 +737,31 @@ export default function RobdayLog({
               id="location"
               label={selectedLocationValueLabel}
               minHeight={300}
-              options={locationData.map((location) => {
-                return { value: location.id, label: location.name, description: location.address }
-              })}
-              onSelect={(value) => handleSelectLocation(locationData.find((location) => location.id === value ) ?? locationData[0])}
+              options={[
+                ...locationData.map((location) => ({
+                  value: location.id,
+                  label: location.name,
+                  description: location.address,
+                })),
+                { value: "create-new", label: "Create New", description: "Add a new location" },
+              ]}
+              onSelect={(value) => {
+                if (value === "create-new") {
+                  // Handle the "create new" action here
+                  // console.log("Create new location");
+                  handleCreateNewLocation();
+                  // You can open a modal or navigate to a different page to create a new location
+                } else {
+                  handleSelectLocation(locationData.find((location) => location.id === value) ?? locationData[0]);
+                }
+              }}
               value={selectedLocationValue}
             />
             <Input
               radius="top"
               label="Cost"
               // labelAsPlaceholder
-              defaultValue={selectedActivity?.cost?.toString()}
+              // defaultValue={selectedActivity?.cost?.toString()}
               id="cost"
               // onChange={(e) => console.log(e.target.value)}
               onChange={(e) => setActivityCost(parseInt(e.target.value))}
@@ -629,12 +770,12 @@ export default function RobdayLog({
               radius="top"
               label="Rating"
               // labelAsPlaceholder
-              defaultValue={selectedActivity?.rating?.toString()}
+              // defaultValue={selectedActivity?.rating?.toString()}
               id="rating"
               // onChange={(e) => console.log(e.target.value)}
               onChange={(e) => setActivityRating(parseInt(e.target.value))}
             />
-            {selectedActivity && selectedActivity.notes && selectedActivity.notes.map((note) => (
+            {/* {selectedActivity && selectedActivity.notes && selectedActivity.notes.map((note) => (
               <Textarea
                 key={`${selectedActivity.id} - ${note}`}
                 id="notes"
@@ -646,9 +787,37 @@ export default function RobdayLog({
                 onChange={(e) => setActivityNotes([e.target.value])}
               >
               </Textarea>
-            ))}
+            ))} */}
           </Column>
         </Dialog>
+        <Dialog
+          isOpen={isCreateNewLocationDialogOpen}
+          onClose={() => setIsCreateNewLocationDialogOpen(false)}
+          title="Create New Location"
+          description=""
+          style={{marginBottom: "50%"}}
+          // onHeightChange={(height) => setFirstDialogHeight(height)}
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => createNewLocation()}>
+                CREATE
+              </Button>
+            </>
+          }
+            >
+            <Input
+              id="location"
+              label="Location Name"
+              value={newLocationName}
+              onChange={(value) => setNewLocationName(value.target.value)}
+            />
+            <Input
+              id="address"
+              label="Location Address"
+              value={newLocationAddress}
+              onChange={(value) => setNewLocationAddress(value.target.value)}
+            />
+          </Dialog>
     </Row>
   )
 }

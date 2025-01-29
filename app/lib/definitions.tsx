@@ -86,3 +86,32 @@ export type User = {
     amount: number;
     status: 'pending' | 'paid';
   };
+
+  export interface LocationData {
+    id: string;
+    name: string;
+    address: string;
+  }
+
+  export interface RobDayLogActivityProps {
+    // activityInstance: Schema["ActivityInstance"]["type"];
+    activityInstanceId: string;
+    activityInstanceDisplayName: string;
+    activityInstanceNotes: string[];
+    activityInstanceRating: number;
+    activityInstanceCost: number;
+    images: string[];
+    // locations: Schema["Location"]["type"][];
+    location: string;
+    locationId: string;
+    imageUrls: string[];
+    // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
+  }
+
+  export interface RobDayLogBaseActivityProps {
+    activityId: string;
+    activityName: string;
+    activityDescription: string;
+    activityCategories: string[];
+    activityImageUrl: string;
+  }
