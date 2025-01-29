@@ -9,7 +9,7 @@ import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json";
 import { getUrl } from 'aws-amplify/storage';
 import { uploadData } from 'aws-amplify/storage';
-import { RobDayLogActivityProps } from "@/app/lib/definitions";
+import { RobDayLogActivityProps, TodoProps } from "@/app/lib/definitions";
 
 
 Amplify.configure(outputs);
@@ -36,4 +36,35 @@ export async function updateActivityInstance(activity: RobDayLogActivityProps) {
   });
   console.log("Update result", fullResult);
   revalidatePath("/dashboard/gallery");
+}
+
+export async function updateTodo(id: string, props: TodoProps) {
+  console.log("Updating todo", props);
+  const fullResult = await client.models.Todo.update({
+    id: id,
+    content: props.content,
+    isDone: !props.isDone,
+  });
+  console.log("Update result", fullResult);
+  revalidatePath("/dashboard/todos");
+}
+
+export async function createTodo(content: string) {
+  console.log("Creating todo", content);
+  const fullResult = await client.models.Todo.create({
+    content: content,
+    isDone: false,
+  });
+  console.log("Create result", fullResult);
+  revalidatePath("/dashboard/todos");
+}
+
+export async function fetchTodos() {
+  const todos = await client.models.Todo.list();
+  const todoProps = todos.data.map(todo => ({
+    id: todo.id,
+    content: todo.content ?? "",
+    isDone: todo.isDone ?? false,
+  }));
+  return todoProps;
 }

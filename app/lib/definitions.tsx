@@ -115,3 +115,9 @@ export type User = {
     activityCategories: string[];
     activityImageUrl: string;
   }
+
+  export type TodoProps = {
+    id: string;
+    content: string;
+    isDone: boolean;
+  }

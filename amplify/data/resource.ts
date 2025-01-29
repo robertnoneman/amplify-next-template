@@ -11,6 +11,8 @@ const schema = a.schema({
     .model({
       content: a.string(),
       isDone: a.boolean(),
+      status: a.enum(["Todo", "In Progress", "Completed"]),
+      notes: a.string().array(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
   Category: a.customType({
