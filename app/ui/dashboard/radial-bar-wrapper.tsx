@@ -37,7 +37,7 @@ export default async function RadialBarWrapper() {
             <Row mobileDirection="column">
                 <RadialBar labels={["ROBDAYS COMPLETED"]} series={[robdayLogs.data.length]} />
             </Row>
-            <Grid columns="3" mobileColumns="2">
+            <Grid columns="3" mobileColumns="1">
                 <RadialBar labels={["AVERAGE ROBDAY RATING"]} series={[99]} height={200} fontSize="14px" />
                 <RadialBar labels={["AVERAGE ROBDAY COST"]} series={[25]} colors={["#01CF38", "#FD6325"]} height={200} fontSize="14px" />
                 <RadialBar labels={["AVERAGE ACTIVITY RATING"]} series={[averageRating]} colors={["#01CF38", "#FD6325"]} height={200} fontSize="14px" />
