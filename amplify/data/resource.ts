@@ -74,6 +74,7 @@ const schema = a.schema({
   Robdaylog: a
     .model({
       date: a.date().required(),
+      status: a.enum(["Upcoming", "Started", "Completed"]),
       robDayNumber: a.integer(),
       notes: a.string().array(),
       weatherCondition: a.string(),
@@ -111,6 +112,7 @@ const schema = a.schema({
   ActivityInstance: a
     .model({
       date: a.date().required(),
+      status: a.enum(["Planned", "InProgress", "Paused", "Completed"]),
       displayName: a.string(),
       startTime: a.timestamp(),
       endTime: a.timestamp(),

@@ -44,6 +44,7 @@ export async function updateTodo(id: string, props: TodoProps) {
     id: id,
     content: props.content,
     isDone: !props.isDone,
+    status: props.status,
   });
   console.log("Update result", fullResult);
   revalidatePath("/dashboard/todos");
@@ -65,6 +66,7 @@ export async function fetchTodos() {
     id: todo.id,
     content: todo.content ?? "",
     isDone: todo.isDone ?? false,
+    status: todo.status ?? "Todo",
   }));
   return todoProps;
 }

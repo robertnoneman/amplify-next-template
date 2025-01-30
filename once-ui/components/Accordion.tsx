@@ -43,7 +43,7 @@ const Accordion: React.FC<AccordionProps> = forwardRef(
           aria-expanded={isOpen}
           aria-controls="accordion-content"
         >
-          <Heading as="h3" variant="heading-strong-s">
+          <Heading as="h3" variant="body-strong-s">
             {title}
           </Heading>
           <Icon

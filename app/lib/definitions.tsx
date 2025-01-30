@@ -120,4 +120,5 @@ export type User = {
     id: string;
     content: string;
     isDone: boolean;
+    status: "Todo" | "InProgress" | "Completed";
   }

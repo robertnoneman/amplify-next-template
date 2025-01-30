@@ -74,12 +74,12 @@ export default async function Page() {
               alignItems="center"
               justifyContent="center"
               >
-              <Heading
+              {/* <Heading
                 size="xl"
                 color="brand-strong"
                 >
                   Robday Todo List
-              </Heading>
+              </Heading> */}
               <TodoList todoProps={todos}/>
             </Column>
         </Flex>

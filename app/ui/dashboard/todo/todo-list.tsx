@@ -33,6 +33,7 @@ import {
   import styles from '@/app/dashboard/activities/styles.module.css';
   import { createTodo, updateTodo} from "@/app/lib/actions";
   import TodoItem from "@/app/ui/dashboard/todo/todo-item";
+import { PiRowsPlusBottom } from "react-icons/pi";
 
 
   export default function TodoList({
@@ -73,18 +74,20 @@ import {
         <ul className={`${styles.ul}`} key={"todoList"}>
           <div className={`${styles.li} ${roboto.className} `}>
             {/* <li key={"todoheader"}> */}
-              <Flex background="surface" fillWidth >
-                <Column alignItems="left" paddingTop="4" fillWidth gap="0">
-                  <Row fillWidth justifyContent="space-around">
-                    <Text variant="body-default-xl" align="left"> 
+              <Row background="surface" fillWidth >
+                {/* <Row alignItems="left" paddingTop="4" fillWidth gap="0"> */}
+                  <Column width="m" justifyContent="space-between" paddingX="4">
+                    <Text variant="body-default-xl" align="left"paddingX="4"> 
                       Activity
                     </Text>
-                    <Text variant="body-default-xl" align="left"> 
+                  </Column>
+                    <Column width="xs" justifyContent="space-between" paddingX="4">
+                    <Text variant="body-default-xl" align="left" paddingX="4"> 
                       Status
                     </Text>
-                  </Row>
-                </Column>
-              </Flex>
+                    </Column>
+                </Row>
+              {/* </Row> */}
             {/* </li> */}
           </div>
         {/* </div> */}
