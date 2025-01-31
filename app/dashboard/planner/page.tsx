@@ -55,7 +55,6 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json"
 import { getUrl } from 'aws-amplify/storage';
-import ActivityInstanceItem from "@/app/ui/dashboard/planner/activity-instance";
 
 
 Amplify.configure(outputs);
@@ -189,7 +188,8 @@ export default function Page() {
       console.log("Checking RobDayLog for Activity Instances");
       setFailSafeBool(true);
       if (!id) {
-        console.log("No RobDayLog ID found");
+        console.log("No RobDayLog ID found. Creating new Robday Log...");
+        createRobdayLog();
         return;
       }
       const myRobDayLog = await client.models.Robdaylog.get({ id: id });
@@ -229,7 +229,8 @@ export default function Page() {
         }
       }
       else {
-        console.log("No RobDayLog found");
+        console.log("No RobDayLog found. Creating a new one...");
+        createRobdayLog();
       }
     }
   }
@@ -432,7 +433,7 @@ export default function Page() {
   function startActivity(activity: Schema["ActivityInstance"]["type"]) {
     const startTime = new Date().getTime();
     const temp = Number(currentTemp?.split(" F")[0]);
-    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: startTime, weatherCondition: currentWeather, temperature: temp, robdaylogId: robDayLog?.id });
+    const result = client.models.ActivityInstance.update({ id: activity.id, status: "InProgress", startTime: startTime, weatherCondition: currentWeather, temperature: temp, robdaylogId: robDayLog?.id });
     console.log("Activity Instance started: ", startTime, result);
   }
 
@@ -442,7 +443,7 @@ export default function Page() {
     if (activity.startTime) {
       duration = endTime - activity.startTime;
     }
-    const result = client.models.ActivityInstance.update({ id: activity.id, endTime: endTime, totalTime: duration });
+    const result = client.models.ActivityInstance.update({ id: activity.id, status: "Paused", endTime: endTime, totalTime: duration });
     console.log("Activity Instance stopped: ", endTime, result);
   }
 
@@ -466,6 +467,7 @@ export default function Page() {
     completedActivityInstance && completedActivityInstance.displayName ? completedActivityInstance.displayName = convertToPastTense2(`${completedActivityInstance.displayName.toLocaleLowerCase()}`) : null;
     console.log("Completed Activity Instance: ", completedActivityInstance?.displayName);
     completedActivityInstance ? completedActivityInstance.completed = true : null;
+    completedActivityInstance ? completedActivityInstance.status = "Completed" : null;
     if (completedActivityInstance && robDayLog) {
       completedActivityInstance.robdaylogId = robDayLog.id;
     }
@@ -477,6 +479,7 @@ export default function Page() {
   async function createRobdayLog() {
     setStarted(true);
     const startTime = new Date().getTime();
+    const selectedActivityInstanceIds = selectedActivityInstances.map((activityInstance) => activityInstance.id);
     const newRobdayLog = {
       date: robDayDate ? robDayDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
       robDayNumber: robDayLogNumber,
@@ -485,11 +488,20 @@ export default function Page() {
       temperature: Number(currentTemp?.split(" F")[0]),
       // activities: activities,
       // locations: [],
-      // activityInstances: activityInstances ? activityInstances : [],
+      activityInstances: selectedActivityInstanceIds,
+      status: "Upcoming" as "Upcoming" | "Started" | "Completed",
       // notes: [],
     };
     const myRobdayLog = await client.models.Robdaylog.create({ ...newRobdayLog });
     console.log("Robday Log created: ", myRobdayLog);
+    if (myRobdayLog.data) {
+      setRobDayLog(myRobdayLog.data);
+      setRobDayLogId(myRobdayLog.data.id);
+    }
+    selectedActivityInstanceIds.forEach((activityInstanceId) => {
+      const result = client.models.ActivityInstance.update({ id: activityInstanceId, robdaylogId: myRobdayLog.data?.id });
+      console.log("Activity Instance updated: ", result);
+    });
   }
 
   function updateRobdayLog() {
@@ -809,7 +821,7 @@ export default function Page() {
               </Column>
 
               <Line height={0.1}/>
-              {!failSafeBool && (
+              {!robDayLog && (
                 <Row fillWidth justifyContent="center">
                   <Button
                     onClick={() => checkRobDayLogForActivityInstances(robDayLogId? robDayLogId : "")}
@@ -818,7 +830,7 @@ export default function Page() {
                     id="trigger"
                   >
                     <Row justifyContent="center" alignItems="center">
-                      SYNC
+                      CREATE ROBDAY FOR {robDayDate.toLocaleDateString()}
                       <Arrow
                         trigger="#trigger"
                         color="onBackground"
@@ -871,7 +883,7 @@ export default function Page() {
                           />
                         </Row>
                         <Column>
-                        {activityInstance.startTime === 0 && (
+                        {activityInstance.status === "Planned" || activityInstance.status === null && (
                           <Row justifyContent="flex-end" fillHeight alignItems="center">
                             <IconButton
                               icon="play"
@@ -881,7 +893,7 @@ export default function Page() {
                             />
                           </Row>
                         )}
-                        {activityInstance.startTime !== 0 && activityInstance.endTime === 0 && (
+                        {activityInstance.status === "InProgress" && (
                           <Row justifyContent="flex-end" fillHeight alignItems="center" >
                             <IconButton
                               icon="stop"
@@ -891,7 +903,7 @@ export default function Page() {
                             />
                           </Row>
                         )}
-                        {activityInstance.endTime !== 0 && (
+                        {activityInstance.status === "Paused" && (
                           <Row justifyContent="flex-end" fillHeight alignItems="center">
                             <IconButton
                               icon="rewind"
@@ -1102,7 +1114,7 @@ export default function Page() {
                   </Row>
                 </Button>
               </Row>
-              {!started && (
+              {robDayLog?.status === "Upcoming" && (
                 <Row fillWidth justifyContent="center">
                   <Button
                     onClick={() => createRobdayLog()}
@@ -1120,7 +1132,7 @@ export default function Page() {
                   </Button>
                 </Row>
               )}
-              {started && !ended && (
+              {robDayLog?.status === "Started" && (
                 <Row fillWidth justifyContent="center">
                   <Button
                     onClick={() => completeRobDayLog()}

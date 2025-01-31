@@ -48,10 +48,23 @@ import { getNextRobDay, getWeather, getCurrentLocation, getCurrentRobDay, isRobD
 import ActivityInstanceItem from "@/app/ui/dashboard/planner/activity-instance";
 import { createRobdayLog, completeRobDayLog, createActivityInstance } from "@/app/lib/actions";
 
-export default function Agenda(robdayLogProps: RobdayLogProps, currentWeatherProps: WeatherProps, forecastWeatherProps: WeatherProps, baseActivityProps: RobDayLogBaseActivityProps[]) {
-  const createRobDayLogWithId = createRobdayLog.bind(null, robdayLogProps.robdayLogId);
-  const completeRobDayLogWithId = completeRobDayLog.bind(null, robdayLogProps.robdayLogId);
-  const createActivityInstanceWithId = createActivityInstance.bind(null, robdayLogProps.robdayLogId);
+export default function Agenda({
+  robdayLogProps,
+  currentWeatherProps,
+  forecastWeatherProps,
+  baseActivityProps,
+  locationData
+} : {
+  robdayLogProps: RobdayLogProps[],
+  currentWeatherProps: WeatherProps,
+  forecastWeatherProps: WeatherProps,
+  baseActivityProps: RobDayLogBaseActivityProps[],
+  locationData: LocationData[]
+}) {
+  const [currentRobdayLogIndex, setCurrentRobdayLogIndex] = useState(robdayLogProps.length - 1);
+  const createRobDayLogWithId = createRobdayLog.bind(null, robdayLogProps[0].robdayLogId);
+  const completeRobDayLogWithId = completeRobDayLog.bind(null, robdayLogProps[0].robdayLogId);
+  const createActivityInstanceWithId = createActivityInstance.bind(null, robdayLogProps[0].robdayLogId);
   const [selectedDate, setSelectedDate] = useState<Date>(getCurrentRobDay());
   const [robDayDate, setRobDayDate] = useState<Date>(getCurrentRobDay());
   const [isAddActivityDialogOpen, setIsAddActivityDialogOpen] = useState(false);
@@ -83,8 +96,7 @@ export default function Agenda(robdayLogProps: RobdayLogProps, currentWeatherPro
       padding="32"
       gap="64"
       position="relative"
-      overflow="hidden"
-    >
+      overflow="hidden">
       <Column
         background="brand-weak"
         // direction="column"
@@ -128,10 +140,11 @@ export default function Agenda(robdayLogProps: RobdayLogProps, currentWeatherPro
         </Column>
 
         <Column>
-          {robdayLogProps.aiProps.map((activity, index) => (
+          {robdayLogProps[currentRobdayLogIndex].aiProps.map((activity, index) => (
             <ActivityInstanceItem
               key={index}
-              {...activity}
+              activityInstanceProps={activity}
+              locationData={locationData}
             />
           ))}
         </Column>
@@ -151,7 +164,7 @@ export default function Agenda(robdayLogProps: RobdayLogProps, currentWeatherPro
             </Row>
           </Button>
         </Row>
-        {robdayLogProps.status === "Upcoming" && (
+        {robdayLogProps[currentRobdayLogIndex].status === "Upcoming" && (
           <Row fillWidth justifyContent="center">
             <Button
               onClick={() => onCreateRobdayLog()}
@@ -169,7 +182,7 @@ export default function Agenda(robdayLogProps: RobdayLogProps, currentWeatherPro
             </Button>
           </Row>
         )}
-        {robdayLogProps.status == "Started" && (
+        {robdayLogProps[currentRobdayLogIndex].status == "Started" && (
           <Row fillWidth justifyContent="center">
             <Button
               onClick={() => onCompleteRobdayLog()}
@@ -223,7 +236,7 @@ export default function Agenda(robdayLogProps: RobdayLogProps, currentWeatherPro
             // value=""
           />
         </Column>
-            </Dialog>
+      </Dialog>
     </Row>
   )
 }

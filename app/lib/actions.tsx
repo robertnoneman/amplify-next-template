@@ -60,9 +60,23 @@ export async function fetchTodos() {
 export async function fetchRobdayLogs() {
   const robDayLogs = await client.models.Robdaylog.list();
   const robDayLogProps = robDayLogs.data.map(robDayLog => ({
-    id: robDayLog.id,
-    date: robDayLog.date,
-    activities: robDayLog.activities,
+    robdayLogId: robDayLog.id,
+    status: robDayLog.status as "Upcoming" | "Started" | "Completed",
+    robdayLogDate: robDayLog.date,
+    robdayLogNumber: robDayLog.robDayNumber ?? 0,
+    robdayLogWeather: robDayLog.weatherCondition ?? "",
+    robdayLogTemperature: robDayLog.temperature ?? 0,
+    rating: robDayLog.rating ?? 0,
+    cost: robDayLog.cost ?? 0,
+    duration: robDayLog.totalTime ?? 0,
+    startTime: robDayLog.startTime ?? 0,
+    endTime: robDayLog.endTime ?? 0,
+    totalTime: robDayLog.totalTime ?? 0,
+    notes: [],
+    locationData: [],
+    baseActivities: [],
+    aiProps: [],
+    urlsDict: {},
   }));
   return robDayLogProps;
 }
@@ -70,9 +84,9 @@ export async function fetchRobdayLogs() {
 export async function fetchRobdaylogForDate(date: string) {
   const robDayLogs = await client.models.Robdaylog.list();
   const robDayLogProps = robDayLogs.data.map(robDayLog => ({
-    id: robDayLog.id,
+    robdayLogId: robDayLog.id,
     date: robDayLog.date,
-    activities: robDayLog.activities,
+    baseActivities: robDayLog.activities,
   }));
   return robDayLogProps.find(robDayLog => robDayLog.date === date);
 }
@@ -131,12 +145,24 @@ export async function fetchActivities() {
   return activityProps;
 }
 
+export async function populateBaseActivityProps() {
+  const activities = await client.models.Activity.list();
+  const activityProps = activities.data.map(activity => ({
+    activityId: activity.id ?? "",
+    activityName: activity.name ?? "",
+    activityDescription: activity.description ?? "",
+    activityCategories: [],
+    activityImageUrl: activity.image ?? "",
+  }));
+  return activityProps;
+}
+
 export async function fetchLocations() {
   const locations = await client.models.Location.list();
   const locationProps = locations.data.map(location => ({
-    id: location.id,
-    name: location.name,
-    address: location.address
+    id: location.id ?? "",
+    name: location.name ?? "",
+    address: location.address ?? "",
   }));
   return locationProps;
 }

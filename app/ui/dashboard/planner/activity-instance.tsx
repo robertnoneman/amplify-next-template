@@ -41,12 +41,18 @@ import {
 } from "@/app/lib/actions";
 
 
-export default function ActivityInstanceItem(activityInstanceProps: RobDayLogActivityProps, locationData: LocationData[]) {
+export default function ActivityInstanceItem({
+  activityInstanceProps,
+  locationData
+}: {
+  activityInstanceProps: RobDayLogActivityProps,
+  locationData: LocationData[]
+}) {
   const updateActivityInstanceWithId = updateActivityInstance.bind(null, activityInstanceProps.activityInstanceId);
   const resetActivityTime = resetActivityInstance.bind(null, activityInstanceProps.activityInstanceId);
   const removeActivityInstanceWithId = removeActivityInstance.bind(null, activityInstanceProps.activityInstanceId);
   const completeActivityInstanceWithId = completeActivityInstance.bind(null, activityInstanceProps.activityInstanceId);
-  const createNewLocationWithId = createLocation.bind(null, locationData[0].id);
+  const createNewLocationWithId = createLocation.bind(null, "");
   const [isSecondDialogOpen, setIsSecondDialogOpen] = useState(false);
   const [isCreateNewLocationDialogOpen, setIsCreateNewLocationDialogOpen] = useState(false);
   const [selectedLocationValue, setSelectedLocationValue] = useState("");
