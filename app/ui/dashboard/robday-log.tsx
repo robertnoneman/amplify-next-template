@@ -59,29 +59,34 @@ import { uploadData } from 'aws-amplify/storage';
 import { Nullable } from "@aws-amplify/data-schema";
 import { AuthMode, CustomHeaders, LazyLoader, ListReturnValue, SingularReturnValue } from "@aws-amplify/data-schema/runtime";
 import RobDayLogActivity from "./robday-log-activity";
+import { RobDayLogActivityProps,
+  RobdayLogProps,
+  LocationData, 
+  // RobDayLogBaseActivityProps
+} from "@/app/lib/definitions";
 
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
-interface RobDayLogActivityProps {
-  // activityInstance: Schema["ActivityInstance"]["type"];
-  activityInstanceId: string;
-  activityInstanceDisplayName: string;
-  activityInstanceNotes: string[];
-  activityInstanceRating: number;
-  activityInstanceCost: number;
-  images: string[];
-  location: string;
-  imageUrls: Array<string>;
-  // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
-}
+// interface RobDayLogActivityProps {
+//   // activityInstance: Schema["ActivityInstance"]["type"];
+//   activityInstanceId: string;
+//   activityInstanceDisplayName: string;
+//   activityInstanceNotes: string[];
+//   activityInstanceRating: number;
+//   activityInstanceCost: number;
+//   images: string[];
+//   location: string;
+//   imageUrls: Array<string>;
+//   // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
+// }
 
-interface LocationData {
-  id: string;
-  name: string;
-  address: string;
-}
+// interface LocationData {
+//   id: string;
+//   name: string;
+//   address: string;
+// }
 
 interface RobDayLogBaseActivityProps {
   activityId: string;
@@ -105,10 +110,11 @@ export default function RobdayLog({
   robdayLogActivityProps,
   urlsDict,
   notes,
-  locationData
+  locationData,
+  robDayLogProp
   // locations
 }: { 
-  robdayLogNumber: string; 
+  robdayLogNumber: Number; 
   robdayLogDate: string;
   robdayLogId: string;
   robdayLogWeather: string;
@@ -121,6 +127,7 @@ export default function RobdayLog({
   urlsDict: Record<string, string>;
   notes: Array<string>;
   locationData: LocationData[];
+  robDayLogProp: RobdayLogProps;
   // locations: Schema["Location"]["type"][];
 }) {
 
@@ -260,10 +267,10 @@ export default function RobdayLog({
     setEditedActivity(activityInstance);
     activityInstance.activityInstanceDisplayName? setActivityDisplayName(activityInstance.activityInstanceDisplayName) : setActivityDisplayName("");
     // activityInstance.locationId? setActivityLocationId(activityInstance.locationId) : setActivityLocationId("");
-    activityInstance.location? setSelectedLocationValue(activityInstance.location) : setSelectedLocationValue("");
-    setSelectedLocation(activityInstance.location ? locationData.find((location) => location.name === activityInstance.location) : locationData[0]);
+    activityInstance.locationData? setSelectedLocationValue(activityInstance.locationData.name) : setSelectedLocationValue("");
+    setSelectedLocation(activityInstance.locationData ? locationData.find((location) => location.name === activityInstance.locationData.name) : locationData[0]);
     // activityInstance.locationId? setSelectedLocationValueLabel(locationData.find((location) => location.id === activityInstance.locationId)?.address ?? "") : setSelectedLocationValueLabel("");
-    setSelectedLocationValueLabel(locationData.find((location) => location.name === activityInstance.location)?.address ?? "");
+    setSelectedLocationValueLabel(locationData.find((location) => location.name === activityInstance.locationData.address)?.address ?? "");
     setActivityNotes(activityInstance.activityInstanceNotes ? activityInstance.activityInstanceNotes.filter((note): note is string => note !== null) : []);
     activityInstance.images? setActivityImages(activityInstance.images.filter((image): image is string => image !== null)) : setActivityImages([]);
     activityInstance.activityInstanceCost? setActivityCost(activityInstance.activityInstanceCost) : setActivityCost(0);
@@ -438,7 +445,7 @@ export default function RobdayLog({
         fillHeight>
         {/* <Line height={0.25}/> */}
         <Heading variant="display-default-m" align="center">
-          ROBDAY #{robdayLogNumber}
+          ROBDAY #{robdayLogNumber.toString()}
         </Heading>
         <Line height={0.25}/>
         { formatDate(robdayLogDate) } <br></br>

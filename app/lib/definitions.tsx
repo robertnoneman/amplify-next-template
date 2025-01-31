@@ -102,9 +102,12 @@ export type User = {
     activityInstanceCost: number;
     images: string[];
     // locations: Schema["Location"]["type"][];
-    location: string;
-    locationId: string;
+    // location: LocationData;
+    locationData: LocationData;
+    // location: string;
+    // locationId: string;
     imageUrls: string[];
+    status: "Planned" | "InProgress" | "Paused" | "Completed";
     // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
   }
 
@@ -121,4 +124,29 @@ export type User = {
     content: string;
     isDone: boolean;
     status: "Todo" | "InProgress" | "Completed";
+  }
+
+  export type RobdayLogProps = {
+    robdayLogId: string;
+    status: "Upcoming" | "Started" | "Completed";
+    robdayLogDate: string;
+    robdayLogNumber: number;
+    notes: string[];
+    robdayLogWeather: string;
+    robdayLogTemperature: number;
+    rating: number;
+    cost: number;
+    duration: number;
+    startTime: number;
+    endTime: number;
+    totalTime: number;
+    locationData: LocationData[];
+    baseActivities: RobDayLogBaseActivityProps[];
+    aiProps: RobDayLogActivityProps[];
+    urlsDict: Record<string, string>;
+  }
+
+  export type WeatherProps = {
+    temperature: number;
+    conditions: string;
   }

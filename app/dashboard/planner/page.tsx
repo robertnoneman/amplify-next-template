@@ -55,18 +55,12 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json"
 import { getUrl } from 'aws-amplify/storage';
+import ActivityInstanceItem from "@/app/ui/dashboard/planner/activity-instance";
 
 
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
-
-interface LocationData {
-  id: string;
-  name: string;
-  address: string;
-}
-
 
 export default function Page() {
   const [selectedValue, setSelectedValue] = useState("");
@@ -254,7 +248,7 @@ export default function Page() {
           setRobDayLog(foundRobDayLog[0]);
           console.log("Robday Log found for date: ", myRobDayDate.toISOString().split("T")[0]);
           setRobDayLogId(foundRobDayLog[0].id);
-          setStarted(true);
+          setStarted(foundRobDayLog[0].status === "Started");
           if (foundRobDayLog[0].endTime) {
             if (foundRobDayLog[0].endTime > 0) {
               setEnded(true);

@@ -51,21 +51,25 @@ import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json";
+import { RobDayLogActivityProps, 
+  LocationData, 
+  // RobDayLogBaseActivityProps
+} from "@/app/lib/definitions";
 
 
-interface RobDayLogActivityProps {
-  // activityInstance: Schema["ActivityInstance"]["type"];
-  activityInstanceId: string;
-  activityInstanceDisplayName: string;
-  activityInstanceNotes: string[];
-  activityInstanceRating: number;
-  activityInstanceCost: number;
-  images: string[];
-  // locations: Schema["Location"]["type"][];
-  location: string;
-  imageUrls: string[];
-  // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
-}
+// interface RobDayLogActivityProps {
+//   // activityInstance: Schema["ActivityInstance"]["type"];
+//   activityInstanceId: string;
+//   activityInstanceDisplayName: string;
+//   activityInstanceNotes: string[];
+//   activityInstanceRating: number;
+//   activityInstanceCost: number;
+//   images: string[];
+//   // locations: Schema["Location"]["type"][];
+//   location: string;
+//   imageUrls: string[];
+//   // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
+// }
 
 
 Amplify.configure(outputs);
@@ -82,7 +86,7 @@ export default function RobDayLogActivity(
     activityInstanceRating,
     activityInstanceCost,
     images,
-    location,
+    locationData,
     imageUrls,
     // populateActivityInstance
   }: RobDayLogActivityProps
@@ -127,7 +131,7 @@ export default function RobDayLogActivity(
             paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
           >
             {/* {((await activityInstance.location())?.data as unknown as string) ?? "LOCATION TBD"} */}
-            {location ?? "LOCATION TBD"}
+            {locationData?.name ?? "LOCATION TBD"}
           </Text>
         </Column>
         <Line vertical width={0.1}/>

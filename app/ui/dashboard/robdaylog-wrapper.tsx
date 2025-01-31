@@ -13,40 +13,47 @@ import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import { data, type Schema } from "@/amplify/data/resource";
 import { getUrl } from 'aws-amplify/storage';
+import { 
+    RobDayLogActivityProps, 
+    LocationData, 
+    // RobDayLogBaseActivityProps, 
+    RobdayLogProps 
+} from "@/app/lib/definitions";
 
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
-interface RobdayLogProps {
-    robdayLogNumber: string;
-    robdayLogDate: string;
-    robdayLogId: string;
-    robdayLogWeather: string;
-    robdayLogTemperature: number;
-    robdayLogActivities: Schema["RobdaylogActivity"]["type"][];
-    // activitiesDict: Record<string, Schema["Activity"]["type"]>;
-    baseActivities: RobDayLogBaseActivityProps[];
-    activityInstances: Schema["ActivityInstance"]["type"][];
-    aiProps: RobDayLogActivityProps[];
-    urlsDict: Record<string, string>;
-    notes: Array<string>;
-    // locations: Schema["Location"]["type"][];
-    locationData: LocationData[];
-  }
+// interface RobdayLogProps {
+//     robdayLogNumber: string;
+//     robdayLogDate: string;
+//     robdayLogId: string;
+//     robdayLogWeather: string;
+//     robdayLogTemperature: number;
+//     robdayLogActivities: Schema["RobdaylogActivity"]["type"][];
+//     // activitiesDict: Record<string, Schema["Activity"]["type"]>;
+//     baseActivities: RobDayLogBaseActivityProps[];
+//     activityInstances: Schema["ActivityInstance"]["type"][];
+//     aiProps: RobDayLogActivityProps[];
+//     urlsDict: Record<string, string>;
+//     notes: Array<string>;
+//     // locations: Schema["Location"]["type"][];
+//     locationData: LocationData[];
+//   }
 
-  interface RobDayLogActivityProps {
-    // activityInstance: Schema["ActivityInstance"]["type"];
-    activityInstanceId: string;
-    activityInstanceDisplayName: string;
-    activityInstanceNotes: string[];
-    activityInstanceRating: number;
-    activityInstanceCost: number;
-    images: string[];
-    location: string;
-    imageUrls: Array<string>;
-    // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
-  }
+//   interface RobDayLogActivityProps {
+//     // activityInstance: Schema["ActivityInstance"]["type"];
+//     activityInstanceId: string;
+//     activityInstanceDisplayName: string;
+//     activityInstanceNotes: string[];
+//     activityInstanceRating: number;
+//     activityInstanceCost: number;
+//     images: string[];
+//     // location: string;
+//     locationData: LocationData;
+//     imageUrls: Array<string>;
+//     // populateActivityInstance: (activityInstance: Schema["ActivityInstance"]["type"]) => void;
+//   }
 
   interface RobDayLogBaseActivityProps {
     activityId: string;
@@ -56,11 +63,11 @@ interface RobdayLogProps {
     activityImageUrl: string;
   }
 
-  interface LocationData {
-    id: string;
-    name: string;
-    address: string;
-  }
+//   interface LocationData {
+//     id: string;
+//     name: string;
+//     address: string;
+//   }
 
 export default async function RobdaylogWrapper() {
     
@@ -135,8 +142,11 @@ export default async function RobdaylogWrapper() {
                     activityInstanceRating: activityInstance.rating ?? 0,
                     activityInstanceCost: activityInstance.cost ?? 0,
                     images: (activityInstance.images ?? []).filter((image): image is string => image !== null),
-                    location: location?.data?.name || "",
-                    imageUrls: imageUrls
+                    // location: location?.data?.name || "",
+                    locationData: {id: location?.data?.id || "", name: location?.data?.name || "", address: location?.data?.address || ""},
+                    imageUrls: imageUrls,
+                    status: activityInstance.status ?? "Planned"
+
                 });
             });
             const activitiesDict: Record<string, Schema["Activity"]["type"]> = {};
@@ -155,15 +165,23 @@ export default async function RobdaylogWrapper() {
               }));
             // const notes = robdayLogActivities.map(robdayLogActivity => robdayLogActivity.notes ?? "");
             robdayLogProps.push({
-                robdayLogNumber: robdayLog.robDayNumber?.toString() || "",
-                robdayLogDate: robdayLog.date,
+                // robdayLogNumber: robdayLog.robDayNumber?.toString() || "",
                 robdayLogId: robdayLog.id,
+                status: robdayLog.status ?? "Upcoming",
+                robdayLogNumber: Number(robdayLog.robDayNumber),
+                robdayLogDate: robdayLog.date,
                 robdayLogWeather: robdayLog.weatherCondition?.toString() || "",
                 robdayLogTemperature: robdayLog.temperature?.valueOf() || 0,
-                robdayLogActivities: robdayLogActivities.data,
+                rating: robdayLog.rating?.valueOf() || 0,
+                cost: robdayLog.cost?.valueOf() || 0,
+                duration: Number(robdayLog.duration?.valueOf() || 0),
+                startTime: robdayLog.startTime?.valueOf() || 0,
+                endTime: robdayLog.endTime?.valueOf() || 0,
+                totalTime: robdayLog.totalTime?.valueOf() || 0,
+                // robdayLogActivities: robdayLogActivities.data,
                 // activitiesDict: activitiesDict,
                 baseActivities: robdayLogBaseActivityProps,
-                activityInstances: robdayLogActivityInstances.data,
+                // activityInstances: robdayLogActivityInstances.data,
                 aiProps: robdayLogActivityInstanceProps,
                 urlsDict: urlsDict,
                 notes: Array.isArray(robdayLog.notes) ? robdayLog.notes.filter(note => note !== null) : [],
@@ -193,6 +211,7 @@ export default async function RobdaylogWrapper() {
                 notes={robdayLogProp.notes}
                 // locations={locations.data}
                 locationData={robdayLogProp.locationData}
+                robDayLogProp={robdayLogProp}
                 />
             ))}
         </Column>
