@@ -11,6 +11,7 @@ import {
     Button,
     StyleOverlay,
     IconButton,
+    Skeleton
   } from "@/once-ui/components";
 
 import outputs from "@/amplify_outputs.json"
@@ -27,7 +28,9 @@ import {
 } from "@/app/lib/definitions";
 import { fetchRobdayLogs, populateBaseActivityProps, fetchLocations } from "@/app/lib/actions";
 import Agenda from "@/app/ui/dashboard/planner/agenda";
+import AgendaWrapper from "@/app/ui/dashboard/planner/agenda-wrapper";
 import { getWeather } from "@/app/lib/utils";
+import { Suspense } from "react";
 
 Amplify.configure(outputs);
 
@@ -37,8 +40,6 @@ const client = generateClient<Schema>();
 export default async function Page() {
     const locations = await client.models.Location.list();
     const robdayLogProps = await populateRobdayLogProps((await client.models.Robdaylog.list()).data.sort((b, a) => Number(b.robDayNumber) - Number(a.robDayNumber)));
-    // const currentWeather = await getWeather(38.9143, -77.0102);
-    // const currentWeatherProps = {temperature: currentWeather.temperature, conditions: currentWeather.conditions};
     const baseActivityProps = await populateBaseActivityProps();
     const locationData = await fetchLocations();
 
@@ -256,36 +257,9 @@ export default async function Page() {
               On the next Robday...
             </Heading>
           </Column>
-
-          <Row
-            padding="32"
-            fillWidth
-            gap="64"
-            position="relative"
-            mobileDirection="column"
-            alignItems="center"
-          >
-            <Column
-              fillWidth
-              background="surface"
-              radius="xl"
-              border="neutral-medium"
-              overflow="hidden"
-              padding="32"
-              gap="40"
-              position="relative"
-            >
-              <Agenda
-                robdayLogProps={robdayLogProps}
-                currentWeatherProps={{temperature: 0, conditions: ""}}
-                baseActivityProps={baseActivityProps}
-                // baseActivityProps={[]}
-                forecastWeatherProps={{temperature: 0, conditions: ""}}
-                locationData={locationData}
-                >
-              </Agenda>
-            </Column>
-          </Row>
+          <Suspense fallback={<Skeleton shape="block" width="xl" height="l" />}>
+            <AgendaWrapper/>
+          </Suspense>
       </Column>
     </Column>
   </Column>

@@ -50,21 +50,26 @@ import { createRobdayLog, completeRobDayLog, createActivityInstance } from "@/ap
 
 export default function Agenda({
   robdayLogProps,
-  currentWeatherProps,
-  forecastWeatherProps,
+  // currentWeatherProps,
+  // forecastWeatherProps,
   baseActivityProps,
   locationData
-} : {
+}: {
   robdayLogProps: RobdayLogProps[],
-  currentWeatherProps: WeatherProps,
-  forecastWeatherProps: WeatherProps,
+  // currentWeatherProps: WeatherProps,
+  // forecastWeatherProps: WeatherProps,
   baseActivityProps: RobDayLogBaseActivityProps[],
   locationData: LocationData[]
 }) {
   const [currentRobdayLogIndex, setCurrentRobdayLogIndex] = useState(robdayLogProps.length - 1);
-  const createRobDayLogWithId = createRobdayLog.bind(null, robdayLogProps[0].robdayLogId);
-  const completeRobDayLogWithId = completeRobDayLog.bind(null, robdayLogProps[0].robdayLogId);
-  const createActivityInstanceWithId = createActivityInstance.bind(null, robdayLogProps[0].robdayLogId);
+  const [selectedRobdayLogProp, setSelectedRobdayLogProp] = useState<RobdayLogProps>();
+  // const [currentWeatherProps, setCurrentWeatherProps] = useState<WeatherProps>({temperature: 0, conditions: ""});
+  // const currentWeatherProps = getWeather(38.9143, -77.0102);
+  const [currentWeatherProps, setCurrentWeatherProps] = useState<WeatherProps>({ temperature: 0, conditions: "" });
+  const [forecastWeatherProps, setForecastWeatherProps] = useState<WeatherProps>({ temperature: 0, conditions: "" });
+  const createRobDayLogWithId = createRobdayLog.bind(null, robdayLogProps[currentRobdayLogIndex].robdayLogId);
+  const completeRobDayLogWithId = completeRobDayLog.bind(null, robdayLogProps[currentRobdayLogIndex].robdayLogId);
+  const createActivityInstanceWithId = createActivityInstance.bind(null, robdayLogProps[currentRobdayLogIndex].robdayLogId);
   const [selectedDate, setSelectedDate] = useState<Date>(getCurrentRobDay());
   const [robDayDate, setRobDayDate] = useState<Date>(getCurrentRobDay());
   const [isAddActivityDialogOpen, setIsAddActivityDialogOpen] = useState(false);
@@ -89,11 +94,47 @@ export default function Agenda({
     setSelectedValueLabel(activity.activityName);
   }
 
+  const handleChangeDate = (date: Date) => {
+    setSelectedDate(date);
+    setRobDayDate(date);
+    // Search for a robday log with the selected date
+    const selectedRobdayLogIndex = robdayLogProps.findIndex((robdayLog) => robdayLog.robdayLogDate === date.toISOString().split("T")[0]);
+    if (selectedRobdayLogIndex !== -1) {
+      console.log("Selected robday log index: ", selectedRobdayLogIndex);
+      setCurrentRobdayLogIndex(selectedRobdayLogIndex);
+      setSelectedRobdayLogProp(robdayLogProps[selectedRobdayLogIndex]);
+    }
+    else {
+      console.log("No robday log found for selected date: ", date.toISOString().split("T")[0], selectedRobdayLogIndex);
+      setSelectedRobdayLogProp(undefined);
+    }
+  }
+
+
+  useEffect(() => {
+    const getCurrentandForecastWeather = async () => {
+      const currentWeather = await getWeather(38.9143, -77.0102);
+      setCurrentWeatherProps({
+        ...currentWeather,
+        temperature: parseFloat(currentWeather.temperature.split("F")[0])
+      });
+      const forecastWeather = await getWeather(38.9143, -77.0102, robDayDate.toISOString().split("T")[0]);
+      // setCurrentWeatherProps(currentWeather);
+      setForecastWeatherProps({
+        ...forecastWeather,
+        temperature: parseFloat(forecastWeather.temperature.split("F")[0])
+      });
+    }
+    getCurrentandForecastWeather();
+    // setSelectedRobdayLogProp(robdayLogProps[currentRobdayLogIndex]);
+    // handleChangeDate(robDayDate);
+  }, []); // When we have longer range forecasts, add robDayDate to the dependency array
+
   return (
     <Row
       fillWidth
       transition="macro-medium"
-      padding="32"
+      // padding="32"
       gap="64"
       position="relative"
       overflow="hidden">
@@ -101,7 +142,7 @@ export default function Agenda({
         background="brand-weak"
         // direction="column"
         // overflow="hidden"
-        padding="32"
+        padding="12"
         gap="20"
         border="neutral-medium"
         radius="xl"
@@ -118,7 +159,8 @@ export default function Agenda({
             label="Date"
             // value={getNextRobDay()}
             value={robDayDate}
-            onChange={(date) => setRobDayDate(date)}
+            // onChange={(date) => setRobDayDate(date)}
+            onChange={(date) => handleChangeDate(date)}
           >
           </DateInput>
           <Row padding="2" justifyContent="space-between" alignItems="center" fillWidth>
@@ -138,33 +180,55 @@ export default function Agenda({
                     onBackground="neutral-medium"
                   /> */}
         </Column>
-
-        <Column>
-          {robdayLogProps[currentRobdayLogIndex].aiProps.map((activity, index) => (
-            <ActivityInstanceItem
-              key={index}
-              activityInstanceProps={activity}
-              locationData={locationData}
-            />
-          ))}
-        </Column>
-        <Row fillWidth justifyContent="center">
-          <Button
-            onClick={() => setIsAddActivityDialogOpen(true)}
-            variant="tertiary"
-            size="m"
-            id="trigger"
-          >
-            <Row justifyContent="center" alignItems="center">
-              ADD NEW ACTIVITY
-              <Arrow
-                trigger="#trigger"
-                color="onBackground"
+        {!selectedRobdayLogProp && (
+          <Row fillWidth justifyContent="center">
+            <Button
+              // onClick={() => checkRobDayLogForActivityInstances(robDayLogId? robDayLogId : "")}
+              variant="primary"
+              size="m"
+              id="trigger"
+            >
+              <Row justifyContent="center" alignItems="center">
+                CREATE ROBDAY FOR {robDayDate.toLocaleDateString()}
+                <Arrow
+                  trigger="#trigger"
+                  color="onBackground"
+                />
+              </Row>
+            </Button>
+          </Row>
+        )}
+        {selectedRobdayLogProp && (
+          <Column>
+            {robdayLogProps[currentRobdayLogIndex].aiProps.map((activity, index) => (
+              <ActivityInstanceItem
+                key={index}
+                activityInstanceProps={activity}
+                locationData={locationData}
               />
-            </Row>
-          </Button>
-        </Row>
-        {robdayLogProps[currentRobdayLogIndex].status === "Upcoming" && (
+            ))}
+          </Column>
+        )}
+        {selectedRobdayLogProp && (
+          <Row fillWidth justifyContent="center">
+            <Button
+              onClick={() => setIsAddActivityDialogOpen(true)}
+              variant="tertiary"
+              size="m"
+              id="trigger"
+            >
+              <Row justifyContent="center" alignItems="center">
+                ADD NEW ACTIVITY
+                <Arrow
+                  trigger="#trigger"
+                  color="onBackground"
+                />
+              </Row>
+            </Button>
+          </Row>
+        )}
+
+        {selectedRobdayLogProp && robdayLogProps[currentRobdayLogIndex].status === "Upcoming" && (
           <Row fillWidth justifyContent="center">
             <Button
               onClick={() => onCreateRobdayLog()}
@@ -182,7 +246,7 @@ export default function Agenda({
             </Button>
           </Row>
         )}
-        {robdayLogProps[currentRobdayLogIndex].status == "Started" && (
+        {selectedRobdayLogProp && robdayLogProps[currentRobdayLogIndex].status == "Started" && (
           <Row fillWidth justifyContent="center">
             <Button
               onClick={() => onCompleteRobdayLog()}
@@ -206,7 +270,7 @@ export default function Agenda({
         onClose={() => setIsAddActivityDialogOpen(false)}
         title="Add Robday Activity"
         description=""
-        style={{marginBottom: "50%"}}
+        style={{ marginBottom: "50%" }}
         // onHeightChange={(height) => setFirstDialogHeight(height)}
         footer={
           <>
@@ -215,7 +279,7 @@ export default function Agenda({
             </Button>
           </>
         }
-        >
+      >
         <Column >
           <Text variant="body-default-s">
             Ability to add a new activity if it hasn't been created yet here coming soon...
@@ -231,9 +295,9 @@ export default function Agenda({
             // onChange={(value) => setSelectedValue(activities.find((activity) => activity.id === value.target.value)?.id ?? "")}
             // onChange={(value) => handleSelect(activities.find((activity) => activity.name === value.target.value ) ?? activities[0])}
             // onSelect={(value) => printSelect(value)}
-            onSelect={(value) => handleSelect(baseActivityProps.find((activity) => activity.activityId === value ) ?? baseActivityProps[0])}
+            onSelect={(value) => handleSelect(baseActivityProps.find((activity) => activity.activityId === value) ?? baseActivityProps[0])}
             value={selectedValue}
-            // value=""
+          // value=""
           />
         </Column>
       </Dialog>

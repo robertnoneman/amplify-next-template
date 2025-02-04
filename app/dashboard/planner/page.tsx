@@ -247,7 +247,7 @@ export default function Page() {
         var foundRobDayLog = data.items.filter((robdayLog) => robdayLog.date === myRobDayDate.toISOString().split("T")[0]);
         if (foundRobDayLog.length > 0) {
           setRobDayLog(foundRobDayLog[0]);
-          console.log("Robday Log found for date: ", myRobDayDate.toISOString().split("T")[0]);
+          console.log("Robday Log found for date: ", myRobDayDate.toISOString().split("T")[0], foundRobDayLog[0].date);
           setRobDayLogId(foundRobDayLog[0].id);
           setStarted(foundRobDayLog[0].status === "Started");
           if (foundRobDayLog[0].endTime) {
@@ -773,7 +773,7 @@ export default function Page() {
           <Row
             fillWidth 
             transition="macro-medium"
-            padding="32"
+            padding="12"
             gap="64"
             position="relative"
             overflow="hidden"
