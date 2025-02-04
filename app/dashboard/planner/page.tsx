@@ -55,6 +55,7 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json"
 import { getUrl } from 'aws-amplify/storage';
+import RobdayLog from "@/app/ui/dashboard/robday-log";
 
 
 Amplify.configure(outputs);
@@ -502,6 +503,12 @@ export default function Page() {
       const result = client.models.ActivityInstance.update({ id: activityInstanceId, robdaylogId: myRobdayLog.data?.id });
       console.log("Activity Instance updated: ", result);
     });
+  }
+
+  async function startRobDay() {
+    setStarted(true);
+    const result = await client.models.Robdaylog.update({ id: robDayLogId ?? "", status: "Started"})
+    console.log("Robday started!", result)
   }
 
   function updateRobdayLog() {
@@ -1117,7 +1124,7 @@ export default function Page() {
               {robDayLog?.status === "Upcoming" && (
                 <Row fillWidth justifyContent="center">
                   <Button
-                    onClick={() => createRobdayLog()}
+                    onClick={() => startRobDay()}
                     variant="primary"
                     size="m"
                     id="trigger"
