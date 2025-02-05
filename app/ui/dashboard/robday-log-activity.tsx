@@ -93,6 +93,7 @@ export default function RobDayLogActivity(
 ) {
   const [defaultImageUrl, setDefaultImageUrl] = useState<string>("/poop.jpg");
   const [newImageUrl, setNewImageUrl] = useState<string[]>([]);
+  const [newImageUrls, setNewImageUrls] = useState<string[]>([]);
 
   const handleUploadData = async (file: File): Promise<void> => {
     await uploadData({
@@ -115,6 +116,19 @@ export default function RobDayLogActivity(
     );
     console.log("Update result:", result);
     setNewImageUrl([]);
+  }
+
+  const addPhotoToActivityInstance = async (file: File): Promise<void> => {
+    handleUploadData(file);
+    const key = `picture-submissions/${file.name}`;
+    const myimages = images ? images : [];
+    myimages.push(key);
+    const result = client.models.ActivityInstance.update({ id: activityInstanceId, images: myimages });
+    console.log("Activity Instance updated: ", result);
+    const url = await getImageUrl(key);
+    if (url) {
+      newImageUrls.push(url);
+    }
   }
 
   return (
@@ -204,6 +218,27 @@ export default function RobDayLogActivity(
         />
         </Column>
       ))}
+      {newImageUrls.map((url) => (
+        <Column key={`${newImageUrls.indexOf(url)}-${activityInstanceId}-${url}col`}
+          fillWidth 
+          justifyContent="center"
+          >
+        <SmartImage
+          key={`${newImageUrls.indexOf(url)}-${activityInstanceId}-${url}img`}
+          src={url ?? defaultImageUrl}
+          alt="Robday"
+          // aspectRatio="1/1"
+          objectFit="cover"
+          sizes="s"
+          radius="xl"
+          // width={15}
+          // fillWidth
+          maxWidth="l"
+          minHeight="xs"
+          // height={15}
+        />
+        </Column>
+      ))}
     </Grid>
         
     </Row>
@@ -213,7 +248,8 @@ export default function RobDayLogActivity(
         maxHeight={10}
         maxWidth={8}
         emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
-        onFileUpload={handleUploadData}
+        // onFileUpload={handleUploadData}
+        onFileUpload={addPhotoToActivityInstance}
         // initialPreviewImage="/placeholderImage.jpg"
       />
       { newImageUrl.length > 0 &&

@@ -182,10 +182,11 @@ export default function RobdayLog({
   }
 
   const handleUploadData = async (file: File): Promise<void> => {
-      await uploadData({
+      const result = await uploadData({
           path: `picture-submissions/${file.name}`, 
           data: file
-      });
+      }).result;
+      console.log("File uploaded: ", result);
         // setActivityImages(prevImages => [...prevImages, `picture-submissions/${file.name}`])
       setActivityImages([`picture-submissions/${file.name}`]);
   }
