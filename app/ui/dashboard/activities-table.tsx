@@ -80,19 +80,20 @@ export default function ActivitiesTable() {
 
   const myTheme = themeQuartz.withPart(colorSchemeDark);
 
-  function populateActivities() {
+  async function populateActivities() {
     client.models.Activity.observeQuery().subscribe({
       next: async (data) => {
         setActivities([...data.items]);
-        setRowData(data.items.map((activity) => ({
+        const rows = await Promise.all(data.items.map(async (activity) => ({
           name: activity.name,
-          count: activity.count,
+          count:  (await activity.activityInstances()).data.length,
           rating: activity.rating,
           cost: activity.cost,
           level_of_effort: activity.lever_of_effort,
           location: activity.location,
           categories: activity.categories ? activity.categories.filter((category): category is string => category !== null) : null,
         })));
+        setRowData(rows);
       }
     });
   };

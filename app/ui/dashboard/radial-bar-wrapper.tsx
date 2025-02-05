@@ -35,7 +35,7 @@ export default async function RadialBarWrapper() {
     return (
         <Column justifyContent='center' alignItems='center'>
             <Row mobileDirection="column">
-                <RadialBar labels={["ROBDAYS COMPLETED"]} series={[robdayLogs.data.length]} />
+                <RadialBar labels={["ROBDAYS COMPLETED"]} series={[robdayLogs.data.filter((robdayLog) => robdayLog.status === "Completed").length]} />
             </Row>
             <Grid columns="3" mobileColumns="1">
                 <RadialBar labels={["AVERAGE ROBDAY RATING"]} series={[99]} height={200} fontSize="14px" />
