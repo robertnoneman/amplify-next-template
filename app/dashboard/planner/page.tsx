@@ -110,6 +110,7 @@ export default function Page() {
   // Because I'm young and dumb and scared
   const [failSafeBool, setFailSafeBool] = useState(false);
   const [urls, setUrls] = useState<Record<string, string>>({});
+  const [newImageUrls, setNewImageUrls] = useState<Record<string, string[]>>({}); // For new images uploaded
   const [forecastTemp, setForecastTemp] = useState<string>();
   const [forecastWeather, setForecastWeather] = useState<string>();
   const [currentTemp, setCurrentTemp] = useState<string>();
@@ -191,8 +192,8 @@ export default function Page() {
     client.models.ActivityInstance.observeQuery().subscribe({
       next: async (data) => {
         setActivityInstances([...data.items]);
-        const selected = data.items.filter((activityInstance) => activityInstance.isOnNextRobDay);
-        selected.filter((activityInstance) => activityInstance.robdaylogId === robDayLogId);
+        const selected = data.items.filter((activityInstance) => activityInstance.isOnNextRobDay).filter((activityInstance) => activityInstance.status !== "Completed");
+        // selected.filter((activityInstance) => activityInstance.robdaylogId === robDayLogId);
         setSelectedActivityInstances(selected);
       },
     })
@@ -466,6 +467,14 @@ export default function Page() {
     console.log("Activity Instance updated: ", result);
     const url = await getImageUrl(key);
     if (url) {
+      const myImageUrls = { ...newImageUrls };
+      if (myImageUrls[activityInstance.id]) {
+        myImageUrls[activityInstance.id].push(url);
+      }
+      else {
+        myImageUrls[activityInstance.id] = [url];
+      }
+      setNewImageUrls(myImageUrls);
       const newUrlsDict = { ...urls };
       newUrlsDict[activityInstance.id] = url;
       setUrls(newUrlsDict);
@@ -1035,29 +1044,47 @@ export default function Page() {
                           ))}
                       </Column>
                       <Column justifyContent="space-evenly" mobileDirection="row" background="neutral-alpha-weak" border="neutral-alpha-medium" radius="s">
-                      <IconButton
+                        <IconButton
                           icon="close"
                           onClick={() => onRemoveActivityInstance(activityInstance)}
                           variant="tertiary"
                           size="s"
-                          />
-                          <IconButton
-                            icon="edit"
-                            onClick={() => onEditActivityInstance(activityInstance)}
-                            variant="tertiary"
-                            size="s"
-                          />
-                          <IconButton
-                            icon="check"
-                            onClick={() => onCompleteActivityInstance(activityInstance)}
-                            variant="tertiary"
-                            size="s"
-                          />
-                        </Column>
+                        />
+                        <IconButton
+                          icon="edit"
+                          onClick={() => onEditActivityInstance(activityInstance)}
+                          variant="tertiary"
+                          size="s"
+                        />
+                        <IconButton
+                          icon="check"
+                          onClick={() => onCompleteActivityInstance(activityInstance)}
+                          variant="tertiary"
+                          size="s"
+                        />
+                      </Column>
                       {/* </Background> */}
                     </Row>
                     )}
-                  {activityInstance.status !== "Planned" || activityInstance.status !== null && (
+                <Column>
+                  {newImageUrls[activityInstance.id] && (
+                    <Column width="xs" justifyContent="center" mobileDirection="column">
+                      {newImageUrls[activityInstance.id].map((image, index) => (
+                        <Row key={index} fillWidth justifyContent="center">
+                          <SmartImage
+                            src={image}
+                            alt="Robday"
+                            aspectRatio="16/9"
+                            objectFit="contain"
+                            sizes="xs"
+                            radius="xl"
+                          />
+                        </Row>
+                      ))}
+                  </Column>
+                  )}
+                  </Column>
+                  {activityInstance.status !== "Planned" && activityInstance.status !== null && (
                   <MediaUpload
                   emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
                   onFileUpload={(file) => addPhotoToActivityInstance(activityInstance, file)}
