@@ -41,7 +41,8 @@ import {
   Flex,
   DateInput,
   Skeleton,
-  Arrow
+  Arrow,
+  Grid
 } from "@/once-ui/components";
 import { CodeBlock, MediaUpload } from "@/once-ui/modules";
 import Link from 'next/link';
@@ -56,6 +57,7 @@ import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json"
 import { getUrl } from 'aws-amplify/storage';
 import RobdayLog from "@/app/ui/dashboard/robday-log";
+import { uploadData } from 'aws-amplify/storage';
 
 
 Amplify.configure(outputs);
@@ -70,6 +72,8 @@ export default function Page() {
   const [selectedRange, setSelectedRange] = useState<DateRange>();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [robDayDate, setRobDayDate] = useState<Date>(getCurrentRobDay());
+  const [startTimeString, setStartTimeString] = useState<string>("Pending");
+  const [endTimeString, setEndTimeString] = useState<string>("Pending");
   const [isFirstDialogOpen, setIsFirstDialogOpen] = useState(false);
   const [isSecondDialogOpen, setIsSecondDialogOpen] = useState(false);
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
@@ -131,6 +135,7 @@ export default function Page() {
     console.log("Selected date:", date);
     setSelectedDate(date);
     setRobDayDate(date);
+    changeRobDayLog(date);
   }
 
   const printSelect = (value: string) => {
@@ -138,6 +143,14 @@ export default function Page() {
     setSelectedValueLabel(value);
     console.log("Selected value:", value);
   }
+
+  const handleUploadData = async (file: File): Promise<void> => {
+      await uploadData({
+        path: `picture-submissions/${file.name}`, 
+        data: file
+      });
+      // setActivityImage(`picture-submissions/${file.name}`)
+    }
 
   const getImageUrl = async (key: string): Promise<string> => {
     const url = getUrl({
@@ -179,6 +192,7 @@ export default function Page() {
       next: async (data) => {
         setActivityInstances([...data.items]);
         const selected = data.items.filter((activityInstance) => activityInstance.isOnNextRobDay);
+        selected.filter((activityInstance) => activityInstance.robdaylogId === robDayLogId);
         setSelectedActivityInstances(selected);
       },
     })
@@ -236,6 +250,44 @@ export default function Page() {
     }
   }
 
+  function timestampToHoursMinSecString(timestamp: number) {
+    const date = new Date(timestamp);
+    const hours = date.getHours()
+    const hoursString = hours > 12 ? (hours - 12).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) : hours.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+    const minutes = date.getMinutes().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+    const seconds = date.getSeconds().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+    return `${hoursString}:${minutes}:${seconds}`;
+  }
+
+  async function changeRobDayLog(date: Date) {
+    const logs = await client.models.Robdaylog.list();
+    const foundLog = logs.data.find((log) => log.date === date.toISOString().split("T")[0]);
+    if (foundLog) {
+      setRobDayLog(foundLog);
+      setRobDayLogId(foundLog.id);
+      if (foundLog.startTime) {
+        const startTimeString = timestampToHoursMinSecString(foundLog.startTime);
+        setStartTimeString(startTimeString);
+      }
+      else {
+        setStartTimeString("Pending");
+      }
+      if (foundLog.endTime) {
+        const endTimeString = timestampToHoursMinSecString(foundLog.endTime);
+        setEndTimeString(endTimeString);
+      }
+      else {
+        setEndTimeString("Pending");
+      }
+    }
+    else {
+      setRobDayLog(undefined);
+      setRobDayLogId(undefined);
+      setStartTimeString("Pending");
+      setEndTimeString("Pending");
+    }
+  }
+
   function listRobDayLogs() {
     var myRobDayDate = getCurrentRobDay();
     if (robDayDate) {
@@ -250,6 +302,16 @@ export default function Page() {
           setRobDayLog(foundRobDayLog[0]);
           console.log("Robday Log found for date: ", myRobDayDate.toISOString().split("T")[0], foundRobDayLog[0].date);
           setRobDayLogId(foundRobDayLog[0].id);
+          // Create string to display as hours minutes seconds
+          if (robDayLog?.startTime) {
+            const startTimeString = timestampToHoursMinSecString(robDayLog?.startTime ?? 0);
+            setStartTimeString(startTimeString);
+          }
+          if (robDayLog?.endTime) {
+            const endTimeString = timestampToHoursMinSecString(robDayLog?.endTime ?? 0);
+            setEndTimeString(endTimeString);
+          }
+
           setStarted(foundRobDayLog[0].status === "Started");
           if (foundRobDayLog[0].endTime) {
             if (foundRobDayLog[0].endTime > 0) {
@@ -395,6 +457,21 @@ export default function Page() {
     setSelectedLocationValueLabel("Choose a location");
   }
 
+  const addPhotoToActivityInstance = async (activityInstance: Schema["ActivityInstance"]["type"], file: File): Promise<void> => {
+    handleUploadData(file);
+    const key = `picture-submissions/${file.name}`;
+    const images = activityInstance.images ? activityInstance.images : [];
+    images.push(key);
+    const result = client.models.ActivityInstance.update({ id: activityInstance.id, images: images });
+    console.log("Activity Instance updated: ", result);
+    const url = await getImageUrl(key);
+    if (url) {
+      const newUrlsDict = { ...urls };
+      newUrlsDict[activityInstance.id] = url;
+      setUrls(newUrlsDict);
+    }
+  }
+
   function addActivity() {
     addedActivity ? addedActivity.isOnNextRobDay = true : null;
     addedActivity ? client.models.Activity.update({ ...addedActivity }) : null;
@@ -449,7 +526,7 @@ export default function Page() {
   }
 
   function resetActivityTime(activity: Schema["ActivityInstance"]["type"]) {
-    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: 0, endTime: 0, totalTime: 0 });
+    const result = client.models.ActivityInstance.update({ id: activity.id, startTime: 0, endTime: 0, totalTime: 0, status: null });
     console.log("Activity Instance reset: ", result);
   }
 
@@ -806,18 +883,18 @@ export default function Page() {
                   label="Date"
                   // value={getNextRobDay()}
                   value={robDayDate}
-                  onChange={(date) => setRobDayDate(date)}
+                  onChange={(date) => handleSelectedDateChange(date)}
                   >
                 </DateInput>
                 <Row padding="2" justifyContent="space-between" alignItems="center" fillWidth>
                 <Text variant="body-default-xs">
                   Current Weather: <br></br>
-                  {currentTemp?.split(" F")[0]}°F, {currentWeather}.
+                  {currentTemp?.split(" F")[0]}°F, {currentWeather}
                 </Text>
                 <Line width={0.1} vertical/>
                 <Text variant="body-default-xs" align="right">
                   Forcast Weather: <br></br>
-                  {forecastTemp?.split(" F")[0]}°F, {forecastWeather?.split(".")[0]}°F.
+                  {forecastTemp?.split(" F")[0]}°F, {forecastWeather?.split(".")[0]}
                 </Text>
                 </Row>
                 {/* <Icon
@@ -828,6 +905,22 @@ export default function Page() {
               </Column>
 
               <Line height={0.1}/>
+              <Column fillWidth>
+                <Grid columns="2">
+                  <Text variant="body-default-xs">
+                    Start Time:
+                  </Text>
+                  <Text variant="body-default-xs" align="right">
+                    End Time:
+                  </Text>
+                  <Text variant="body-default-xs">
+                    {startTimeString}
+                  </Text>
+                  <Text variant="body-default-xs" align="right">
+                    {endTimeString}
+                  </Text>
+                </Grid>
+              </Column>
               {!robDayLog && (
                 <Row fillWidth justifyContent="center">
                   <Button
@@ -964,6 +1057,12 @@ export default function Page() {
                       {/* </Background> */}
                     </Row>
                     )}
+                  {activityInstance.status !== "Planned" || activityInstance.status !== null && (
+                  <MediaUpload
+                  emptyState={<Row paddingBottom="80">Drag and drop or click to browse</Row>}
+                  onFileUpload={(file) => addPhotoToActivityInstance(activityInstance, file)}
+                  />
+                  )}
                   <Line height={0.1}/>
                     
                 </Column>
