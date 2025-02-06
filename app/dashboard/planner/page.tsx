@@ -726,7 +726,7 @@ export default function Page() {
           paddingLeft="32"
           paddingY="20"
         >
-          <Logo size="m" icon={false} href="https://itsrobday.com" />
+          {/* <Logo size="m" icon={false} href="https://itsrobday.com" />
           <Row gap="12" hide="s">
             <Button
               href="https://github.com/robertnoneman/amplify-next-template"
@@ -737,7 +737,7 @@ export default function Page() {
               variant="tertiary"
             />
             <StyleOverlay top="20" right="24" />
-          </Row>
+          </Row> */}
           <Row gap="16" show="s" alignItems="center" paddingRight="24">
             <IconButton
               href="https://github.com/robertnoneman/amplify-next-template"
@@ -765,8 +765,9 @@ export default function Page() {
           radius="xl"
           paddingTop="80"
           position="relative"
+          background="surface"
         >
-          <Background
+          {/* <Background
             mask={{
               x: 0,
               y: 48,
@@ -778,7 +779,7 @@ export default function Page() {
               color: "neutral-alpha-medium",
               height: "0.25rem",
             }}
-          />
+          /> */}
           <Background
             mask={{
               x: 80,
@@ -799,19 +800,20 @@ export default function Page() {
           />
           <Background
             mask={{
-              x: 100,
+              x: 50,
               y: 0,
-              radius: 100,
+              radius: 50,
+              cursor: true
             }}
             position="absolute"
             gradient={{
               display: true,
               opacity: 100,
-              tilt: -35,
-              height: 20,
-              width: 120,
-              x: 120,
-              y: 35,
+              tilt: 0,
+              height: 100,
+              width: 100,
+              x: 50,
+              y: 0,
               colorStart: "brand-solid-strong",
               colorEnd: "static-transparent",
             }}

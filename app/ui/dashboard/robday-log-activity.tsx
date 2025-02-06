@@ -209,7 +209,7 @@ export default function RobDayLogActivity(
           alt="Robday"
           // aspectRatio="1/1"
           objectFit="cover"
-          sizes="s"
+          sizes="xs"
           radius="xl"
           // width={15}
           // fillWidth
@@ -230,7 +230,7 @@ export default function RobDayLogActivity(
           alt="Robday"
           // aspectRatio="1/1"
           objectFit="cover"
-          sizes="s"
+          sizes="xs"
           radius="xl"
           // width={15}
           // fillWidth

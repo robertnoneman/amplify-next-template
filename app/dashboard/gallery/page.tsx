@@ -1,20 +1,20 @@
 // "use client";
 
 import {
-    Column,
-    Row,
-    Heading,
-    Background,
-    Dialog,
-    Button,
-    Flex,
-    Input,
-    Textarea,
-    Switch,
-    TagInput,
-    Select,
-    Skeleton
-  } from "@/once-ui/components";
+  Column,
+  Row,
+  Heading,
+  Background,
+  Dialog,
+  Button,
+  Flex,
+  Input,
+  Textarea,
+  Switch,
+  TagInput,
+  Select,
+  Skeleton
+} from "@/once-ui/components";
 
 import RobdayLog from "@/app/ui/dashboard/robday-log";
 import { Amplify } from "aws-amplify";
@@ -54,7 +54,7 @@ export default async function Page() {
   // const [robdayLogActivities, setRobdayLogActivities] = useState<Schema["RobdaylogActivity"]["type"][]>([]);
   // const [activitiesDict, setActivitiesDict] = useState<Record<string, Schema["Activity"]["type"]>>({});
   // const [editedActivity, setEditedActivity] = useState<Schema["ActivityInstance"]["type"] | null>(null);
-  
+
   // const [activityDisplayName, setActivityDisplayName] = useState<string>("");
   // const [activityLocationId, setActivityLocationId] = useState<string>("");
   // const [activityNotes, setActivityNotes] = useState<string[]>([]);
@@ -67,8 +67,8 @@ export default async function Page() {
   // const [selectedLocationValueLabel, setSelectedLocationValueLabel] = useState("Choose a location");
   // const [selectedLocation, setSelectedLocation] = useState<Schema["Location"]["type"]>();
 
-  
-  
+
+
   // useEffect(() => {
   //   const getImageUrl = async (key: string): Promise<string> => {
   //     const url = getUrl({
@@ -134,9 +134,9 @@ export default async function Page() {
   //   fetchRobdayLogs();
   // }, []);
 
-    return (
-      <Column fillWidth paddingY="80" paddingX="s" alignItems="center" flex={1}>
-        <Column
+  return (
+    <Column fillWidth paddingY="80" paddingX="s" alignItems="center" flex={1}>
+      <Column
         overflow="hidden"
         as="main"
         maxWidth="l"
@@ -170,19 +170,20 @@ export default async function Page() {
           /> */}
           <Background
             mask={{
-              x: 80,
+              x: 0,
               y: 0,
               radius: 200,
             }}
             position="absolute"
             gradient={{
               display: true,
-              tilt: -35,
-              height: 50,
-              width: 75,
+              tilt: 0,
+              opacity: 50,
+              height: 30,
+              width: 275,
               x: 100,
               y: 40,
-              colorStart: "accent-solid-medium",
+              colorStart: "accent-solid-strong",
               colorEnd: "static-transparent",
             }}
           />
@@ -190,14 +191,15 @@ export default async function Page() {
             mask={{
               x: 100,
               y: 0,
-              radius: 200,
+              radius: 50,
+              cursor: true
             }}
             position="absolute"
             gradient={{
               display: true,
-              opacity: 100,
-              tilt: -35,
-              height: 20,
+              opacity: 80,
+              tilt: -90,
+              height: 220,
               width: 120,
               x: 120,
               y: 35,
@@ -208,13 +210,13 @@ export default async function Page() {
           <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
             ROBDAY MEMORIES
           </Heading>
-          </Column>
         </Column>
-        <Column fillWidth alignItems="center" gap="32" padding="xs" position="relative">
+        <Column fillWidth alignItems="center" gap="32" position="relative">
           <Suspense fallback={<Skeleton shape="block" width="xl" height="m" />}>
             <RobdaylogWrapper />
           </Suspense>
-          {/* { robdayLogProps.map((robdayLogProp, index) => (
+        </Column>
+        {/* { robdayLogProps.map((robdayLogProp, index) => (
             <RobdayLog 
               key={robdayLogProp.robdayLogNumber} 
               robdayLogNumber={robdayLogProp.robdayLogNumber} 
@@ -229,7 +231,7 @@ export default async function Page() {
               locations={locations}
               />
           ))} */}
-        </Column>
       </Column>
-    )
-  }
+    </Column>
+  )
+}
