@@ -122,15 +122,14 @@ export default async function RobdaylogWrapper() {
                 const imageUrls: Array<string> = [];
                 const baseActivity = await client.models.Activity.get({ id: activityInstance.activityId });
                 const baseActivityImages = baseActivity.data?.image;
-                const url2 = await getImageUrl(baseActivityImages ?? "picture-submissions/placeholderImage.jpg");
+                // const url2 = await getImageUrl(baseActivityImages ?? "picture-submissions/placeholderImage.jpg");
+                const url2 = `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${baseActivityImages ?? "picture-submissions/placeholderImage.jpg"}`;
                 imageUrls.push(url2);
                 if (activityInstance.images) {
                     await Promise.all(activityInstance.images.map(async (key, index) => {
                         if (key) {
-                        const url = await getImageUrl(key);
-                        if (url) {
+                            const url = `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${key}`;
                             imageUrls[index] = url;
-                        }
                         }
                     }));
                 };
@@ -156,10 +155,8 @@ export default async function RobdaylogWrapper() {
                 if (activity.data) {
                   activitiesDict[robdayLogActivity.id] = activity.data;
                   if (activity.data.image) {
-                    const url = await getImageUrl(activity.data.image);
-                    if (url) {
-                      urlsDict[robdayLogActivity.id] = url;
-                    }
+                    const url =  `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${activity.data.image}`;
+                    urlsDict[robdayLogActivity.id] = url;
                   }
                 }
               }));
@@ -195,6 +192,7 @@ export default async function RobdaylogWrapper() {
     return (
        <Column fillWidth alignItems="center" gap="32" padding="xs" position="relative">
             { robdayLogProps.map((robdayLogProp, index) => (
+            (robdayLogProp.status === "Completed" || robdayLogProp.status === null) &&
             <RobdayLog 
                 key={robdayLogProp.robdayLogNumber} 
                 robdayLogNumber={robdayLogProp.robdayLogNumber} 

@@ -446,13 +446,52 @@ export default function RobdayLog({
       overflow="hidden"
     >
       <Column
-        background="accent-alpha-weak"
-        padding="m"
+        background="surface"
+        padding="s"
         gap="xs"
         border="neutral-medium"
         radius="xl"
         fillWidth
         fillHeight>
+        {/* <Background
+          mask={{
+           cursor: true
+          }}
+          radius="xl"
+          position="absolute"
+          gradient={{
+            display: true,
+            opacity: 50,
+            tilt: -5,
+            height: 200,
+            width: 120,
+            x: 120,
+            y: 35,
+            colorStart: "brand-solid-strong",
+            colorEnd: "brand-alpha-weak",
+          }}
+        /> */}
+        <Background
+          mask={{
+            // x: 100,
+            // y: 0,
+            // radius: 100,
+            cursor: true
+          }}
+          radius="xl"
+          position="absolute"
+          gradient={{
+            display: true,
+            opacity: 30,
+            tilt: 0,
+            height: 200,
+            width: 120,
+            x: 0,
+            y: 0,
+            colorStart: "accent-solid-strong",
+            colorEnd: "neutral-alpha-weak",
+          }}
+        />
         {/* <Line height={0.25}/> */}
         <Heading variant="display-default-m" align="center">
           ROBDAY #{robdayLogNumber.toString()}
