@@ -154,10 +154,12 @@ export default function Page() {
     }
 
   const getImageUrl = async (key: string): Promise<string> => {
-    const url = getUrl({
-        path: key
-    });
-      return (await url).url.toString();
+    // const url = getUrl({
+    //     path: key
+    // });
+    const url = `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${key}`;
+      // return (await url).url.toString();
+      return url;
     }
 
   function listActivities() {

@@ -125,7 +125,8 @@ export default function RobDayLogActivity(
     myimages.push(key);
     const result = client.models.ActivityInstance.update({ id: activityInstanceId, images: myimages });
     console.log("Activity Instance updated: ", result);
-    const url = await getImageUrl(key);
+    // const url = await getImageUrl(key);
+    const url = `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/picture-submissions/${file.name}`;
     if (url) {
       newImageUrls.push(url);
     }
