@@ -29,10 +29,15 @@ import {
   import { roboto } from '@/app/ui/fonts';
   import TodoList from "@/app/ui/dashboard/todo/todo-list";
   import { fetchTodos } from "@/app/lib/actions";
+  import { unstable_cache } from 'next/cache';
+
+  const getTodos = unstable_cache( async () => {
+    return await fetchTodos();
+}, ["todos"], {revalidate: 3600, tags: ["todos"]});
 
 export default async function Page() {
 
-    const todos = await fetchTodos();
+    const todos = await getTodos();
     return (
       <main>
         <Flex

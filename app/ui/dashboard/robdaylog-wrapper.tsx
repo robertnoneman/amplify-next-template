@@ -79,7 +79,8 @@ export default async function RobdaylogWrapper() {
     // const activities = await client.models.Activity.list();
     // const activityInstances = await client.models.ActivityInstance.list();
     const locations = await client.models.Location.list();
-    const robdayLogs = await getRobdayLogs();
+    // const robdayLogs = await getRobdayLogs();
+    const robdayLogs = (await client.models.Robdaylog.list()).data.sort((a, b) => Number(b.robDayNumber) - Number(a.robDayNumber));
     const robdayLogProps = await populateRobdayLogProps(robdayLogs);
     // console.log("Activities fetched: ", activities);
     // console.log("Activity Instances fetched: ", activityInstances);
