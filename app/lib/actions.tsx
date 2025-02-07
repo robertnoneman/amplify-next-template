@@ -31,9 +31,10 @@ export async function updateTodo(id: string, props: TodoProps) {
     content: props.content,
     isDone: !props.isDone,
     status: props.status,
+    notes: Array.isArray(props.notes) ? props.notes.filter(note => note !== null) : [],
   });
   console.log("Update result", fullResult);
-  revalidatePath("/dashboard/todos");
+  revalidatePath("/dashboard/todo");
 }
 
 export async function createTodo(content: string) {
@@ -53,6 +54,7 @@ export async function fetchTodos() {
     content: todo.content ?? "",
     isDone: todo.isDone ?? false,
     status: todo.status ?? "Todo",
+    notes: Array.isArray(todo.notes) ? todo.notes.filter(note => note !== null) : [],
   }));
   return todoProps;
 }

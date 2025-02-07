@@ -30,6 +30,7 @@ import {
   import TodoList from "@/app/ui/dashboard/todo/todo-list";
   import { fetchTodos } from "@/app/lib/actions";
   import { unstable_cache } from 'next/cache';
+  import Image from 'next/image';
 
   const getTodos = unstable_cache( async () => {
     return await fetchTodos();
@@ -85,7 +86,19 @@ export default async function Page() {
                 >
                   Robday Todo List
               </Heading> */}
+              <Image
+                src="https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/picture-submissions/IMG_1190.jpeg"
+                alt="Todo Image"
+                width={4032/32}
+                height={3024/32}
+              />
               <TodoList todoProps={todos}/>
+              <Image
+                src="https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/picture-submissions/IMG_1167.jpeg"
+                alt="Todo Image"
+                width={4032/32}
+                height={3024/32}
+              />
             </Column>
         </Flex>
       </main>

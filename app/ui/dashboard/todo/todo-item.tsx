@@ -40,6 +40,8 @@ import {
     const updateTodoWithId = updateTodo.bind(null, todoProps.id);
     const [content, setContent] = useState(todoProps.content);
     const [status, setStatus] = useState(todoProps.status);
+    const [notes, setNotes] = useState(todoProps.notes ?? ["Add notes"]);
+    const [newNote, setNewNote] = useState("Add a nice note");
 
     const updateTodoContent = () => {
         const updatedTodoProps = { ...todoProps, content };
@@ -54,10 +56,17 @@ import {
         updateTodoWithId(updatedTodoProps);
     }
 
-
+    const updateTodoNotes = () => {
+        notes[0] = newNote;
+        const updatedTodoProps = { ...todoProps, notes: [newNote] };
+        updateTodoWithId(updatedTodoProps);
+    }
+  
     return (
         // <Row fillWidth justifyContent="space-between">
-      <div key={todoProps.id} className={`${styles.li} ${roboto.className} ${todoProps.isDone} `}>
+      <div key={todoProps.id} 
+        // className={`${styles.li} ${roboto.className} ${todoProps.isDone} `}
+        >
         <li
           // onClick={() => updateTodoWithId()}
         key={todoProps.id}>
@@ -73,10 +82,10 @@ import {
                     labelAsPlaceholder
                     radius="left"
                     
-                    defaultValue={`${todoProps.content}`}
-                    onChange={(e) => setContent(e.target.value)}
+                    defaultValue={notes && `${notes[0] ?? "Add notes"}`}
+                    onChange={(e) => setNewNote(e.target.value)}
                   >
-                  {content !== todoProps.content && <Button onClick={updateTodoContent}>Save</Button>}
+                  {(!todoProps.notes || !todoProps.notes[0] || newNote !== todoProps.notes[0]) && <Button onClick={updateTodoNotes}>Save</Button>}
                 </Textarea>
                 </Accordion>
             </Column>
