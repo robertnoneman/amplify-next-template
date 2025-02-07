@@ -19,6 +19,7 @@ import {
     // RobDayLogBaseActivityProps, 
     RobdayLogProps 
 } from "@/app/lib/definitions";
+import { unstable_cache } from 'next/cache';
 
 Amplify.configure(outputs);
 
@@ -69,12 +70,16 @@ const client = generateClient<Schema>();
 //     address: string;
 //   }
 
+const getRobdayLogs = unstable_cache(async () => {
+    return (await client.models.Robdaylog.list()).data.sort((a, b) => Number(b.robDayNumber) - Number(a.robDayNumber));
+}, ['robdaylogs'], {revalidate: 3600, tags: ['robdaylogs']});
+
 export default async function RobdaylogWrapper() {
     
     // const activities = await client.models.Activity.list();
     // const activityInstances = await client.models.ActivityInstance.list();
     const locations = await client.models.Location.list();
-    const robdayLogs = (await client.models.Robdaylog.list()).data.sort((a, b) => Number(b.robDayNumber) - Number(a.robDayNumber));
+    const robdayLogs = await getRobdayLogs();
     const robdayLogProps = await populateRobdayLogProps(robdayLogs);
     // console.log("Activities fetched: ", activities);
     // console.log("Activity Instances fetched: ", activityInstances);
