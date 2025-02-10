@@ -23,20 +23,141 @@ import {
     Tag,
     RevealFx,
     Line,
-    Grid
+    Grid,
+    Scroller
   } from "@/once-ui/components";
 
-  import { roboto } from '@/app/ui/fonts';
-  import TodoList from "@/app/ui/dashboard/todo/todo-list";
-  import { fetchTodos } from "@/app/lib/actions";
-  import { unstable_cache } from 'next/cache';
-  import Image from 'next/image';
+import { roboto } from '@/app/ui/fonts';
+import TodoList from "@/app/ui/dashboard/todo/todo-list";
+import { fetchTodos } from "@/app/lib/actions";
+import { unstable_cache } from 'next/cache';
+import Image from 'next/image';
+import fs from 'fs/promises';
+import path from 'path';
+import { S3Client, ListObjectsV2Command, ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
+import { list } from 'aws-amplify/storage';
+import { Gallery } from 'next-gallery';
 
-  const getTodos = unstable_cache( async () => {
+
+
+const getTodos = unstable_cache( async () => {
     return await fetchTodos();
 }, ["todos"], {revalidate: 3600, tags: ["todos"]});
 
+const getFilesInPublic = (): Promise<string[]> => {
+  const fs = require('fs').promises;
+  const path = require('path');
+
+  const directoryPath = './public';
+
+  return fs.readdir(directoryPath)
+    .then((files: string[]) => {
+      // Filter only files
+      const fileNames = files.filter(file => {
+        const filePath = path.join(directoryPath, file);
+        return fs.statSync(filePath).isFile();
+      });
+
+      console.log('Files in the directory:');
+      fileNames.forEach(fileName => {
+        console.log(fileName);
+      });
+
+      return fileNames;
+    })
+    .catch((err: any) => {
+      console.error('Error reading directory:', err);
+      return [];
+    });
+}
+
+export async function getImageFileNames(): Promise<string[]> {
+  // Determine the path to the public directory
+  const publicDir = path.join(process.cwd(), 'public');
+  
+  // Read all files in the directory asynchronously
+  const files = await fs.readdir(publicDir);
+  
+  // Define valid image extensions
+  const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg'];
+  
+  // Filter out only those files that have one of the valid image extensions
+  const imageFiles = files.filter(file => {
+    const ext = path.extname(file).toLowerCase();
+    return imageExtensions.includes(ext);
+  });
+  
+  return imageFiles;
+}
+
+export async function getImageFilesFromS3(
+  bucketName: string,
+  region: string = 'us-east-1'
+): Promise<string[]> {
+  // Create an S3 client instance.
+  const s3Client = new S3Client({ region });
+
+  // Define valid image file extensions.
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg'];
+
+  // This array will hold the keys of the image files.
+  const imageKeys: string[] = [];
+
+  // Setup parameters for the initial request.
+  let continuationToken: string | undefined = undefined;
+
+  do {
+    const params: ListObjectsV2CommandInput = {
+      Bucket: bucketName,
+      ContinuationToken: continuationToken,
+    };
+
+    // List objects in the bucket.
+    const command = new ListObjectsV2Command(params);
+    const response = await s3Client.send(command);
+
+    // If there are objects in this batch, filter them by image extension.
+    if (response.Contents) {
+      for (const object of response.Contents) {
+        if (object.Key) {
+          // Check if the key ends with one of the valid image extensions.
+          const lowerKey = object.Key.toLowerCase();
+          if (imageExtensions.some(ext => lowerKey.endsWith(ext))) {
+            imageKeys.push(object.Key);
+          }
+        }
+      }
+    }
+
+    // Update the continuationToken to check if there are more objects.
+    continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined;
+  } while (continuationToken);
+
+  return imageKeys;
+}
+
+
 export default async function Page() {
+    // const filenames = await getImageFileNames();
+    // const filenames = await getImageFilesFromS3('amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t');
+    const storageFiles = await list({
+        path: 'picture-submissions/',
+        options: {
+            listAll: true,
+        }
+    });
+    const filenames = storageFiles.items.map(item => `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${item.path}`).filter(url => url.includes("4x3"));
+    const filenames_3x4 = storageFiles.items.map(item => `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${item.path}`).filter(url => url.includes("3x4"));
+    const filenames_1x1 = storageFiles.items.map(item => `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${item.path}`).filter(url => url.includes("1x1"));
+
+    const images_4x3 = filenames.map((filename: string) => ({ src: filename, aspect_ratio: 4 / 3 }));
+    const images_3x4 = filenames_3x4.map((filename: string) => ({ src: filename, aspect_ratio: 3 / 4 }));
+    const images_1x1 = filenames_1x1.map((filename: string) => ({ src: filename, aspect_ratio: 1 / 1 }));
+
+    const widths = [200];
+    const ratios = [2.2, 4];
+
+    const images = [...images_4x3, ...images_3x4, ...images_1x1];
 
     const todos = await getTodos();
     return (
@@ -86,19 +207,41 @@ export default async function Page() {
                 >
                   Robday Todo List
               </Heading> */}
-              <Image
+              {/* <Image
                 src="https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/picture-submissions/IMG_1190.jpeg"
                 alt="Todo Image"
                 width={4032/32}
                 height={3024/32}
-              />
+              /> */}
               <TodoList todoProps={todos}/>
-              <Image
+              <Column fillWidth fillHeight> 
+                <Gallery {...{ images, widths, ratios }} lastRowBehavior="fill"/>
+              </Column>
+              {/* <Scroller 
+                direction="column"
+                // maxHeight={12}
+                // fillHeight
+                fillWidth
+                gap="16"
+                >
+                  {filenames.map((filename: string) => {
+                    return (
+                      <Image
+                        src={filename}
+                        alt="Todo Image"
+                        // fill
+                        width={4032/32}
+                        height={3024/32}
+                      />
+                    );
+                  })}
+                </Scroller> */}
+              {/* <Image
                 src="https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/picture-submissions/IMG_1167.jpeg"
                 alt="Todo Image"
                 width={4032/32}
                 height={3024/32}
-              />
+              /> */}
             </Column>
         </Flex>
       </main>

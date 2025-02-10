@@ -453,24 +453,7 @@ export default function RobdayLog({
         radius="xl"
         fillWidth
         fillHeight>
-        {/* <Background
-          mask={{
-           cursor: true
-          }}
-          radius="xl"
-          position="absolute"
-          gradient={{
-            display: true,
-            opacity: 50,
-            tilt: -5,
-            height: 200,
-            width: 120,
-            x: 120,
-            y: 35,
-            colorStart: "brand-solid-strong",
-            colorEnd: "brand-alpha-weak",
-          }}
-        /> */}
+        
         <Background
           mask={{
             // x: 100,
@@ -515,9 +498,6 @@ export default function RobdayLog({
         <Line height={0.1}/>
         
         <Column>
-          {/* {activityInstances && Object.entries(activityInstances).map(([id, activityInstance]) => (
-            <RobDayLogActivity key={`${activityInstance.id} - ${id}`} activityInstance={activityInstance} imageUrls={imageUrls}  />
-          ))} */}
           {robdayLogActivityProps.map((props) => (
             <Row  
               key={`${props.activityInstanceId}`} 
@@ -539,16 +519,7 @@ export default function RobdayLog({
                   </RevealFx>
                 </Column>
               )}
-              {/* <Column fillHeight justifyContent="flex-start" direction="column">
-                <IconButton
-                    onClick={() => populateActivityInstance(props)}
-                    // name="HiOutlinePencil"
-                    icon="edit"
-                    size="m"
-                    variant="tertiary"
-                    // onBackground="brand-weak"
-                />
-                </Column> */}
+              
             </Row>
           ))}
           <Heading variant="display-default-xs" align="center">
@@ -591,61 +562,7 @@ export default function RobdayLog({
               )}
             </Row>
           ))}
-          {/* {activitiesDict && Object.entries(activitiesDict).map(([id, activity]) => (
-            <Column key={`${activity.id}${id}`} fillWidth>
-              <Row>
-              <Column
-                position="relative"
-                overflow="hidden"
-                width={20}
-              >
-                <SmartImage
-                  src={urlsDict[id] ?? ""}
-                  alt="Robday"
-                  aspectRatio="1/1"
-                  objectFit="contain"
-                  sizes="s"
-                  radius="xl"
-                  width={10}
-                  height={10}
-                />
-              </Column>
-              <Column fillWidth >
-                <Text
-                  padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs"
-                >
-                  {activity.name?.toUpperCase() ?? "ACTIVITY TBD"}
-                </Text>
-                <Line/>
-                <Text
-                  paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs"
-                >
-                  {activity.location?.toUpperCase() ?? "LOCATION TBD"}
-                </Text>
-                
-              </Column>
-              <Line vertical width={0.1}/>
-              <Column fillWidth justifyContent="center">
-                <Text
-                    padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
-                  >
-                  {activity.description}
-                </Text>
-              </Column>
-              <Column fillHeight justifyContent="flex-start" direction="column">
-                <IconButton
-                  onClick={() => populateNewActivityInstance(activity)}
-                  // name="HiOutlinePencil"
-                  icon="plus"
-                  size="m"
-                  variant="tertiary"
-                  // onBackground="brand-weak"
-                ></IconButton>
-              </Column>
-            </Row>
-            <Line height={0.1}/>
-          </Column>
-          ))} */}
+          
         </Column>
       </Column>
       <Dialog
@@ -770,15 +687,7 @@ export default function RobdayLog({
             </Flex>
           </Flex>
           <Column paddingTop="24" fillWidth gap="24">
-            {/* <Input
-              radius="top"
-              label="Name"
-              // labelAsPlaceholder
-              defaultValue={selectedActivity?.name ?? ""}
-              id="name"
-              // onChange={(e) => console.log(e.target.value)}
-              onChange={(e) => setActivityDisplayName(e.target.value)}
-            /> */}
+            
             <Input
               radius="top"
               label="Name"
@@ -831,19 +740,7 @@ export default function RobdayLog({
               // onChange={(e) => console.log(e.target.value)}
               onChange={(e) => setActivityRating(parseInt(e.target.value))}
             />
-            {/* {selectedActivity && selectedActivity.notes && selectedActivity.notes.map((note) => (
-              <Textarea
-                key={`${selectedActivity.id} - ${note}`}
-                id="notes"
-                label="Notes"
-                defaultValue={note?.toString() ?? ""}
-                lines={2}
-                // onChange={(e) => console.log(e.target.value)}
-                // append to notes array
-                onChange={(e) => setActivityNotes([e.target.value])}
-              >
-              </Textarea>
-            ))} */}
+            
           </Column>
         </Dialog>
         <Dialog
