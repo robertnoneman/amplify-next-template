@@ -78,7 +78,7 @@ const getFilesInPublic = (): Promise<string[]> => {
     });
 }
 
-export async function getImageFileNames(): Promise<string[]> {
+async function getImageFileNames(): Promise<string[]> {
   // Determine the path to the public directory
   const publicDir = path.join(process.cwd(), 'public');
   
