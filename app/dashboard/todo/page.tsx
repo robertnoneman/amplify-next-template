@@ -37,6 +37,13 @@ import path from 'path';
 import { S3Client, ListObjectsV2Command, ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
 import { list } from 'aws-amplify/storage';
 import { Gallery } from 'next-gallery';
+import RobdayLog from '@/app/ui/dashboard/robday-log';
+import RobDayLogCard from "@/app/ui/dashboard/gallery/robday-log-card";
+import { RobDayLogActivityProps,
+  RobdayLogProps,
+  LocationData, 
+  // RobDayLogBaseActivityProps
+} from "@/app/lib/definitions";
 
 
 
@@ -160,6 +167,25 @@ export default async function Page() {
     const images = [...images_4x3, ...images_3x4, ...images_1x1];
 
     const todos = await getTodos();
+    const robdaylogprop = {
+      robdayLogId: "suckit",
+      status: "Started" as "Started",
+      robdayLogDate: "2025-03-17",
+      robdayLogNumber: 100,
+      notes: ["Suck it like a suck shaker"],
+      robdayLogWeather: "hot hot hot",
+      robdayLogTemperature: 69,
+      rating: 100,
+      cost: 100,
+      duration: 0,
+      startTime: new Date().getTime(),
+      endTime: 0,
+      totalTime: 0,
+      baseActivities: [{ activityId: "suckit", activityName: "Suckit", activityDescription: "Suckit", activityCategories: ["Suckit"], activityImageUrl: "https://static-00.iconduck.com/assets.00/loading-icon-1024x1024-z5lrc2lo.png" }],
+      aiProps: [{ activityInstanceId: "suckit", activityInstanceDisplayName: "Suckit", activityInstanceNotes: ["Suckit"], activityInstanceRating: 100, activityInstanceCost: 100, images: ["https://static-00.iconduck.com/assets.00/loading-icon-1024x1024-z5lrc2lo.png"], locationData: { id: "suckit", name: "Suckit", address: "Suckit" }, imageUrls: [...filenames], status: "Planned" as "Planned" }],
+      urlsDict: {},
+      locationData: [{ id: "suckit", name: "Suckit", address: "Suckit" }] as LocationData[]
+    }
     return (
       <main>
         <Flex
@@ -201,19 +227,27 @@ export default async function Page() {
               alignItems="center"
               justifyContent="center"
               >
-              {/* <Heading
-                size="xl"
-                color="brand-strong"
-                >
-                  Robday Todo List
-              </Heading> */}
-              {/* <Image
-                src="https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/picture-submissions/IMG_1190.jpeg"
-                alt="Todo Image"
-                width={4032/32}
-                height={3024/32}
-              /> */}
+              
               <TodoList todoProps={todos}/>
+              <Column fillWidth fillHeight>
+                <RobDayLogCard
+                images={images}>
+                  
+                </RobDayLogCard>
+                <RobdayLog 
+                  robdayLogNumber={100}
+                  robdayLogDate="2025-03-17"
+                  robdayLogId="suckit"
+                  robdayLogWeather="hot hot hot"
+                  robdayLogTemperature={69}
+                  baseActivities={robdaylogprop.baseActivities}
+                  robdayLogActivityProps={[robdaylogprop.aiProps[0]]}
+                  urlsDict={{}}
+                  notes={robdaylogprop.notes}
+                  locationData={robdaylogprop.locationData}
+                  robDayLogProp={robdaylogprop}
+                />
+              </Column>
               <Column fillWidth fillHeight> 
                 <Gallery {...{ images, widths, ratios }} lastRowBehavior="fill"/>
               </Column>
@@ -236,12 +270,6 @@ export default async function Page() {
                     );
                   })}
                 </Scroller> */}
-              {/* <Image
-                src="https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/picture-submissions/IMG_1167.jpeg"
-                alt="Todo Image"
-                width={4032/32}
-                height={3024/32}
-              /> */}
             </Column>
         </Flex>
       </main>
