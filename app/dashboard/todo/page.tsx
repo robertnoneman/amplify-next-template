@@ -97,7 +97,7 @@ async function getImageFileNames(): Promise<string[]> {
   return imageFiles;
 }
 
-export async function getImageFilesFromS3(
+async function getImageFilesFromS3(
   bucketName: string,
   region: string = 'us-east-1'
 ): Promise<string[]> {
