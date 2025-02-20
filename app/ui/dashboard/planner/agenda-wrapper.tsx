@@ -11,6 +11,7 @@ import {
 } from "@/app/lib/definitions";
 import { populateBaseActivityProps, fetchLocations } from "@/app/lib/actions";
 import Agenda from "@/app/ui/dashboard/planner/agenda";
+import { Suspense } from "react";
 
 Amplify.configure(outputs);
 

@@ -18,7 +18,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         transition="macro-medium"
         radius="xl"
         border="neutral-medium"
-        className={styles.card}
+        // className={styles.card}
         {...rest}
       >
         {children}

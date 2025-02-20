@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   Row,
@@ -6,24 +8,126 @@ import {
   Background,
   Heading,
   Line,
+  Accordion,
+  Grid
 } from "@/once-ui/components";
 import { Gallery } from 'next-gallery';
+import { RobdayLogProps, RobDayLogActivityProps, LocationData } from "@/app/lib/definitions";
+import { formatDate } from "@/app/lib/utils";
+import { useEffect, useState } from "react";
 
+import outputs from "@/amplify_outputs.json"
+import { Amplify } from "aws-amplify";
+import { generateClient } from "aws-amplify/data";
+import { data, type Schema } from "@/amplify/data/resource";
+import { getUrl } from 'aws-amplify/storage';
+
+
+Amplify.configure(outputs);
+
+const client = generateClient<Schema>();
 
 export default function RobDayLogCard(
   {
     images,
+    robdayLogId
   }: {
     images: { src: string, aspect_ratio: number }[];
+    robdayLogId: string;
   }
 ) {
+  const [robdayLogData, setRobdayLogData] = useState<RobdayLogProps | null>(null);
+  const [locationData, setLocationData] = useState<Schema["Location"]["type"] | null>(null);
+  const [activityInstances, setActivityInstances] = useState<Schema["ActivityInstance"]["type"][]>([]);
+  const [activityInstanceProps, setActivityInstanceProps] = useState<RobDayLogActivityProps[]>([]);
+  const [activityImages, setActivityImages] = useState<{ src: string, aspect_ratio: number }[]>([]);
+
+  async function fetchRobdayLogData() {
+    // setActivityImages([]);
+    const robdayLog = (await client.models.Robdaylog.get({ id: robdayLogId })).data;
+    const activityInstancesArray: Schema["ActivityInstance"]["type"][] = [];
+    const activityInstancesData = await robdayLog?.activityInstances();
+    const activityInstancePropsArray: RobDayLogActivityProps[] = [];
+    const imageUrls: string[] = [];
+    const activityImageUrls: { src: string, aspect_ratio: number }[] = [];
+    if (activityInstancesData?.data) {
+      await Promise.all(activityInstancesData.data.map(async (activityInstance: Schema["ActivityInstance"]["type"]) => {
+        activityInstancesArray.push(activityInstance);
+        const location = await activityInstance.location();
+        const locationDataProp = { id: location?.data?.id ?? "", name: location?.data?.name ?? "", address: location?.data?.address ?? "" };
+        if (activityInstance.images) {
+          await Promise.all(activityInstance.images.map(async (key, index) => {
+              if (key) {
+                    const url = `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${key}`;
+                    const img = new Image();
+                    img.src = url;
+                    await new Promise((resolve) => {
+                    img.onload = () => {
+                      const aspectRatio = img.width / img.height;
+                      activityImageUrls.push({ src: url, aspect_ratio: aspectRatio });
+                      resolve(null);
+                    };
+                    });
+                  imageUrls.push(url);
+                  // activityImageUrls.push({ src: url, aspect_ratio: 1/1 });
+
+              }
+          }));
+      };
+
+        activityInstancePropsArray.push({
+
+          activityInstanceDisplayName: activityInstance.displayName ?? "ACTIVITY TBD",
+          locationData: locationDataProp,
+          activityInstanceNotes: (activityInstance.notes ?? []).filter((note): note is string => note !== null),
+          activityInstanceRating: activityInstance.rating ?? 0,
+          activityInstanceCost: activityInstance.cost ?? 0,
+          images: [],
+          imageUrls: imageUrls,
+          status: "Completed",
+          activityInstanceId: activityInstance.id ?? "",
+        });
+      }));
+    }
+
+    setActivityImages(activityImageUrls);
+
+    setActivityInstances(activityInstancesArray);
+    setActivityInstanceProps(activityInstancePropsArray);
+
+    setRobdayLogData({
+      robdayLogId: robdayLog?.id ?? "",
+      status: robdayLog?.status ?? "Completed",
+      robdayLogDate: robdayLog?.date ?? "",
+      robdayLogNumber: robdayLog?.robDayNumber ?? 0,
+      robdayLogWeather: robdayLog?.weatherCondition ?? "",
+      robdayLogTemperature: robdayLog?.temperature ?? 0,
+      rating: robdayLog?.rating ?? 0,
+      cost: robdayLog?.cost ?? 0,
+      duration: 0,
+      startTime: robdayLog?.startTime ?? 0,
+      endTime: robdayLog?.endTime ?? 0,
+      totalTime: robdayLog?.totalTime ?? 0,
+      locationData: [],
+      baseActivities: [],
+      aiProps: [],
+      urlsDict: {},
+      notes: (robdayLog?.notes ?? []).filter((note): note is string => note !== null),
+    })
+  }
+
+  useEffect(() => {
+    fetchRobdayLogData();
+  }, [robdayLogId]);
+
   const widths = [200];
   const ratios = [2.2, 4];
   return (
     <Card
       padding="m"
       gap="4"
-      >
+      marginBottom="xl"
+    >
       <Background
         mask={{
           cursor: true
@@ -44,13 +148,133 @@ export default function RobDayLogCard(
       />
       {/* <Line height={0.25}/> */}
       <Heading variant="display-default-m" align="center">
-        ROBDAY #100
+        ROBDAY #{robdayLogData?.robdayLogNumber}
       </Heading>
-      <Line height={0.25}/>
-      <Text variant="body-default-xs">03/17/2025</Text>
-      <Text variant="body-default-xs">Weather: Hot Hot Hot - 69°</Text>
+      <Line height={0.25} />
+      <Text variant="body-default-xs">{formatDate(robdayLogData?.robdayLogDate ?? '')}</Text>
+      <Text variant="body-default-xs">Weather: {robdayLogData?.robdayLogWeather} - {robdayLogData?.robdayLogTemperature}°</Text>
       <Line height={0.1} />
-      <Heading variant="display-default-xs" align="left">
+      <Column fillWidth fillHeight>
+        <Gallery {...{ images: activityImages, widths, ratios }} lastRowBehavior="fill" />
+      </Column>
+      {(activityInstanceProps ?? []).map((activityInstance, index) => (
+        <Row key={index}>
+          <Column fillWidth >
+            <Text padding="xs" align="left" onBackground="neutral-strong" variant="display-default-xs">
+              {activityInstance.activityInstanceDisplayName?.toUpperCase() ?? "ACTIVITY TBD"}
+            </Text>
+            <Text paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs">
+              {activityInstance.locationData?.name.toUpperCase() ?? "LOCATION TBD"}
+            </Text>
+            <Accordion title="DETAILS">
+              <Column fillWidth fillHeight>
+                <Row>
+                  <Column width={6}>
+                    <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                      RATING
+                    </Text>
+                  </Column>
+                  <Line vertical width={0.1} />
+                  <Column fillWidth justifyContent="center">
+                    <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                      {activityInstance?.activityInstanceRating}
+                    </Text>
+                  </Column>
+                </Row>
+                <Line />
+                <Row>
+                  <Column width={6}>
+                    <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                      COST
+                    </Text>
+                  </Column>
+                  <Line vertical width={0.1} />
+                  <Column fillWidth justifyContent="center">
+                    <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                      {activityInstance?.activityInstanceCost}
+                    </Text>
+                  </Column>
+                </Row>
+                <Line />
+                <Row >
+                  <Column width={6}>
+                    <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                      NOTES
+                    </Text>
+                  </Column>
+                  <Line vertical width={0.1} />
+                  <Column fillWidth justifyContent="center">
+                    {(activityInstance?.activityInstanceNotes ?? []).map((note, index) => (
+                      <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s" key={index}>
+                        {note}
+                      </Text>
+                    ))}
+                  </Column>
+                </Row>
+              </Column>
+            </Accordion>
+            <Line height={0.1} />
+          </Column>
+        </Row>
+      ))}
+      {/* <Accordion
+        title="DETAILS"
+      >
+        <Column fillWidth fillHeight>
+          <Row >
+            <Column width={6}>
+              <Text
+                padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s"
+              >
+                
+                NOTES
+              </Text>
+            </Column>
+            <Line vertical width={0.1} />
+            <Column fillWidth justifyContent="center">
+              {(robdayLogData?.notes ?? []).map((note, index) => (
+                <Text
+                  padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s" key={index}
+                >
+                  {note}
+                </Text>
+              ))}
+            </Column>
+          </Row>
+          <Line />
+          <Row>
+            <Column width={6}>
+              <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                
+                RATING
+              </Text>
+            </Column>
+            <Line vertical width={0.1} />
+            <Column fillWidth justifyContent="center">
+              <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                
+                {robdayLogData?.rating}
+              </Text>
+            </Column>
+          </Row>
+          <Line />
+          <Row>
+            <Column width={6}>
+              <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                COST
+              </Text>
+            </Column>
+            <Line vertical width={0.1} />
+            <Column fillWidth justifyContent="center">
+              <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                {robdayLogData?.cost}
+              </Text>
+            </Column>
+          </Row>
+        </Column>
+      </Accordion> */}
+      
+      {/* <Heading variant="display-default-xs" align="left">
         ACTIVITIES
       </Heading>
       <Line height={0.1} />
@@ -64,12 +288,11 @@ export default function RobDayLogCard(
         <Column>
           <Text>Notes</Text>
           <Text variant="body-default-xs">I've had better</Text>
-          {/* <Text>Images: [Explicit content blocked]</Text> */}
         </Column>
-      </Row>
-      <Column fillWidth fillHeight>
+      </Row> */}
+      {/* <Column fillWidth fillHeight>
         <Gallery {...{ images, widths, ratios }} lastRowBehavior="fill" />
-      </Column>
+      </Column> */}
     </Card>
   )
 }

@@ -44,7 +44,7 @@ export async function createTodo(content: string) {
     isDone: false,
   });
   console.log("Create result", fullResult);
-  revalidatePath("/dashboard/todos");
+  revalidatePath("/dashboard/todo");
 }
 
 export async function fetchTodos() {

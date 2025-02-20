@@ -22,8 +22,17 @@ export const getImageUrl = async (key: string): Promise<string> => {
 };
 
 export function formatDate(date: string) {
-    return new Date(date).toLocaleDateString();
-};
+  // add a day to the date because... timezones
+  const dateObj = new Date(date);
+  dateObj.setDate(dateObj.getDate() + 1);
+  // console.log(date)
+  return dateObj.toLocaleDateString("en-US", {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
 
 export const formatDateToLocal = (
   dateStr: string,

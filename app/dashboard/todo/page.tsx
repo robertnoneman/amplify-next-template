@@ -230,10 +230,10 @@ export default async function Page() {
               
               <TodoList todoProps={todos}/>
               <Column fillWidth fillHeight>
-                <RobDayLogCard
+                {/* <RobDayLogCard
                 images={images}>
                   
-                </RobDayLogCard>
+                </RobDayLogCard> */}
                 <RobdayLog 
                   robdayLogNumber={100}
                   robdayLogDate="2025-03-17"

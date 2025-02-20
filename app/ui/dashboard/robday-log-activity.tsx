@@ -163,16 +163,6 @@ export default function RobDayLogActivity(
               Cost: {activityInstanceCost}
           </Text>
         </Column>
-        {/* <Column fillHeight justifyContent="flex-start" direction="column">
-          <IconButton
-              // onClick={() => populateActivityInstance(activityInstance)}
-              // name="HiOutlinePencil"
-              icon="edit"
-              size="m"
-              variant="tertiary"
-              // onBackground="brand-weak"
-          />
-        </Column> */}
       </Row>
       <Line height={0.1}/>
       <Row fillWidth justifyContent="space-around" padding="s">
@@ -183,20 +173,6 @@ export default function RobDayLogActivity(
         gap="8"
         mobileColumns='1'
         >
-        
-        {/* <SmartImage
-          src={(imageUrls && imageUrls[0]) ?? defaultImageUrl}
-          alt="Robday"
-          // aspectRatio="1/1"
-          objectFit="cover"
-          sizes="s"
-          radius="xl"
-          // width={15}
-          // fillWidth
-          maxWidth="l"
-          minHeight="l"
-          // height={15}
-        /> */}
   
       {imageUrls.map((url) => (
         <Column key={`${imageUrls.indexOf(url)}-${activityInstanceId}-${url}col`} 
