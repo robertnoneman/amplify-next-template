@@ -13,7 +13,7 @@ export const Header = () => {
         '/about':   true,
         '/work':    true,
         '/blog':    true,
-        '/gallery': true,
+        '/archive': true,
         '/games': true,
     }
 
@@ -88,11 +88,11 @@ export const Header = () => {
                                         </Flex>
                                 </ToggleButton>
                             )}
-                            { routes['/gallery'] && (
+                            { routes['/archive'] && (
                                 <ToggleButton
                                     prefixIcon="gallery"
-                                    href={`/dashboard/gallery`}
-                                    selected={pathname.startsWith('/gallery')}>
+                                    href={`/dashboard/archive`}
+                                    selected={pathname.startsWith('/archive')}>
                                         <Flex paddingX="2" hide="s">
                                             Gallery
                                         </Flex>
