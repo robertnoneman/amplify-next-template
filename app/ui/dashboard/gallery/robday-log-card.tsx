@@ -9,12 +9,16 @@ import {
   Heading,
   Line,
   Accordion,
-  Grid
+  Button,
+  Grid,
+  Dialog,
+  Input,
+  Textarea
 } from "@/once-ui/components";
 import { Gallery } from 'next-gallery';
 import { RobdayLogProps, RobDayLogActivityProps, LocationData } from "@/app/lib/definitions";
 import { formatDate } from "@/app/lib/utils";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 
 import outputs from "@/amplify_outputs.json"
 import { Amplify } from "aws-amplify";
@@ -44,6 +48,11 @@ export default function RobDayLogCard(
   const [activityInstances, setActivityInstances] = useState<Schema["ActivityInstance"]["type"][]>([]);
   const [activityInstanceProps, setActivityInstanceProps] = useState<RobDayLogActivityProps[]>([]);
   const [activityImages, setActivityImages] = useState<{ src: string, aspect_ratio: number }[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [rating, setRating] = useState<number | null>(null);
+  const [cost, setCost] = useState<number | null>(null);
+  const [notes, setNotes] = useState<string[]>([]);
+  const [editedActivityInstanceId, setEditedActivityInstanceId] = useState<string>("");
 
   const handleUploadData = async (file: File, activityInstanceId: string): Promise<void> => {
     await uploadData({
@@ -55,6 +64,46 @@ export default function RobDayLogCard(
     images.push(`picture-submissions/${file.name}`);
     const result = await client.models.ActivityInstance.update({ id: activityInstanceId, images: images });
     console.log(result);
+    fetchRobdayLogData();
+  }
+
+  const editActivityRating = async (activityInstanceId: string, rating: number, cost: number, notes: string[]) => {
+    setRating(rating);
+    setCost(cost);
+    setNotes(notes);
+    console.log("Activity Instance ID:", activityInstanceId);
+    console.log("Rating:", rating);
+    const result = await client.models.ActivityInstance.update({ id: editedActivityInstanceId, rating: rating, cost: cost, notes: notes });
+    console.log(result);
+    setEditedActivityInstanceId("");
+    setRating(null);
+    setIsDialogOpen(false);
+    fetchRobdayLogData();
+  }
+
+  const onEditActivityRating = async (activityInstanceId: string, rating: number, cost: number, notes: string[]) => {
+    console.log("Activity Instance ID:", activityInstanceId);
+    console.log("Rating:", rating);
+    setRating(rating);
+    setCost(cost);
+    setNotes(notes);
+    setEditedActivityInstanceId(activityInstanceId);
+    setIsDialogOpen(true);
+  }
+
+  const editActivityCost = async (activityInstanceId: string, cost: number) => {
+    console.log("Activity Instance ID:", activityInstanceId);
+    console.log("Cost:", cost);
+    // const result = await client.models.ActivityInstance.update({ id: activityInstanceId, cost: cost });
+    // console.log(result);
+    fetchRobdayLogData();
+  }
+
+  const editActivityNotes = async (activityInstanceId: string, notes: string[]) => {
+    console.log("Activity Instance ID:", activityInstanceId);
+    console.log("Notes:", notes);
+    // const result = await client.models.ActivityInstance.update({ id: activityInstanceId, notes: notes });
+    // console.log(result);
     fetchRobdayLogData();
   }
 
@@ -168,7 +217,7 @@ export default function RobDayLogCard(
         ROBDAY #{robdayLogData?.robdayLogNumber}
       </Heading>
       <Line height={0.25} />
-      <Text variant="body-default-xs">{formatDate(robdayLogData?.robdayLogDate ?? '')}</Text>
+      <Text variant="body-default-s">{formatDate(robdayLogData?.robdayLogDate ?? '')}</Text>
       <Text variant="body-default-xs">Weather: {robdayLogData?.robdayLogWeather} - {robdayLogData?.robdayLogTemperature}°</Text>
       <Line height={0.1} />
       <Column fillWidth fillHeight>
@@ -198,21 +247,29 @@ export default function RobDayLogCard(
             </Row>
             <Accordion title="DETAILS">
               <Column fillWidth fillHeight>
-                <Row>
+                <Row gap="4" 
+                // onClick={() => editActivityRating(activityInstance.activityInstanceId, 5)}
+                onClick={() => onEditActivityRating(activityInstance.activityInstanceId, activityInstance.activityInstanceRating, activityInstance.activityInstanceCost, activityInstance.activityInstanceNotes)}
+                cursor="interactive"
+                zIndex={10}
+                >
                   <Column width={6}>
-                    <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
+                    <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s" >
                       RATING
                     </Text>
                   </Column>
                   <Line vertical width={0.1} />
-                  <Column fillWidth justifyContent="center">
+                  <Column fillWidth justifyContent="center" >
                     <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
                       {activityInstance?.activityInstanceRating}
                     </Text>
                   </Column>
                 </Row>
                 <Line />
-                <Row>
+                <Row gap="4"
+                onClick={() => onEditActivityRating(activityInstance.activityInstanceId, activityInstance.activityInstanceRating, activityInstance.activityInstanceCost, activityInstance.activityInstanceNotes)}
+                cursor="interactive"
+                zIndex={10}>
                   <Column width={6}>
                     <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
                       COST
@@ -226,7 +283,10 @@ export default function RobDayLogCard(
                   </Column>
                 </Row>
                 <Line />
-                <Row >
+                <Row gap="4"
+                onClick={() => onEditActivityRating(activityInstance.activityInstanceId, activityInstance.activityInstanceRating, activityInstance.activityInstanceCost, activityInstance.activityInstanceNotes)}
+                cursor="interactive"
+                zIndex={10}>
                   <Column width={6}>
                     <Text padding="xs" align="left" onBackground="neutral-strong" variant="body-default-s">
                       NOTES
@@ -323,6 +383,44 @@ export default function RobDayLogCard(
       {/* <Column fillWidth fillHeight>
         <Gallery {...{ images, widths, ratios }} lastRowBehavior="fill" />
       </Column> */}
+    <Dialog 
+      isOpen={isDialogOpen}
+      onClose={() => setIsDialogOpen(false)}
+      title="Add Rating"
+      description="Rate this activity"
+      fillHeight
+      footer={
+        <>
+          <Button variant="primary" onClick={() => editActivityRating(activityInstances[0].id, rating ?? 0, cost ?? 0, notes ?? [])}>
+            Save
+          </Button>
+          <Button variant="secondary" onClick={() => setIsDialogOpen(false)}>
+            Cancel
+          </Button>
+        </>
+      }
+    >
+      <Input
+        id="rating"
+        label="Rating"
+        defaultValue={rating?.toString()}
+        onChange={(e) => setRating(Number(e.target.value))}
+      />
+      <Input
+      id="cost"
+      label="Cost"
+      defaultValue={cost?.toString()}
+      onChange={(e) => setCost(Number(e.target.value))}
+      />
+      <Textarea
+      id="notes"
+      label="Notes"
+      defaultValue={notes?.toString()}
+      onChange={(e) => setNotes([e.target.value])}
+      />
+
+
+    </Dialog>
     </Card>
   )
 }
