@@ -125,6 +125,7 @@ const MediaUpload = forwardRef<HTMLInputElement, MediaUploadProps>(
         await onFileUpload(file);
       }
       setUploading(false);
+      setPreviewImage("");
     };
 
     return (

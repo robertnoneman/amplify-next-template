@@ -22,6 +22,8 @@ import { generateClient } from "aws-amplify/data";
 import { data, type Schema } from "@/amplify/data/resource";
 import { getUrl } from 'aws-amplify/storage';
 import { MyOverlay, OverlayProvider } from './overlay'
+import { MediaUpload } from "@/once-ui/modules";
+import { uploadData } from 'aws-amplify/storage';
 
 
 Amplify.configure(outputs);
@@ -43,6 +45,19 @@ export default function RobDayLogCard(
   const [activityInstanceProps, setActivityInstanceProps] = useState<RobDayLogActivityProps[]>([]);
   const [activityImages, setActivityImages] = useState<{ src: string, aspect_ratio: number }[]>([]);
 
+  const handleUploadData = async (file: File, activityInstanceId: string): Promise<void> => {
+    await uploadData({
+      path: `picture-submissions/${file.name}`,
+      data: file
+    });
+    const activityInstance = await client.models.ActivityInstance.get({ id: activityInstanceId });
+    const images = activityInstance?.data?.images ?? [];
+    images.push(`picture-submissions/${file.name}`);
+    const result = await client.models.ActivityInstance.update({ id: activityInstanceId, images: images });
+    console.log(result);
+    fetchRobdayLogData();
+  }
+
   async function fetchRobdayLogData() {
     // setActivityImages([]);
     const robdayLog = (await client.models.Robdaylog.get({ id: robdayLogId })).data;
@@ -58,23 +73,23 @@ export default function RobDayLogCard(
         const locationDataProp = { id: location?.data?.id ?? "", name: location?.data?.name ?? "", address: location?.data?.address ?? "" };
         if (activityInstance.images) {
           await Promise.all(activityInstance.images.map(async (key, index) => {
-              if (key) {
-                    const url = `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${key}`;
-                    const img = new Image();
-                    img.src = url;
-                    await new Promise((resolve) => {
-                    img.onload = () => {
-                      const aspectRatio = img.width / img.height;
-                      activityImageUrls.push({ src: url, aspect_ratio: aspectRatio });
-                      resolve(null);
-                    };
-                    });
-                  imageUrls.push(url);
-                  // activityImageUrls.push({ src: url, aspect_ratio: 1/1 });
+            if (key) {
+              const url = `https://amplify-d2e7zdl8lpqran-ma-robdayimagesbuckete97c22-bwldlxhxdd4t.s3.us-east-1.amazonaws.com/${key}`;
+              const img = new Image();
+              img.src = url;
+              await new Promise((resolve) => {
+                img.onload = () => {
+                  const aspectRatio = img.width / img.height;
+                  activityImageUrls.push({ src: url, aspect_ratio: aspectRatio });
+                  resolve(null);
+                };
+              });
+              imageUrls.push(url);
+              // activityImageUrls.push({ src: url, aspect_ratio: 1/1 });
 
-              }
+            }
           }));
-      };
+        };
 
         activityInstancePropsArray.push({
 
@@ -128,6 +143,7 @@ export default function RobDayLogCard(
       padding="m"
       gap="4"
       marginBottom="xl"
+      fillWidth
     >
       <Background
         mask={{
@@ -169,6 +185,17 @@ export default function RobDayLogCard(
             <Text paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs">
               {activityInstance.locationData?.name.toUpperCase() ?? "LOCATION TBD"}
             </Text>
+            <Row fillWidth height="32" justifyContent="center" gap="8">
+              {/* <Text variant="body-default-xs" wrap="nowrap" align="center">
+                Add Image
+              </Text> */}
+              <MediaUpload
+                emptyState={<Row paddingBottom="2">Drag and drop or click to browse</Row>}
+                onFileUpload={(file) => handleUploadData(file, activityInstance.activityInstanceId)}
+                initialPreviewImage=""
+              >
+              </MediaUpload>
+            </Row>
             <Accordion title="DETAILS">
               <Column fillWidth fillHeight>
                 <Row>
@@ -276,7 +303,7 @@ export default function RobDayLogCard(
           </Row>
         </Column>
       </Accordion> */}
-      
+
       {/* <Heading variant="display-default-xs" align="left">
         ACTIVITIES
       </Heading>
