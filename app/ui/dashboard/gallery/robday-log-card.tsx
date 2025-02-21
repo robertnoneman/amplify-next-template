@@ -21,6 +21,7 @@ import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import { data, type Schema } from "@/amplify/data/resource";
 import { getUrl } from 'aws-amplify/storage';
+import { MyOverlay, OverlayProvider } from './overlay'
 
 
 Amplify.configure(outputs);
@@ -155,7 +156,9 @@ export default function RobDayLogCard(
       <Text variant="body-default-xs">Weather: {robdayLogData?.robdayLogWeather} - {robdayLogData?.robdayLogTemperature}°</Text>
       <Line height={0.1} />
       <Column fillWidth fillHeight>
-        <Gallery {...{ images: activityImages, widths, ratios }} lastRowBehavior="fill" />
+        <OverlayProvider>
+          <Gallery {...{ images: activityImages, widths, ratios }} lastRowBehavior="fill" overlay={(i) => <MyOverlay index={i} src={activityImages[i].src} aspect_ratio={activityImages[i].aspect_ratio} />} />
+        </OverlayProvider>
       </Column>
       {(activityInstanceProps ?? []).map((activityInstance, index) => (
         <Row key={index}>
