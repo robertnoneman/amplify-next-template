@@ -57,6 +57,11 @@ export default function Page() {
 				console.error("Error fetching robday logs", error);
 			}
 		});
+		if (robdayLogs.length === 0) {
+			return
+		}
+		setSelectedRobdayLog(robdayLogs[-1].id ?? "49154454-449f-4b4b-abf7-d214f26ddce5");
+		setSelectedRobdayLogNumber(robdayLogs[-1].robDayNumber ?? 33);
 	}
 
 	useEffect(() => {
@@ -132,7 +137,7 @@ export default function Page() {
 				</Column>
 			</Column>
 			<Column fillWidth alignItems="center" gap="48" marginBottom="l">
-				<RobdayLogSelector selectedRobdayLogNumber={selectedRobdayLogNumber} setSelectedRobdayLogId={onChangeRobdayLog} />
+				<RobdayLogSelector selectedRobdayLogNumber={selectedRobdayLogNumber} numberOfRobdays={robdayLogs.length} setSelectedRobdayLogId={onChangeRobdayLog} />
 				<RobDayLogCard images={[]} robdayLogId={selectedRobdayLog}/>
 			</Column>
 		</Column>

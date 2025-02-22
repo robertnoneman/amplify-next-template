@@ -646,7 +646,7 @@ export default function Page() {
         const result = client.models.ActivityInstance.update({ ...activityInstance });
         console.log("Activity Instance completed: ", result);
       });
-      const result = client.models.Robdaylog.update({ id: robDayLog.id, endTime: endTime, totalTime: duration });
+      const result = client.models.Robdaylog.update({ id: robDayLog.id, endTime: endTime, totalTime: duration, status: "Completed" });
       console.log("Robday Log completed: ", result);
     }
   }

@@ -73,6 +73,8 @@ export default function RobDayLogCard(
     setNotes(notes);
     console.log("Activity Instance ID:", activityInstanceId);
     console.log("Rating:", rating);
+    // Cast rating to integer
+    rating = Math.round(rating);
     const result = await client.models.ActivityInstance.update({ id: editedActivityInstanceId, rating: rating, cost: cost, notes: notes });
     console.log(result);
     setEditedActivityInstanceId("");
@@ -232,7 +234,7 @@ export default function RobDayLogCard(
               {activityInstance.activityInstanceDisplayName?.toUpperCase() ?? "ACTIVITY TBD"}
             </Text>
             <Text paddingLeft="xs" align="left" onBackground="neutral-medium" variant="code-default-xs">
-              {activityInstance.locationData?.name.toUpperCase() ?? "LOCATION TBD"}
+              {activityInstance.locationData?.name?.toUpperCase() ?? "LOCATION TBD"}
             </Text>
             <Row fillWidth height="32" justifyContent="center" gap="8">
               {/* <Text variant="body-default-xs" wrap="nowrap" align="center">

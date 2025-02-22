@@ -15,15 +15,16 @@ import {
 export default function RobdayLogSelector(
     {
         selectedRobdayLogNumber,
+        numberOfRobdays,
         setSelectedRobdayLogId
     }: {
         selectedRobdayLogNumber: number | null;
+        numberOfRobdays: number;
         setSelectedRobdayLogId: (robdayNumber: number) => void;
     }
 ) {
     const [selectedLog, setSelectedLog] = useState<string | null>(null);
-    const [robdayNumber, setRobdayNumber] = useState<number>(33);
-    const [numberOfRobdays, setNumberOfRobdays] = useState<number>(33);
+    const [robdayNumber, setRobdayNumber] = useState<number>(selectedRobdayLogNumber || 1);
 
     // useEffect(() => {
 
