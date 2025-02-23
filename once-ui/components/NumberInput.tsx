@@ -69,48 +69,48 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         min={min}
         max={max}
         step={step}
-        hasSuffix={
-          <>
-            <Flex minWidth={1.25}></Flex>
-            <Flex
-              position="absolute"
-              right="0"
-              top="0"
-              direction="column"
-              borderLeft="neutral-medium"
-              fillHeight
-              background="neutral-alpha-weak"
-            >
-              <Flex
-                fillHeight
-                borderBottom="neutral-medium"
-                paddingX="4"
-                className={classNames(styles.stepper, "transition-micro-medium")}
-              >
-                <IconButton
-                  icon="chevronUp"
-                  variant="ghost"
-                  size="s"
-                  onClick={increment}
-                  aria-label="Increment value"
-                />
-              </Flex>
-              <Flex
-                fillHeight
-                paddingX="4"
-                className={classNames(styles.stepper, "transition-micro-medium")}
-              >
-                <IconButton
-                  icon="chevronDown"
-                  variant="ghost"
-                  size="s"
-                  onClick={decrement}
-                  aria-label="Decrement value"
-                />
-              </Flex>
-            </Flex>
-          </>
-        }
+        // hasSuffix={
+        //   <>
+        //     <Flex minWidth={1.25}></Flex>
+        //     <Flex
+        //       position="absolute"
+        //       right="0"
+        //       top="0"
+        //       direction="column"
+        //       borderLeft="neutral-medium"
+        //       fillHeight
+        //       background="neutral-alpha-weak"
+        //     >
+        //       <Flex
+        //         fillHeight
+        //         borderBottom="neutral-medium"
+        //         paddingX="4"
+        //         className={classNames(styles.stepper, "transition-micro-medium")}
+        //       >
+        //         <IconButton
+        //           icon="chevronUp"
+        //           variant="ghost"
+        //           size="s"
+        //           onClick={increment}
+        //           aria-label="Increment value"
+        //         />
+        //       </Flex>
+        //       <Flex
+        //         fillHeight
+        //         paddingX="4"
+        //         className={classNames(styles.stepper, "transition-micro-medium")}
+        //       >
+        //         <IconButton
+        //           icon="chevronDown"
+        //           variant="ghost"
+        //           size="s"
+        //           onClick={decrement}
+        //           aria-label="Decrement value"
+        //         />
+        //       </Flex>
+        //     </Flex>
+        //   </>
+        // }
         className={styles.numberInput}
       />
     );
