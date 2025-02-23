@@ -28,7 +28,7 @@ export default function DartScoreboard() {
     // Store finalized rounds: each round is an object with player1 and player2 round scores (as numbers)
     const [rounds, setRounds] = useState<{ player1: number; player2: number }[]>([]);
     // Store the current round inputs (as strings so the user can edit them)
-    const [currentRound, setCurrentRound] = useState({ player1: '0', player2: '0' });
+    const [currentRound, setCurrentRound] = useState({ player1: '', player2: '' });
 
     const initialPlayerScores = scoreboardValues.reduce((acc: { [key: string]: number }, val) => {
         acc[val] = 0;
@@ -76,7 +76,7 @@ export default function DartScoreboard() {
     // Update the current round input for the specified player
     const handleInputChange = (e: string, player: 'player1' | 'player2') => {
         if (e === "") {
-            setCurrentRound({ ...currentRound, [player]: '0' });
+            setCurrentRound({ ...currentRound, [player]: '' });
             return;
         }
 
@@ -110,7 +110,7 @@ export default function DartScoreboard() {
         const player1Score = parseInt(currentRound.player1, 10) || 0;
         const player2Score = parseInt(currentRound.player2, 10) || 0;
         setRounds([...rounds, { player1: player1Score, player2: player2Score }]);
-        setCurrentRound({ player1: '0', player2: '0' });
+        setCurrentRound({ player1: '', player2: '' });
     };
 
     const undoRound = () => {
@@ -176,7 +176,7 @@ export default function DartScoreboard() {
     };
 
     const resetScores = () => {
-        setCurrentRound({ player1: '0', player2: '0' });
+        setCurrentRound({ player1: '', player2: '' });
         setRounds([]);
         setPlayer1Scores({ ...initialPlayerScores });
         setPlayer2Scores({ ...initialPlayerScores });
@@ -206,7 +206,9 @@ export default function DartScoreboard() {
             </Row>
             {(currentGameType === "301" || currentGameType === "501" || currentGameType === "701") && (
             <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
-                <h2>Dart Scoreboard (Game: {initialScore})</h2>
+                <Heading align="center">
+                    Dart Scoreboard (Game: {initialScore})
+                </Heading>
                 {/* <button onClick={resetScores}>Reset Scores</button> */}
                 <div style={{ marginBottom: '1rem' }}></div>
                 <table
@@ -279,15 +281,15 @@ export default function DartScoreboard() {
                         {rounds.map((round, index) => (
                             <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
                                 <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round.player1}</td>
-                                <td style={{ color: "#BBB" }}>{computeRemainingAfterRound('player1', index)}</td>
-                                <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{index + 1}</td>
+                                <td style={{ color: "#BBB", textDecoration: "line-through" }}>{computeRemainingAfterRound('player1', index)}</td>
+                                <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{index + 1}</td>
                                 <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round.player2}</td>
-                                <td style={{ color: "#BBB" }}>{computeRemainingAfterRound('player2', index)}</td>
+                                <td style={{ color: "#BBB", textDecoration: "line-through" }}>{computeRemainingAfterRound('player2', index)}</td>
                             </tr>
                         ))}
                         {/* Current round input row */}
                         <tr style={{ borderTop: '2px dashed #666' }}>
-                            <td>
+                            <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
                             {/* <NumberInput
                                     id="player1-input"
                                     // value={parseInt(currentRound.player1)}
@@ -300,22 +302,22 @@ export default function DartScoreboard() {
                                     type="number"
                                     value={parseInt(currentRound.player1)}
                                     onChange={(e) => handleInputChange(e.target.value, 'player1')}
-                                    placeholder={"0"}
-                                    style={{paddingLeft: 0, paddingRight: 0, width: '20px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                    placeholder={""}
+                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
                                 />
                             </td>
-                            <td>{currentRemaining('player1')}</td>
-                            <td>{rounds.length + 1}</td>
-                            <td>
+                            <td style={{ color: "#EEE" }}>{currentRemaining('player1')}</td>
+                            <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} >{rounds.length + 1}</td>
+                            <td >
                                 <input
                                     type="number"
                                     value={parseInt(currentRound.player2)}
                                     onChange={(e) => handleInputChange(e.target.value, 'player2')}
-                                    placeholder={"0"}
-                                    style={{paddingLeft: 0, paddingRight: 0, width: '20px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                    placeholder={""}
+                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
                                 />
                             </td>
-                            <td>{currentRemaining('player2')}</td>
+                            <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#EEE" }}>{currentRemaining('player2')}</td>
                         </tr>
                     </tbody>
                 </table>
