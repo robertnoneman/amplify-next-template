@@ -16,6 +16,16 @@ import {
     Icon
 } from "@/once-ui/components";
 
+import outputs from "@/amplify_outputs.json"
+import { Amplify } from "aws-amplify";
+import { generateClient } from "aws-amplify/data";
+import { data, type Schema } from "@/amplify/data/resource";
+
+Amplify.configure(outputs);
+
+const client = generateClient<Schema>();
+
+
 export default function DartScoreboard() {
     const [playerOnePoints, setPlayerOnePoints] = useState(0);
     const [playerTwoPoints, setPlayerTwoPoints] = useState(0);
@@ -23,6 +33,7 @@ export default function DartScoreboard() {
     const [playerTwoTotalPoints, setPlayerTwoTotalPoints] = useState([0]);
     const [gameTypes, setGameTypes] = useState(["301", "501", "701", "Cricket", "Baseball", "Robday Night Football"]);
     const [currentGameType, setCurrentGameType] = useState("301");
+    const [currentGameId, setCurrentGameId] = useState("");
     const [playerOneName, setPlayerOneName] = useState("Player 1");
     const [playerTwoName, setPlayerTwoName] = useState("Player 2");
     const boardNumbers = [20, 19, 18, 17, 16, 15, "BULL", "T", "D", "3B"];
@@ -32,64 +43,16 @@ export default function DartScoreboard() {
     const [currentInningScore, setCurrentInningScore] = useState({ player1: 0, player2: 0 });
     const [currentInningErrors, setCurrentInningErrors] = useState({ player1: 0, player2: 0 });
     const [totalBaseballScore, setTotalBaseballScore] = useState({ player1: 0, player2: 0 });
-    const [innings, setInnings] = useState<{ player1: [number, number]; player2: [number, number] }[]>([]);
+    const [innings, setInnings] = useState<{ player1: [number, number]; player2: [number, number] }[]>([{ player1: [0, 0], player2: [0, 0] }]);
     const [initialScore, setInitialScore] = useState(301);
-
-    const handleSubmitInning = () => {
-        const totalBaseballScore = innings.reduce((acc, inning) => {
-            acc.player1 += inning.player1[0];
-            acc.player2 += inning.player2[0];
-            return acc;
-        }, { player1: 0, player2: 0 });
-        setTotalBaseballScore(totalBaseballScore);
-        setInnings([...innings, { player1: [currentInningScore.player1, currentInningErrors.player1], player2: [currentInningScore.player2, currentInningErrors.player2] }]);
-        setCurrentInningScore({ player1: 0, player2: 0 });
-        setCurrentInningErrors({ player1: 0, player2: 0 });
-        setCurrentInning((parseInt(currentInning) + 1).toString());
-        if (parseInt(currentInning) >= 9) {
-            if (totalBaseballScore.player1 > totalBaseballScore.player2) {
-                console.log("Player 1 wins!");
-            } else if (totalBaseballScore.player1 < totalBaseballScore.player2) {
-                console.log("Player 2 wins!");
-            } else {
-                const updatedBaseBallInningValues = [...baseBallInningValues];
-                updatedBaseBallInningValues.push((innings.length + 2).toString());
-                setBaseBallInningValues(updatedBaseBallInningValues);
-                // if (innings.length === 8) {
-                //     updatedBaseBallInningValues.push((innings.length + 2).toString());
-                // }
-                // else {
-                //     updatedBaseBallInningValues.push((innings.length + 1).toString());
-                //     setBaseBallInningValues(updatedBaseBallInningValues);
-                // }
-            }
-        }
-    };
-
-    const handleBaseballInputChange = (e: string, player: 'player1' | 'player2', type: 'score' | 'errors') => {
-        if (e === "") {
-            setCurrentInningScore({ ...currentInningScore, [player]: 0 });
-            return;
-        }
-
-        const value = parseInt(e, 10) || 0;
-        if (type === 'score') {
-            setCurrentInningScore({ ...currentInningScore, [player]: value });
-        } else if (type === 'errors') {
-            setCurrentInningErrors({ ...currentInningErrors, [player]: value });
-        }
-    };
-
     // Store finalized rounds: each round is an object with player1 and player2 round scores (as numbers)
     const [rounds, setRounds] = useState<{ player1: number; player2: number }[]>([]);
     // Store the current round inputs (as strings so the user can edit them)
     const [currentRound, setCurrentRound] = useState({ player1: '', player2: '' });
-
     const initialPlayerScores = scoreboardValues.reduce((acc: { [key: string]: number }, val) => {
         acc[val] = 0;
         return acc;
     }, {});
-
     const [player1Scores, setPlayer1Scores] = useState({ ...initialPlayerScores });
     const [player2Scores, setPlayer2Scores] = useState({ ...initialPlayerScores });
 
@@ -106,6 +69,133 @@ export default function DartScoreboard() {
             return acc;
         }, {})
     );
+
+    const fetchActiveDartGames = () => {
+        client.models.DartGame.observeQuery().subscribe({
+            next: async (data) => {
+                // setDartGames([...data.items]);
+                parseDartGameData(data.items);
+            },
+            error: (error) => {
+                console.error("Error fetching dart games", error);
+            }
+        });
+    }
+
+    const parseDartGameData = (data: Array<Schema["DartGame"]["type"]>) => {
+        const parsedData = data.map((game) => {
+            if (game.status === "Completed") {
+                return;
+            }
+            if (game.gameType === "ThreeOhOne" || game.gameType === "FiveOhOne" || game.gameType === "SevenOhOne") {
+                const player1RoundScores = game.x01RoundScoresPlayer1 ?? [];
+                const player2RoundScores = game.x01RoundScoresPlayer2 ?? [];
+                const roundData: { player1: number; player2: number }[] = [];
+                player1RoundScores.forEach((score, index) => {
+                    roundData.push({ player1: score ?? 0, player2: player2RoundScores[index] ?? 0 });
+                });
+                setRounds(roundData);
+            }
+            if (game.gameType === "Cricket") {
+                const player1TotalPoints = game.cricketTotalPointsPlayer1 ?? [];
+                const player2TotalPoints = game.cricketTotalPointsPlayer2 ?? [];
+                setPlayerOneTotalPoints(player1TotalPoints.filter((point): point is number => point !== null));
+                setPlayerTwoTotalPoints(player2TotalPoints.filter((point): point is number => point !== null));
+                const player1Tallies = game.cricketMarksPlayer1 ?? [];
+                const player2Tallies = game.cricketMarksPlayer2 ?? [];
+                const player1Inputs = scoreboardValues.reduce((acc: { [key: string]: number }, val, index) => {
+                    acc[val] = player1Tallies[index] ?? 0;
+                    return acc;
+                }, {});
+                setPlayer1Inputs(player1Inputs);
+                const player2Inputs = scoreboardValues.reduce((acc: { [key: string]: number }, val, index) => {
+                    acc[val] = player2Tallies[index] ?? 0;
+                    return acc;
+                }, {});
+                setPlayer2Inputs(player2Inputs);
+            }
+            if (game.gameType === "Baseball") {
+                const player1InningScores = game.baseballInningScoresPlayer1 ?? [];
+                const player2InningScores = game.baseballInningScoresPlayer2 ?? [];
+                const player1InningErrors = game.baseballInningErrorsPlayer1 ?? [];
+                const player2InningErrors = game.baseballInningErrorsPlayer2 ?? [];
+                const inningData: { player1: [number, number]; player2: [number, number] }[] = [];
+                player1InningScores.forEach((score, index) => {
+                    inningData.push({
+                        player1: [score ?? 0, player1InningErrors[index] ?? 0],
+                        player2: [player2InningScores[index] ?? 0, player2InningErrors[index] ?? 0]
+                    });
+                });
+                setCurrentInning((player1InningScores.length + 1).toString());
+                setInnings(inningData);
+            }
+            setCurrentGameId(game.id ?? "");
+        });
+        return parsedData;
+    };
+    
+    const handleSubmitInning = () => {
+        const totalBaseballScore = innings.reduce((acc, inning) => {
+            acc.player1 += inning.player1[0];
+            acc.player2 += inning.player2[0];
+            return acc;
+        }, { player1: 0, player2: 0 });
+        setTotalBaseballScore(totalBaseballScore);
+        setInnings([...innings, { player1: [currentInningScore.player1, currentInningErrors.player1], player2: [currentInningScore.player2, currentInningErrors.player2] }]);
+        setCurrentInningScore({ player1: 0, player2: 0 });
+        setCurrentInningErrors({ player1: 0, player2: 0 });
+        let winner = "";
+        setCurrentInning((parseInt(currentInning) + 1).toString());
+        if (parseInt(currentInning) >= 9) {
+            if (totalBaseballScore.player1 > totalBaseballScore.player2) {
+                console.log("Player 1 wins!");
+                winner = "player1";
+            } else if (totalBaseballScore.player1 < totalBaseballScore.player2) {
+                console.log("Player 2 wins!");
+                winner = "player2";
+            } else {
+                const updatedBaseBallInningValues = [...baseBallInningValues];
+                updatedBaseBallInningValues.push((innings.length + 2).toString());
+                setBaseBallInningValues(updatedBaseBallInningValues);
+                // if (innings.length === 8) {
+                //     updatedBaseBallInningValues.push((innings.length + 2).toString());
+                // }
+                // else {
+                //     updatedBaseBallInningValues.push((innings.length + 1).toString());
+                //     setBaseBallInningValues(updatedBaseBallInningValues);
+                // }
+            }
+        }
+        const result = client.models.DartGame.update({
+            id: currentGameId,
+            baseballInningScoresPlayer1: [...innings.map((inning) => inning.player1[0]), currentInningScore.player1],
+            baseballInningScoresPlayer2: [...innings.map((inning) => inning.player2[0]), currentInningScore.player2],
+            baseballInningErrorsPlayer1: [...innings.map((inning) => inning.player1[1]), currentInningErrors.player1],
+            baseballInningErrorsPlayer2: [...innings.map((inning) => inning.player2[1]), currentInningErrors.player2],
+            winnerName: winner === "player1" ? playerOneName : winner === "player2" ? playerTwoName : "",
+            loserName: winner === "player1" ? playerTwoName : winner === "player2" ? playerOneName : "",
+            status: winner ? "Completed" : "InProgress"
+        }).then(() => {
+            console.log("Inning submitted successfully");
+        }).catch((error) => {
+            console.error("Error submitting inning:", error);
+        });
+        console.log(result);
+    };
+
+    const handleBaseballInputChange = (e: string, player: 'player1' | 'player2', type: 'score' | 'errors') => {
+        if (e === "") {
+            setCurrentInningScore({ ...currentInningScore, [player]: 0 });
+            return;
+        }
+
+        const value = parseInt(e, 10) || 0;
+        if (type === 'score') {
+            setCurrentInningScore({ ...currentInningScore, [player]: value });
+        } else if (type === 'errors') {
+            setCurrentInningErrors({ ...currentInningErrors, [player]: value });
+        }
+    };
 
     const handleSelectGameType = (e: string) => {
         setCurrentGameType(e);
@@ -174,6 +264,31 @@ export default function DartScoreboard() {
         const player2Score = parseInt(currentRound.player2, 10) || 0;
         setRounds([...rounds, { player1: player1Score, player2: player2Score }]);
         setCurrentRound({ player1: '', player2: '' });
+        let winner = "";
+        let status = "InProgress";
+        if (player1Score === 0) {
+            
+            winner = "player1";
+            status = "Completed";
+        } else if (player2Score === 0) {
+            winner = "player2";
+            status = "Completed";
+        } 
+    
+        // Push updates to server
+        const result = client.models.DartGame.update({
+            id: currentGameId,
+            x01RoundScoresPlayer1: [...rounds.map((round) => round.player1), player1Score],
+            x01RoundScoresPlayer2: [...rounds.map((round) => round.player2), player2Score],     
+            status: status as "InProgress" | "Completed",
+            winnerName: winner === "player1" ? playerOneName : winner === "player2" ? playerTwoName : "",
+            loserName: winner === "player1" ? playerTwoName : winner === "player2" ? playerOneName : "",
+        }).then(() => {
+            console.log("Round submitted successfully");
+        }).catch((error) => {
+            console.error("Error submitting round:", error);
+        });
+        console.log(result);
     };
 
     const undoRound = () => {
@@ -318,11 +433,48 @@ export default function DartScoreboard() {
         setBaseBallInningValues(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
     };
 
+    const createNewDartGame = () => {
+            let gameType = "";
+            if (currentGameType === "301") {
+                gameType = "ThreeOhOne";
+            } else if (currentGameType === "501") {
+                gameType = "FiveOhOne";
+            } else if (currentGameType === "701") {
+                gameType = "SevenOhOne";
+            } else if (currentGameType === "Cricket") {
+                gameType = "Cricket";
+            } else if (currentGameType === "Baseball") {
+                gameType = "Baseball";
+            } else {
+                gameType = "RobdayNightFootball";
+            }
+        const result = client.models.DartGame.create({
+            gameType: gameType as "ThreeOhOne" | "FiveOhOne" | "SevenOhOne" | "Cricket" | "Baseball" | "RobdayNightFootball",
+            x01RoundScoresPlayer1: [],
+            x01RoundScoresPlayer2: [],
+            cricketMarksPlayer1: [],
+            cricketMarksPlayer2: [],
+            cricketTotalPointsPlayer1: [],
+            cricketTotalPointsPlayer2: [],
+            baseballInningScoresPlayer1: [],
+            baseballInningScoresPlayer2: [],
+            baseballInningErrorsPlayer1: [],
+            baseballInningErrorsPlayer2: [],
+            status: "InProgress",
+            player1Name: playerOneName,
+            player2Name: playerTwoName,
+        }).then((data) => {
+            console.log("New dart game created:", data);
+            // setCurrentGameId(data.id ?? "");
+        }).catch((error) => {
+            console.error("Error creating new dart game:", error);
+        });
+        console.log(result);
+    };
 
-
-    // useEffect(() => {
-
-    // }, []);
+    useEffect(() => {
+        fetchActiveDartGames();
+    }, []);
 
     return (
         <Column fillWidth fillHeight justifyContent="center" alignItems="center" background="surface" padding="xs">
@@ -336,6 +488,11 @@ export default function DartScoreboard() {
                 />
                 <Button variant="secondary" onClick={resetScores}>
                     Reset Scores
+                </Button>
+            </Row>
+            <Row fillWidth gap="16" justifyContent="center" padding="s">
+                <Button variant="primary" onClick={createNewDartGame}>
+                    Create New Game
                 </Button>
             </Row>
             {(currentGameType === "301" || currentGameType === "501" || currentGameType === "701") && (
@@ -693,11 +850,11 @@ export default function DartScoreboard() {
                             {baseBallInningValues.map((inning, index) => (
                                 (parseInt(currentInning) > index + 1) ? (
                                     <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
-                                        <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{innings[index].player1[0]}</td>
-                                        <td style={{ color: "#BBB" }}>{innings[index].player1[1]}</td>
+                                        <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{innings[index]?.player1[0]}</td>
+                                        <td style={{ color: "#BBB" }}>{innings[index]?.player1[1]}</td>
                                         <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{inning}</td>
-                                        <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{innings[index].player2[0]}</td>
-                                        <td style={{ color: "#BBB" }}>{innings[index].player2[1]}</td>
+                                        <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{innings[index]?.player2[0]}</td>
+                                        <td style={{ color: "#BBB" }}>{innings[index]?.player2[1]}</td>
                                     </tr>
                                 ) :
                                     (parseInt(currentInning) === index + 1) ? (
