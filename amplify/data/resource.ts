@@ -1,4 +1,5 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { start } from "repl";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -143,6 +144,27 @@ const schema = a.schema({
       activities: a.hasMany("ActivityLocation", "locationId"),
       robdaylogs: a.hasMany("RobdaylogLocation", "locationId"),
       activityInstances: a.hasMany("ActivityInstance", "locationId")
+    }).authorization((allow) => [allow.publicApiKey()]),
+  DartGame: a
+    .model({
+      startTime: a.timestamp(),
+      endTime: a.timestamp(),
+      status: a.enum(["InProgress", "Completed"]),
+      gameType: a.enum(["Cricket", "301", "501", "701", "Baseball", "RobdayNightFootball"]),
+      player1Name: a.string(),
+      player2Name: a.string(),
+      x01RoundScoresPlayer1: a.integer().array(),
+      x01RoundScoresPlayer2: a.integer().array(),
+      baseballInningScoresPlayer1: a.integer().array(),
+      baseballInningScoresPlayer2: a.integer().array(),
+      baseballInningErrorsPlayer1: a.integer().array(),
+      baseballInningErrorsPlayer2: a.integer().array(),
+      cricketTotalPointsPlayer1: a.integer().array(),
+      cricketTotalPointsPlayer2: a.integer().array(),
+      cricketMarksPlayer1: a.integer().array(),
+      cricketMarksPlayer2: a.integer().array(),
+      winnerName: a.string(),
+      loserName: a.string(),
     }).authorization((allow) => [allow.publicApiKey()]),
 });
 
