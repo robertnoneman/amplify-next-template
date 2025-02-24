@@ -217,6 +217,12 @@ export default function DartScoreboard() {
         });
         console.log(result);
         if (winner !== "") {
+            if (winner === "player1") {
+                fire("player1");
+            }
+            else {
+                fire("player2");
+            }
             setCurrentGameId("");
             resetScores();
         }
