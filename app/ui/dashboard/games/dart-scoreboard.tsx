@@ -12,17 +12,21 @@ import {
     Heading,
     Line,
     NumberInput,
+    Card,
+    Icon
 } from "@/once-ui/components";
 
 export default function DartScoreboard() {
-    const [playerOneScores, setPlayerOneScores] = useState([0]);
-    const [playerTwoScores, setPlayerTwoScores] = useState([0]);
+    const [playerOnePoints, setPlayerOnePoints] = useState(0);
+    const [playerTwoPoints, setPlayerTwoPoints] = useState(0);
+    const [playerOneTotalPoints, setPlayerOneTotalPoints] = useState([0]);
+    const [playerTwoTotalPoints, setPlayerTwoTotalPoints] = useState([0]);
     const [gameTypes, setGameTypes] = useState(["301", "501", "701", "Cricket", "Baseball", "Robday Night Football"]);
     const [currentGameType, setCurrentGameType] = useState("301");
     const [playerOneName, setPlayerOneName] = useState("Player 1");
     const [playerTwoName, setPlayerTwoName] = useState("Player 2");
     const boardNumbers = [20, 19, 18, 17, 16, 15, "BULL", "T", "D", "3B"];
-    const scoreboardValues = ["20", "19", "18", "17", "16", "15", 'BULL', 'T', 'D', '3B'];
+    const scoreboardValues = ["20", "19", "18", "17", "16", "15", 'BULL'];
     const [initialScore, setInitialScore] = useState(301);
 
     // Store finalized rounds: each round is an object with player1 and player2 round scores (as numbers)
@@ -117,18 +121,79 @@ export default function DartScoreboard() {
         setRounds(rounds.slice(0, -1));
     }
 
+    const incrementValTally = (player: 'player1' | 'player2', val: string) => {
+        console.log("player", player);
+        console.log("val", val);
+
+        if (player === 'player1') {
+            console.log("player1Inputs[val]", player1Inputs[val]);
+            if (player1Inputs[val] === 3) {
+                setPlayer1Inputs({ ...player1Inputs, [val]: 0 });
+                return;
+            }
+            setPlayer1Inputs({ ...player1Inputs, [val]: (player1Inputs[val] || 0) + 1 });
+        } else {
+            console.log("player2Inputs[val]", player2Inputs[val]);
+            if (player2Inputs[val] === 3) {
+                setPlayer2Inputs({ ...player2Inputs, [val]: 0 });
+                return;
+            }
+            setPlayer2Inputs({ ...player2Inputs, [val]: (player2Inputs[val] || 0) + 1 });
+        }
+    };
+
+    const addPointsCricket = (points: string, player: 'player1' | 'player2') => {
+        
+        const numericPoints = parseInt(points, 10) || 0;
+
+        if (player === 'player1') {
+            setPlayerOnePoints(numericPoints);
+        } else {
+            setPlayerTwoPoints(numericPoints);
+        }
+    };
+
+    const onAddPointsCricket = () => {
+        
+        const newPlayer1Total = playerOneTotalPoints[playerOneTotalPoints.length - 1] + playerOnePoints;
+        const newPlayer2Total = playerTwoTotalPoints[playerTwoTotalPoints.length - 1] + playerTwoPoints;
+        const newPlayerOneTotalPoints = [...playerOneTotalPoints, newPlayer1Total];
+        const newPlayerTwoTotalPoints = [...playerTwoTotalPoints, newPlayer2Total];
+        if (newPlayerOneTotalPoints.length > 7) {
+            newPlayerOneTotalPoints.shift();
+        }
+        if (newPlayerTwoTotalPoints.length > 7) {
+            newPlayerTwoTotalPoints.shift();
+        }
+        console.log("newPlayerOneTotalPoints", newPlayerOneTotalPoints);
+        console.log("newPlayerTwoTotalPoints", newPlayerTwoTotalPoints);
+        if (playerOnePoints > 0) {
+            setPlayerOneTotalPoints(newPlayerOneTotalPoints);
+        }
+        if (playerTwoPoints > 0) {
+            setPlayerTwoTotalPoints(newPlayerTwoTotalPoints);
+        }
+        setPlayerOnePoints(0);
+        setPlayerTwoPoints(0);
+    };
 
     const handleInputChangeCricket = (
         player: 'player1' | 'player2',
         val: string,
-        score: number
+        points: number,
+        tally: number
     ) => {
         // const input = e;
-        console.log("input", val);
+        console.log("input", val, points, tally);
         if (player === 'player1') {
-            setPlayer1Inputs({ ...player1Inputs, [val]: score });
+            setPlayer1Inputs({ ...player1Inputs, [val]: tally });
+            const newTotal = playerOnePoints + points;
+            setPlayerOnePoints(newTotal);
+            
         } else {
-            setPlayer2Inputs({ ...player2Inputs, [val]: score });
+            setPlayer2Inputs({ ...player2Inputs, [val]: tally });
+            const newTotal = playerTwoPoints + points;
+            setPlayerTwoPoints(newTotal);
         }
     };
 
@@ -178,6 +243,10 @@ export default function DartScoreboard() {
     const resetScores = () => {
         setCurrentRound({ player1: '', player2: '' });
         setRounds([]);
+        setPlayerOnePoints(0);
+        setPlayerTwoPoints(0);
+        setPlayerOneTotalPoints([0]);
+        setPlayerTwoTotalPoints([0]);
         setPlayer1Scores({ ...initialPlayerScores });
         setPlayer2Scores({ ...initialPlayerScores });
         setPlayer1Inputs({ ...initialPlayerScores });
@@ -209,7 +278,6 @@ export default function DartScoreboard() {
                 <Heading align="center">
                     Dart Scoreboard (Game: {initialScore})
                 </Heading>
-                {/* <button onClick={resetScores}>Reset Scores</button> */}
                 <div style={{ marginBottom: '1rem' }}></div>
                 <table
                     style={{
@@ -290,14 +358,6 @@ export default function DartScoreboard() {
                         {/* Current round input row */}
                         <tr style={{ borderTop: '2px dashed #666' }}>
                             <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
-                            {/* <NumberInput
-                                    id="player1-input"
-                                    // value={parseInt(currentRound.player1)}
-                                    value={0}
-                                    onChange={(e) => handleInputChange(e, 'player1')}
-                                    label="Score"
-                                    // style={{ width: '60px' }}
-                                /> */}
                                 <input
                                     type="number"
                                     value={parseInt(currentRound.player1)}
@@ -328,6 +388,167 @@ export default function DartScoreboard() {
                 <Button variant="secondary" onClick={undoRound}>
                     Undo Round
                 </Button>
+                </Row>
+               
+            </div>
+            )}
+
+            {(currentGameType === "Cricket") && (
+            <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
+                <Heading align="center">
+                    Dart Scoreboard (Game: {currentGameType})
+                </Heading>
+                <div style={{ marginBottom: '1rem' }}></div>
+                <table
+                    style={{
+                        width: '100%',
+                        borderCollapse: 'collapse',
+                        textAlign: 'center',
+                        marginBottom: '1rem',
+                    }}
+                >
+                    <thead style={{ padding: '10px' }}>
+                        <tr style={{ paddingBottom: '10px' }}>
+                            <th colSpan={2}>
+                            <Text variant="heading-default-l">
+                                <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)} 
+                                style={{paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                />
+                            </Text>
+                            </th>
+                            <th>
+                                <Text variant="heading-default-m">
+                                vs
+                                </Text>
+                            </th>
+                            <th colSpan={2}>
+                            <Text variant="heading-default-l">
+                                <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)} 
+                                style={{paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                />
+                            </Text>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colSpan={5}>
+                                <Text variant="body-default-xs">
+                                    -
+                                </Text>
+                            </th>
+                        </tr>
+                        <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
+                            <th style={{borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>                                
+                                <Text variant="heading-default-xs">
+                                    POINTS
+                                </Text>
+                            </th>
+                            <th style={{padding: "0.1rem", color: '#CCC'}}>
+                            <Text variant="label-default-xs">
+                                TALLY
+                            </Text>
+                            </th>
+                            <th style={{borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
+                                <Text variant="heading-strong-l">
+                                {currentGameType}
+                                </Text>
+                                </th>
+                            <th style={{padding: "0.1rem", color: '#CCC'}}>
+                            <Text variant="label-default-xs">
+                                TALLY
+                            </Text>
+                            </th>
+                            <th style={{borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC'}}>
+                            <Text variant="heading-default-xs">    
+                                POINTS
+                            </Text>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {/* Render each finalized round */}
+                        {scoreboardValues.map((round, index) => (
+                            <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                                <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB", textDecoration: (playerOneTotalPoints.length > index + 1 ? "line-through" : "none") }}>
+                                    {playerOneTotalPoints[index]?.toString()}
+                                    {/* <input
+                                        type="number"
+                                        value={playerOnePoints}
+                                        onChange={(e) => handleInputChangeCricket("player1", round, parseInt(e.target.value), 0)}
+                                        placeholder={""}
+                                        style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #555', color: '#BBB', zIndex: 10 }}
+                                        /> */}
+                                </td>
+                                <td style={{ color: "#BBB"  }}>
+                                    <Card maxWidth={10} height={3} onClick={incrementValTally.bind(null, 'player1', round)} zIndex={10} alignItems="center" justifyContent="center" border="transparent">
+                                        <Column fillWidth alignItems="center" justifyContent="center">
+                                        {( player1Inputs[round] === 1 ? <Icon name="single" size="xl" /> : 
+                                        player1Inputs[round] === 2 ? <Icon name="double" size='xl' /> : 
+                                        player1Inputs[round] === 3 ? <Icon name="singleClosed" size="xl"/> : 
+                                        <Line width={3} height={3} background="neutral-alpha-weak" />)}
+                                        </Column>
+                                    </Card>
+                                </td>
+                                <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>
+                                    {round}
+                                </td>
+                                <td style={{ color: "#BBB" }}>
+                                    <Card maxWidth={10} height={3} onClick={incrementValTally.bind(null, 'player2', round)} zIndex={10} alignItems="center" justifyContent="center" border="transparent">
+                                        <Column fillWidth alignItems="center" justifyContent="center">
+                                        {( player2Inputs[round] === 1 ? <Icon name="single" size="xl" /> : 
+                                        player2Inputs[round] === 2 ? <Icon name="double" size='xl' /> : 
+                                        player2Inputs[round] === 3 ? <Icon name="singleClosed" size="xl" /> : 
+                                        <Line width={3} height={3} background="neutral-alpha-weak" />)}
+                                        </Column>
+                                    </Card>
+                                </td>
+                                <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
+                                    {playerTwoTotalPoints[index]?.toString()}
+                                    {/* <input
+                                        type="number"
+                                        // value={player2Scores[round]}
+                                        value={playerTwoPoints}
+                                        onChange={(e) => handleInputChangeCricket("player2", round, parseInt(e.target.value), 0)}
+                                        placeholder={""}
+                                        style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #555', color: '#BBB', zIndex: 10 }}
+                                    /> */}
+                                </td>
+                            </tr>
+                        ))}
+                        {/* Current round input row */}
+                        <tr style={{ borderTop: '2px dashed #666' }}>
+                            <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
+                                <input
+                                    type="number"
+                                    value={playerOnePoints}
+                                    onChange={(e) => addPointsCricket(e.target.value, 'player1')}
+                                    placeholder={""}
+                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                />
+                            </td>
+                            <td style={{ color: "#EEE" }}>
+                                {playerOneTotalPoints[-1]}
+                            </td>
+                            <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} ></td>
+                            <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#EEE" }}>{playerTwoTotalPoints[-1]}</td>
+                            <td >
+                                <input
+                                    type="number"
+                                    value={playerTwoPoints}
+                                    onChange={(e) => addPointsCricket(e.target.value, 'player2')}
+                                    placeholder={""}
+                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <Row fillWidth gap="16" justifyContent="center">
+                <Button variant="primary" onClick={onAddPointsCricket}>
+                    Add Points
+                </Button>
+                {/* <Button variant="secondary" onClick={undoRound}>
+                    Undo Round
+                </Button> */}
                 </Row>
                
             </div>
@@ -397,426 +618,6 @@ export default function DartScoreboard() {
                     </tbody>
                 </table>
             </div> */}
-
-            {/* <Row gap="16" fillWidth alignItems="center" justifyContent="center">
-                <Column justifyContent="center" alignItems="center">
-                    <Heading align="center">
-                        {playerOneName}
-                    </Heading>
-                    <Line />
-                </Column>
-                <Column justifyContent="center" alignItems="center">
-                    <Heading align="center">
-                        - vs -
-                    </Heading>
-                </Column>
-                <Column justifyContent="center" alignItems="center">
-                    <Heading align="center">
-                        {playerTwoName}
-                    </Heading>
-                    <Line />
-                </Column>
-            </Row>
-            <Heading variant="heading-default-s" align="center">
-                {currentGameType}
-            </Heading>
-            <Line />
-
-            <Row fillWidth>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    ---
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    301
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    20
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    ---
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    301
-                </Column>
-            </Row>
-
-            <Row fillWidth fillHeight>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    60
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    241
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    19
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    11
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    290
-                </Column>
-            </Row>
-
-            <Row fillWidth>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    30
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    211
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    18
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    26
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    264
-                </Column>
-            </Row>
-
-            <Row fillWidth>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    17
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-            </Row>
-
-            <Row fillWidth>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    16
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-            </Row>
-            <Row fillWidth>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    15
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-            </Row>
-
-            <Row fillWidth>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    BULL
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight >
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-            </Row>
-
-            <Row fillWidth>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    T
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-            </Row>
-
-            <Row fillWidth>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    D
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-            </Row>
-
-            <Row fillWidth>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    3B
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight>
-                    <Line vertical />
-                </Column>
-                <Column justifyContent="center" alignItems="center" fillWidth fillHeight paddingY="s">
-                    .
-                </Column>
-            </Row> */}
-
-            {/* <Grid columns="3" gap="16" fillWidth>
-                <Column fillWidth gap="l" alignItems="center" justifyContent="center" paddingTop="12">
-                    {Array.from({ length: 10 }).map((_, index) => (
-                        <Grid columns="3" key={index}>
-                            <Column justifyContent="center" alignItems="center">
-                                <Heading align="center">
-                                    ---
-                                </Heading>
-                            </Column>
-                            <Column justifyContent="center" alignItems="center">
-                                <Line vertical />
-                            </Column>
-                            <Column justifyContent="center" alignItems="center">
-                                <Heading align="center">
-                                    301
-                                </Heading>
-                            </Column>
-                        </Grid>
-                    ))}
-                </Column>
-                <Grid columns="3" >
-                    <Column justifyContent="center" alignItems="center">
-                        <Line vertical />
-                    </Column>
-                    <Column justifyContent="center" alignItems="center" gap="l" paddingTop="12">
-                        <Row alignItems="center" justifyContent="center">
-                            <Heading align="center">
-                                20
-                            </Heading>
-                        </Row>
-                        <Row alignItems="center">
-                            <Heading align="center">
-                                19
-                            </Heading>
-                        </Row>
-                        <Row alignItems="center">
-                            <Heading align="center">
-                                18
-                            </Heading>
-                        </Row>
-                        <Row alignItems="center">
-                            <Heading align="center">
-                                17
-                            </Heading>
-                        </Row>
-                        <Row alignItems="center">
-                            <Heading align="center">
-                                16
-                            </Heading>
-                        </Row>
-                        <Row alignItems="center">
-                            <Heading align="center">
-                                15
-                            </Heading>
-                        </Row>
-                        <Row alignItems="center">
-                            <Heading align="center">
-                                BULL
-                            </Heading>
-                        </Row>
-                        <Row alignItems="center">
-                            <Heading align="center">
-                                T
-                            </Heading>
-                        </Row>
-                        <Row alignItems="center">
-                            <Heading align="center">
-                                D
-                            </Heading>
-                        </Row>
-                        <Row alignItems="center">
-                            <Heading align="center">
-                                3B
-                            </Heading>
-                        </Row>
-                    </Column>
-                    <Column justifyContent="center" alignItems="center">
-                        <Line vertical />
-                    </Column>
-                </Grid>
-                <Grid columns="3" fillWidth>
-                    <Column justifyContent="center" alignItems="center">
-                        <Heading align="center">
-                            x
-                        </Heading>
-                    </Column>
-                    <Column justifyContent="center" alignItems="center">
-                        <Line vertical />
-                    </Column>
-                    <Column justifyContent="center" alignItems="center">
-                        <Heading align="center">
-                            o
-                        </Heading>
-                    </Column>
-                </Grid>
-            </Grid> */}
         </Column>
     );
 }

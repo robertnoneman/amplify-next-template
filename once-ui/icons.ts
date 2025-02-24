@@ -54,7 +54,11 @@ import { RiVisaLine } from "react-icons/ri";
 
 import { GiTeamIdea } from "react-icons/gi"
 
-import { FaDiscord, FaGithub, FaGoogle } from "react-icons/fa6";
+import { FaDiscord, FaGithub, FaGoogle, FaSlash } from "react-icons/fa6";
+
+import { RxCross1, RxCrossCircled } from "react-icons/rx";
+
+import { LuBan, LuCircle, LuCircleOff, LuCircleSlash2 } from "react-icons/lu";
 
 export const iconLibrary: Record<string, IconType> = {
   chevronUp: HiChevronUp,
@@ -103,5 +107,10 @@ export const iconLibrary: Record<string, IconType> = {
   rewind: PiRewindCircleDuotone,
   dashboard: AiOutlineDashboard,
   idea: GiTeamIdea,
-  lightbulb: HiLightBulb
+  lightbulb: HiLightBulb,
+  single: FaSlash,
+  double: RxCross1,
+  singleClosed: RxCrossCircled,
+  singleDoubleClosed: LuCircleSlash2,
+  tripleClosed: LuCircle
 };
