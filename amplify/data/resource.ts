@@ -150,7 +150,7 @@ const schema = a.schema({
       startTime: a.timestamp(),
       endTime: a.timestamp(),
       status: a.enum(["InProgress", "Completed"]),
-      gameType: a.enum(["Cricket", "301", "501", "701", "Baseball", "RobdayNightFootball"]),
+      gameType: a.enum(["Cricket", "ThreeOhOne", "FiveOhOne", "SevenOhOne", "Baseball", "RobdayNightFootball"]),
       player1Name: a.string(),
       player2Name: a.string(),
       x01RoundScoresPlayer1: a.integer().array(),
