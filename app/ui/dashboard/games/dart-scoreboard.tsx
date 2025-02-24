@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     Grid,
     Column,
@@ -20,6 +20,9 @@ import outputs from "@/amplify_outputs.json"
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import { data, type Schema } from "@/amplify/data/resource";
+import Pride from "react-canvas-confetti/dist/presets/pride";
+import ReactCanvasConfetti from "react-canvas-confetti";
+import confetti from "canvas-confetti";
 
 Amplify.configure(outputs);
 
@@ -69,6 +72,38 @@ export default function DartScoreboard() {
             return acc;
         }, {})
     );
+    const [commonOptions, setCommonOptions] = useState({});
+    const [commonOptions2, setCommonOptions2] = useState({});
+
+    const angles = [60, 120];
+    const doubleAngles = angles.concat(angles);
+    const instance = useRef<any>(null);
+    const onInit = ({ confetti }: { confetti: any }) => {
+        instance.current = confetti;
+      };
+
+    const fire = (player: string) => {
+        if (player === "player1") {
+        doubleAngles.forEach((angle, index) => {
+          setTimeout(() => {
+            instance.current && instance.current({
+              ...commonOptions,
+              angle
+            });
+          }, index * 200);
+        });
+        }
+        else {
+        doubleAngles.forEach((angle, index) => {
+          setTimeout(() => {
+            instance.current && instance.current({
+              ...commonOptions2,
+              angle
+            });
+          }, index * 200);
+        });
+        }
+      };
 
     const fetchActiveDartGames = () => {
         client.models.DartGame.observeQuery().subscribe({
@@ -181,6 +216,10 @@ export default function DartScoreboard() {
             console.error("Error submitting inning:", error);
         });
         console.log(result);
+        if (winner !== "") {
+            setCurrentGameId("");
+            resetScores();
+        }
     };
 
     const handleBaseballInputChange = (e: string, player: 'player1' | 'player2', type: 'score' | 'errors') => {
@@ -289,6 +328,15 @@ export default function DartScoreboard() {
             console.error("Error submitting round:", error);
         });
         console.log(result);
+        if (winner !== "") {
+            if (winner === "player1") {
+                fire("player1");
+            } else {
+                fire("player2");
+            }
+            setCurrentGameId("");
+            // resetScores();
+        }
     };
 
     const undoRound = () => {
@@ -474,10 +522,37 @@ export default function DartScoreboard() {
 
     useEffect(() => {
         fetchActiveDartGames();
+        setCommonOptions({
+            spread: 55,
+            // ticks: 200,
+            gravity: .8,
+            // decay: 0.9,
+            startVelocity: 20,
+            colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+            particleCount: 3,
+            shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text:"😒"})],
+            scalar: 3,
+            // flat: true,
+            origin: {x: 0.0, y: 0.3 }
+          });
+        setCommonOptions2({
+            spread: 55,
+            // ticks: 200,
+            gravity: .8,
+            // decay: 0.9,
+            startVelocity: 30,
+            colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+            particleCount: 10,
+            shapes: [confetti.shapeFromText({text: "☹️"}), confetti.shapeFromText({text: "😒"})],
+            scalar: 2,
+            origin: {x: 1.0, y: 0.3 },
+            flat: true
+          });
     }, []);
 
     return (
         <Column fillWidth fillHeight justifyContent="center" alignItems="center" background="surface" padding="xs">
+            <ReactCanvasConfetti onInit={onInit} />
             <Row fillWidth gap="16" justifyContent="center" padding="s">
                 <Select
                     id="game-type"
@@ -490,11 +565,13 @@ export default function DartScoreboard() {
                     Reset Scores
                 </Button>
             </Row>
+            {( currentGameId === "") && (
             <Row fillWidth gap="16" justifyContent="center" padding="s">
                 <Button variant="primary" onClick={createNewDartGame}>
                     Create New Game
                 </Button>
             </Row>
+            )}
             {(currentGameType === "301" || currentGameType === "501" || currentGameType === "701") && (
                 <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
                     <Heading align="center">
@@ -611,7 +688,6 @@ export default function DartScoreboard() {
                             Undo Round
                         </Button>
                     </Row>
-
                 </div>
             )}
 
@@ -1017,6 +1093,7 @@ export default function DartScoreboard() {
                     </table>
                 </div>
             )}
+            
 
             {/* <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
                 <h2>Dart Scoreboard</h2>
