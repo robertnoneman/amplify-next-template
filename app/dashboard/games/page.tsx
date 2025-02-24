@@ -28,7 +28,6 @@ export default function Page() {
           <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
             GAMES
           </Heading>
-          HERE'S WHERE ALL THE AWESOME GAMES WILL BE!
           <DartScoreboard />
         </Column>
       <Row style={{width: "50%"}} marginBottom="xl" paddingBottom="l">

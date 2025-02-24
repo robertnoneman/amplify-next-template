@@ -27,7 +27,58 @@ export default function DartScoreboard() {
     const [playerTwoName, setPlayerTwoName] = useState("Player 2");
     const boardNumbers = [20, 19, 18, 17, 16, 15, "BULL", "T", "D", "3B"];
     const scoreboardValues = ["20", "19", "18", "17", "16", "15", 'BULL'];
+    const [baseBallInningValues, setBaseBallInningValues] = useState(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
+    const [currentInning, setCurrentInning] = useState("1");
+    const [currentInningScore, setCurrentInningScore] = useState({ player1: 0, player2: 0 });
+    const [currentInningErrors, setCurrentInningErrors] = useState({ player1: 0, player2: 0 });
+    const [totalBaseballScore, setTotalBaseballScore] = useState({ player1: 0, player2: 0 });
+    const [innings, setInnings] = useState<{ player1: [number, number]; player2: [number, number] }[]>([]);
     const [initialScore, setInitialScore] = useState(301);
+
+    const handleSubmitInning = () => {
+        const totalBaseballScore = innings.reduce((acc, inning) => {
+            acc.player1 += inning.player1[0];
+            acc.player2 += inning.player2[0];
+            return acc;
+        }, { player1: 0, player2: 0 });
+        setTotalBaseballScore(totalBaseballScore);
+        setInnings([...innings, { player1: [currentInningScore.player1, currentInningErrors.player1], player2: [currentInningScore.player2, currentInningErrors.player2] }]);
+        setCurrentInningScore({ player1: 0, player2: 0 });
+        setCurrentInningErrors({ player1: 0, player2: 0 });
+        setCurrentInning((parseInt(currentInning) + 1).toString());
+        if (parseInt(currentInning) >= 9) {
+            if (totalBaseballScore.player1 > totalBaseballScore.player2) {
+                console.log("Player 1 wins!");
+            } else if (totalBaseballScore.player1 < totalBaseballScore.player2) {
+                console.log("Player 2 wins!");
+            } else {
+                const updatedBaseBallInningValues = [...baseBallInningValues];
+                updatedBaseBallInningValues.push((innings.length + 2).toString());
+                setBaseBallInningValues(updatedBaseBallInningValues);
+                // if (innings.length === 8) {
+                //     updatedBaseBallInningValues.push((innings.length + 2).toString());
+                // }
+                // else {
+                //     updatedBaseBallInningValues.push((innings.length + 1).toString());
+                //     setBaseBallInningValues(updatedBaseBallInningValues);
+                // }
+            }
+        }
+    };
+
+    const handleBaseballInputChange = (e: string, player: 'player1' | 'player2', type: 'score' | 'errors') => {
+        if (e === "") {
+            setCurrentInningScore({ ...currentInningScore, [player]: 0 });
+            return;
+        }
+
+        const value = parseInt(e, 10) || 0;
+        if (type === 'score') {
+            setCurrentInningScore({ ...currentInningScore, [player]: value });
+        } else if (type === 'errors') {
+            setCurrentInningErrors({ ...currentInningErrors, [player]: value });
+        }
+    };
 
     // Store finalized rounds: each round is an object with player1 and player2 round scores (as numbers)
     const [rounds, setRounds] = useState<{ player1: number; player2: number }[]>([]);
@@ -92,6 +143,14 @@ export default function DartScoreboard() {
         return rounds.reduce((total, round) => total + (Number(round[player]) || 0), 0);
     };
 
+    const cumulativeScoreBaseball = (player: 'player1' | 'player2') => {
+        return innings.reduce((total, inning) => total + inning[player][0], 0);
+    }
+
+    const cumulativeErrorsBaseball = (player: 'player1' | 'player2') => {
+        return innings.reduce((total, inning) => total + inning[player][1], 0);
+    }
+
     // Compute the remaining score after all rounds up to a given round index (inclusive)
     const computeRemainingAfterRound = (player: 'player1' | 'player2', roundIndex: number) => {
         const total = rounds.slice(0, roundIndex + 1).reduce((sum, round) => {
@@ -143,7 +202,7 @@ export default function DartScoreboard() {
     };
 
     const addPointsCricket = (points: string, player: 'player1' | 'player2') => {
-        
+
         const numericPoints = parseInt(points, 10) || 0;
 
         if (player === 'player1') {
@@ -154,7 +213,7 @@ export default function DartScoreboard() {
     };
 
     const onAddPointsCricket = () => {
-        
+
         const newPlayer1Total = playerOneTotalPoints[playerOneTotalPoints.length - 1] + playerOnePoints;
         const newPlayer2Total = playerTwoTotalPoints[playerTwoTotalPoints.length - 1] + playerTwoPoints;
         const newPlayerOneTotalPoints = [...playerOneTotalPoints, newPlayer1Total];
@@ -189,7 +248,7 @@ export default function DartScoreboard() {
             setPlayer1Inputs({ ...player1Inputs, [val]: tally });
             const newTotal = playerOnePoints + points;
             setPlayerOnePoints(newTotal);
-            
+
         } else {
             setPlayer2Inputs({ ...player2Inputs, [val]: tally });
             const newTotal = playerTwoPoints + points;
@@ -251,6 +310,12 @@ export default function DartScoreboard() {
         setPlayer2Scores({ ...initialPlayerScores });
         setPlayer1Inputs({ ...initialPlayerScores });
         setPlayer2Inputs({ ...initialPlayerScores });
+        setInnings([]);
+        setCurrentInning("1");
+        setCurrentInningScore({ player1: 0, player2: 0 });
+        setCurrentInningErrors({ player1: 0, player2: 0 });
+        setTotalBaseballScore({ player1: 0, player2: 0 });
+        setBaseBallInningValues(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
     };
 
 
@@ -269,241 +334,241 @@ export default function DartScoreboard() {
                     options={gameTypes.map((type) => ({ label: type, value: type }))}
                     onSelect={(e) => handleSelectGameType(e)}
                 />
-            <Button variant="secondary" onClick={resetScores}>
-                Reset Scores
-            </Button>
+                <Button variant="secondary" onClick={resetScores}>
+                    Reset Scores
+                </Button>
             </Row>
             {(currentGameType === "301" || currentGameType === "501" || currentGameType === "701") && (
-            <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
-                <Heading align="center">
-                    Dart Scoreboard (Game: {initialScore})
-                </Heading>
-                <div style={{ marginBottom: '1rem' }}></div>
-                <table
-                    style={{
-                        width: '100%',
-                        borderCollapse: 'collapse',
-                        textAlign: 'center',
-                        marginBottom: '1rem',
-                    }}
-                >
-                    <thead style={{ padding: '10px' }}>
-                        <tr style={{ paddingBottom: '10px' }}>
-                            <th colSpan={2}>
-                            <Text variant="heading-default-l">
-                                <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)} 
-                                style={{paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
-                                />
-                            </Text>
-                            </th>
-                            <th>
-                                <Text variant="heading-default-m">
-                                vs
-                                </Text>
-                            </th>
-                            <th colSpan={2}>
-                            <Text variant="heading-default-l">
-                                <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)} 
-                                style={{paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
-                                />
-                            </Text>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th colSpan={5}>
-                                <Text variant="body-default-xs">
-                                    -
-                                </Text>
-                            </th>
-                        </tr>
-                        <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
-                            <th style={{borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>                                
-                                <Text variant="heading-default-xs">
-                                    ROUND SCORE
-                                </Text>
-                            </th>
-                            <th style={{padding: "0.1rem", color: '#CCC'}}>
-                            <Text variant="label-default-xs">
-                                REMAINING
-                            </Text>
-                            </th>
-                            <th style={{borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
-                                <Text variant="heading-strong-l">
-                                {currentGameType}
-                                </Text>
+                <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
+                    <Heading align="center">
+                        Dart Scoreboard (Game: {initialScore})
+                    </Heading>
+                    <div style={{ marginBottom: '1rem' }}></div>
+                    <table
+                        style={{
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            textAlign: 'center',
+                            marginBottom: '1rem',
+                        }}
+                    >
+                        <thead style={{ padding: '10px' }}>
+                            <tr style={{ paddingBottom: '10px' }}>
+                                <th colSpan={2}>
+                                    <Text variant="heading-default-l">
+                                        <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)}
+                                            style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                        />
+                                    </Text>
                                 </th>
-                            <th style={{borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC'}}>
-                            <Text variant="heading-default-xs">    
-                                ROUND SCORE
-                            </Text>
-                            </th>
-                            <th style={{padding: "0.1rem", color: '#CCC'}}>
-                            <Text variant="label-default-xs">
-                                REMAINING
-                            </Text>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {/* Render each finalized round */}
-                        {rounds.map((round, index) => (
-                            <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
-                                <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round.player1}</td>
-                                <td style={{ color: "#BBB", textDecoration: "line-through" }}>{computeRemainingAfterRound('player1', index)}</td>
-                                <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{index + 1}</td>
-                                <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round.player2}</td>
-                                <td style={{ color: "#BBB", textDecoration: "line-through" }}>{computeRemainingAfterRound('player2', index)}</td>
+                                <th>
+                                    <Text variant="heading-default-m">
+                                        vs
+                                    </Text>
+                                </th>
+                                <th colSpan={2}>
+                                    <Text variant="heading-default-l">
+                                        <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)}
+                                            style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                        />
+                                    </Text>
+                                </th>
                             </tr>
-                        ))}
-                        {/* Current round input row */}
-                        <tr style={{ borderTop: '2px dashed #666' }}>
-                            <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
-                                <input
-                                    type="number"
-                                    value={parseInt(currentRound.player1)}
-                                    onChange={(e) => handleInputChange(e.target.value, 'player1')}
-                                    placeholder={""}
-                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
-                                />
-                            </td>
-                            <td style={{ color: "#EEE" }}>{currentRemaining('player1')}</td>
-                            <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} >{rounds.length + 1}</td>
-                            <td >
-                                <input
-                                    type="number"
-                                    value={parseInt(currentRound.player2)}
-                                    onChange={(e) => handleInputChange(e.target.value, 'player2')}
-                                    placeholder={""}
-                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
-                                />
-                            </td>
-                            <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#EEE" }}>{currentRemaining('player2')}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <Row fillWidth gap="16" justifyContent="center">
-                <Button variant="primary" onClick={submitRound}>
-                    Submit Round
-                </Button>
-                <Button variant="secondary" onClick={undoRound}>
-                    Undo Round
-                </Button>
-                </Row>
-               
-            </div>
+                            <tr>
+                                <th colSpan={5}>
+                                    <Text variant="body-default-xs">
+                                        -
+                                    </Text>
+                                </th>
+                            </tr>
+                            <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
+                                <th style={{ borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="heading-default-xs">
+                                        ROUND SCORE
+                                    </Text>
+                                </th>
+                                <th style={{ padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="label-default-xs">
+                                        REMAINING
+                                    </Text>
+                                </th>
+                                <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
+                                    <Text variant="heading-strong-l">
+                                        {currentGameType}
+                                    </Text>
+                                </th>
+                                <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="heading-default-xs">
+                                        ROUND SCORE
+                                    </Text>
+                                </th>
+                                <th style={{ padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="label-default-xs">
+                                        REMAINING
+                                    </Text>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {/* Render each finalized round */}
+                            {rounds.map((round, index) => (
+                                <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                                    <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round.player1}</td>
+                                    <td style={{ color: "#BBB", textDecoration: "line-through" }}>{computeRemainingAfterRound('player1', index)}</td>
+                                    <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{index + 1}</td>
+                                    <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round.player2}</td>
+                                    <td style={{ color: "#BBB", textDecoration: "line-through" }}>{computeRemainingAfterRound('player2', index)}</td>
+                                </tr>
+                            ))}
+                            {/* Current round input row */}
+                            <tr style={{ borderTop: '2px dashed #666' }}>
+                                <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
+                                    <input
+                                        type="number"
+                                        value={parseInt(currentRound.player1)}
+                                        onChange={(e) => handleInputChange(e.target.value, 'player1')}
+                                        placeholder={""}
+                                        style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                    />
+                                </td>
+                                <td style={{ color: "#EEE" }}>{currentRemaining('player1')}</td>
+                                <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} >{rounds.length + 1}</td>
+                                <td >
+                                    <input
+                                        type="number"
+                                        value={parseInt(currentRound.player2)}
+                                        onChange={(e) => handleInputChange(e.target.value, 'player2')}
+                                        placeholder={""}
+                                        style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                    />
+                                </td>
+                                <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#EEE" }}>{currentRemaining('player2')}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <Row fillWidth gap="16" justifyContent="center">
+                        <Button variant="primary" onClick={submitRound}>
+                            Submit Round
+                        </Button>
+                        <Button variant="secondary" onClick={undoRound}>
+                            Undo Round
+                        </Button>
+                    </Row>
+
+                </div>
             )}
 
             {(currentGameType === "Cricket") && (
-            <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
-                <Heading align="center">
-                    Dart Scoreboard (Game: {currentGameType})
-                </Heading>
-                <div style={{ marginBottom: '1rem' }}></div>
-                <table
-                    style={{
-                        width: '100%',
-                        borderCollapse: 'collapse',
-                        textAlign: 'center',
-                        marginBottom: '1rem',
-                    }}
-                >
-                    <thead style={{ padding: '10px' }}>
-                        <tr style={{ paddingBottom: '10px' }}>
-                            <th colSpan={2}>
-                            <Text variant="heading-default-l">
-                                <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)} 
-                                style={{paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
-                                />
-                            </Text>
-                            </th>
-                            <th>
-                                <Text variant="heading-default-m">
-                                vs
-                                </Text>
-                            </th>
-                            <th colSpan={2}>
-                            <Text variant="heading-default-l">
-                                <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)} 
-                                style={{paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
-                                />
-                            </Text>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th colSpan={5}>
-                                <Text variant="body-default-xs">
-                                    -
-                                </Text>
-                            </th>
-                        </tr>
-                        <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
-                            <th style={{borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>                                
-                                <Text variant="heading-default-xs">
-                                    POINTS
-                                </Text>
-                            </th>
-                            <th style={{padding: "0.1rem", color: '#CCC'}}>
-                            <Text variant="label-default-xs">
-                                TALLY
-                            </Text>
-                            </th>
-                            <th style={{borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
-                                <Text variant="heading-strong-l">
-                                {currentGameType}
-                                </Text>
+                <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
+                    <Heading align="center">
+                        Dart Scoreboard (Game: {currentGameType})
+                    </Heading>
+                    <div style={{ marginBottom: '1rem' }}></div>
+                    <table
+                        style={{
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            textAlign: 'center',
+                            marginBottom: '1rem',
+                        }}
+                    >
+                        <thead style={{ padding: '10px' }}>
+                            <tr style={{ paddingBottom: '10px' }}>
+                                <th colSpan={2}>
+                                    <Text variant="heading-default-l">
+                                        <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)}
+                                            style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                        />
+                                    </Text>
                                 </th>
-                            <th style={{padding: "0.1rem", color: '#CCC'}}>
-                            <Text variant="label-default-xs">
-                                TALLY
-                            </Text>
-                            </th>
-                            <th style={{borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC'}}>
-                            <Text variant="heading-default-xs">    
-                                POINTS
-                            </Text>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {/* Render each finalized round */}
-                        {scoreboardValues.map((round, index) => (
-                            <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
-                                <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB", textDecoration: (playerOneTotalPoints.length > index + 1 ? "line-through" : "none") }}>
-                                    {playerOneTotalPoints[index]?.toString()}
-                                    {/* <input
+                                <th>
+                                    <Text variant="heading-default-m">
+                                        vs
+                                    </Text>
+                                </th>
+                                <th colSpan={2}>
+                                    <Text variant="heading-default-l">
+                                        <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)}
+                                            style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                        />
+                                    </Text>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th colSpan={5}>
+                                    <Text variant="body-default-xs">
+                                        -
+                                    </Text>
+                                </th>
+                            </tr>
+                            <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
+                                <th style={{ borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="heading-default-xs">
+                                        POINTS
+                                    </Text>
+                                </th>
+                                <th style={{ padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="label-default-xs">
+                                        TALLY
+                                    </Text>
+                                </th>
+                                <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
+                                    <Text variant="heading-strong-l">
+                                        {currentGameType}
+                                    </Text>
+                                </th>
+                                <th style={{ padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="label-default-xs">
+                                        TALLY
+                                    </Text>
+                                </th>
+                                <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="heading-default-xs">
+                                        POINTS
+                                    </Text>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {/* Render each finalized round */}
+                            {scoreboardValues.map((round, index) => (
+                                <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                                    <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB", textDecoration: (playerOneTotalPoints.length > index + 1 ? "line-through" : "none") }}>
+                                        {playerOneTotalPoints[index]?.toString()}
+                                        {/* <input
                                         type="number"
                                         value={playerOnePoints}
                                         onChange={(e) => handleInputChangeCricket("player1", round, parseInt(e.target.value), 0)}
                                         placeholder={""}
                                         style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #555', color: '#BBB', zIndex: 10 }}
                                         /> */}
-                                </td>
-                                <td style={{ color: "#BBB"  }}>
-                                    <Card maxWidth={10} height={3} onClick={incrementValTally.bind(null, 'player1', round)} zIndex={10} alignItems="center" justifyContent="center" border="transparent">
-                                        <Column fillWidth alignItems="center" justifyContent="center">
-                                        {( player1Inputs[round] === 1 ? <Icon name="single" size="xl" /> : 
-                                        player1Inputs[round] === 2 ? <Icon name="double" size='xl' /> : 
-                                        player1Inputs[round] === 3 ? <Icon name="singleClosed" size="xl"/> : 
-                                        <Line width={3} height={3} background="neutral-alpha-weak" />)}
-                                        </Column>
-                                    </Card>
-                                </td>
-                                <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>
-                                    {round}
-                                </td>
-                                <td style={{ color: "#BBB" }}>
-                                    <Card maxWidth={10} height={3} onClick={incrementValTally.bind(null, 'player2', round)} zIndex={10} alignItems="center" justifyContent="center" border="transparent">
-                                        <Column fillWidth alignItems="center" justifyContent="center">
-                                        {( player2Inputs[round] === 1 ? <Icon name="single" size="xl" /> : 
-                                        player2Inputs[round] === 2 ? <Icon name="double" size='xl' /> : 
-                                        player2Inputs[round] === 3 ? <Icon name="singleClosed" size="xl" /> : 
-                                        <Line width={3} height={3} background="neutral-alpha-weak" />)}
-                                        </Column>
-                                    </Card>
-                                </td>
-                                <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
-                                    {playerTwoTotalPoints[index]?.toString()}
-                                    {/* <input
+                                    </td>
+                                    <td style={{ color: "#BBB" }}>
+                                        <Card maxWidth={10} height={3} onClick={incrementValTally.bind(null, 'player1', round)} zIndex={10} alignItems="center" justifyContent="center" border="transparent">
+                                            <Column fillWidth alignItems="center" justifyContent="center">
+                                                {(player1Inputs[round] === 1 ? <Icon name="single" size="xl" /> :
+                                                    player1Inputs[round] === 2 ? <Icon name="double" size='xl' /> :
+                                                        player1Inputs[round] === 3 ? <Icon name="singleClosed" size="xl" /> :
+                                                            <Line width={3} height={3} background="neutral-alpha-weak" />)}
+                                            </Column>
+                                        </Card>
+                                    </td>
+                                    <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>
+                                        {round}
+                                    </td>
+                                    <td style={{ color: "#BBB" }}>
+                                        <Card maxWidth={10} height={3} onClick={incrementValTally.bind(null, 'player2', round)} zIndex={10} alignItems="center" justifyContent="center" border="transparent">
+                                            <Column fillWidth alignItems="center" justifyContent="center">
+                                                {(player2Inputs[round] === 1 ? <Icon name="single" size="xl" /> :
+                                                    player2Inputs[round] === 2 ? <Icon name="double" size='xl' /> :
+                                                        player2Inputs[round] === 3 ? <Icon name="singleClosed" size="xl" /> :
+                                                            <Line width={3} height={3} background="neutral-alpha-weak" />)}
+                                            </Column>
+                                        </Card>
+                                    </td>
+                                    <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
+                                        {playerTwoTotalPoints[index]?.toString()}
+                                        {/* <input
                                         type="number"
                                         // value={player2Scores[round]}
                                         value={playerTwoPoints}
@@ -511,47 +576,289 @@ export default function DartScoreboard() {
                                         placeholder={""}
                                         style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #555', color: '#BBB', zIndex: 10 }}
                                     /> */}
+                                    </td>
+                                </tr>
+                            ))}
+                            {/* Current round input row */}
+                            <tr style={{ borderTop: '2px dashed #666' }}>
+                                <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
+                                    <input
+                                        type="number"
+                                        value={playerOnePoints}
+                                        onChange={(e) => addPointsCricket(e.target.value, 'player1')}
+                                        placeholder={""}
+                                        style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                    />
+                                </td>
+                                <td style={{ color: "#EEE" }}>
+                                    {playerOneTotalPoints[-1]}
+                                </td>
+                                <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} ></td>
+                                <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#EEE" }}>{playerTwoTotalPoints[-1]}</td>
+                                <td >
+                                    <input
+                                        type="number"
+                                        value={playerTwoPoints}
+                                        onChange={(e) => addPointsCricket(e.target.value, 'player2')}
+                                        placeholder={""}
+                                        style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                    />
                                 </td>
                             </tr>
-                        ))}
-                        {/* Current round input row */}
-                        <tr style={{ borderTop: '2px dashed #666' }}>
-                            <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
-                                <input
-                                    type="number"
-                                    value={playerOnePoints}
-                                    onChange={(e) => addPointsCricket(e.target.value, 'player1')}
-                                    placeholder={""}
-                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
-                                />
-                            </td>
-                            <td style={{ color: "#EEE" }}>
-                                {playerOneTotalPoints[-1]}
-                            </td>
-                            <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} ></td>
-                            <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#EEE" }}>{playerTwoTotalPoints[-1]}</td>
-                            <td >
-                                <input
-                                    type="number"
-                                    value={playerTwoPoints}
-                                    onChange={(e) => addPointsCricket(e.target.value, 'player2')}
-                                    placeholder={""}
-                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
-                                />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <Row fillWidth gap="16" justifyContent="center">
-                <Button variant="primary" onClick={onAddPointsCricket}>
-                    Add Points
-                </Button>
-                {/* <Button variant="secondary" onClick={undoRound}>
+                        </tbody>
+                    </table>
+                    <Row fillWidth gap="16" justifyContent="center">
+                        <Button variant="primary" onClick={onAddPointsCricket}>
+                            Add Points
+                        </Button>
+                        {/* <Button variant="secondary" onClick={undoRound}>
                     Undo Round
                 </Button> */}
-                </Row>
-               
-            </div>
+                    </Row>
+
+                </div>
+            )}
+            {(currentGameType === "Baseball") && (
+                <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
+                    <Heading align="center">
+                        Dart Scoreboard (Game: {currentGameType})
+                    </Heading>
+                    <div style={{ marginBottom: '1rem' }}></div>
+                    <table
+                        style={{
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            textAlign: 'center',
+                            marginBottom: '1rem',
+                        }}
+                    >
+                        <thead style={{ padding: '10px' }}>
+                            <tr style={{ paddingBottom: '10px' }}>
+                                <th colSpan={2}>
+                                    <Text variant="heading-default-l">
+                                        <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)}
+                                            style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                        />
+                                    </Text>
+                                </th>
+                                <th>
+                                    <Text variant="heading-default-m">
+                                        vs
+                                    </Text>
+                                </th>
+                                <th colSpan={2}>
+                                    <Text variant="heading-default-l">
+                                        <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)}
+                                            style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                        />
+                                    </Text>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th colSpan={5}>
+                                    <Text variant="body-default-xs">
+                                        -
+                                    </Text>
+                                </th>
+                            </tr>
+                            <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
+                                <th style={{ borderRight: "1px solid #EEE", paddingLeft: "0.5rem", paddingRight: "0.5rem", color: '#CCC' }}>
+                                    <Text variant="heading-default-xs">
+                                        RUNS
+                                    </Text>
+                                </th>
+                                <th style={{ paddingRight: "0.5rem", paddingLeft: "0.5rem", color: '#CCC' }}>
+                                    <Text variant="label-default-xs">
+                                        E
+                                    </Text>
+                                </th>
+                                <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.5rem", color: "#EEE" }}>
+                                    <Text variant="heading-strong-l">
+                                        {currentGameType}
+                                    </Text>
+                                </th>
+                                <th style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem", color: '#CCC' }}>
+                                    <Text variant="heading-default-xs">
+                                        RUNS
+                                    </Text>
+                                </th>
+                                <th style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem", color: '#CCC', borderLeft: '1px solid #EEE' }}>
+                                    <Text variant="label-default-xs">
+                                        E
+                                    </Text>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {baseBallInningValues.map((inning, index) => (
+                                (parseInt(currentInning) > index + 1) ? (
+                                    <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                                        <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{innings[index].player1[0]}</td>
+                                        <td style={{ color: "#BBB" }}>{innings[index].player1[1]}</td>
+                                        <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{inning}</td>
+                                        <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{innings[index].player2[0]}</td>
+                                        <td style={{ color: "#BBB" }}>{innings[index].player2[1]}</td>
+                                    </tr>
+                                ) :
+                                    (parseInt(currentInning) === index + 1) ? (
+                                        <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                                            <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
+                                                <input
+                                                    type="number"
+                                                    value={currentInningScore.player1}
+                                                    onChange={(e) => handleBaseballInputChange(e.target.value, 'player1', 'score')}
+                                                    placeholder={""}
+                                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                                />
+                                            </td>
+                                            <td style={{ color: "#EEE" }}>
+                                                <input
+                                                    type="number"
+                                                    value={currentInningErrors.player1}
+                                                    onChange={(e) => handleBaseballInputChange(e.target.value, 'player1', 'errors')}
+                                                    placeholder={""}
+                                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                                />
+                                            </td>
+                                            <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{inning}</td>
+                                            <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
+                                                <input
+                                                    type="number"
+                                                    value={currentInningScore.player2}
+                                                    onChange={(e) => handleBaseballInputChange(e.target.value, 'player2', 'score')}
+                                                    placeholder={""}
+                                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                                />
+                                            </td>
+                                            <td style={{ color: "#BBB" }}>
+                                                <input
+                                                    type="number"
+                                                    value={currentInningErrors.player2}
+                                                    onChange={(e) => handleBaseballInputChange(e.target.value, 'player2', 'errors')}
+                                                    placeholder={""}
+                                                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                                                />
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                                            <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>-</td>
+                                            <td style={{ color: "#BBB" }}>-</td>
+                                            <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{inning}</td>
+                                            <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>-</td>
+                                            <td style={{ color: "#BBB" }}>-</td>
+                                        </tr>
+                                    )
+                            ))}
+                            <tr>
+                                <td>
+                                    <Text>
+                                        {cumulativeScoreBaseball("player1")}
+                                    </Text>
+                                </td>
+                                <td>
+                                    <Text>
+                                        {cumulativeErrorsBaseball("player1")}
+                                    </Text>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                    <Text>
+                                        {cumulativeScoreBaseball("player2")}
+                                    </Text>
+                                </td>
+                                <td>
+                                    <Text>
+                                        {cumulativeErrorsBaseball("player2")}
+                                    </Text>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <Column fillWidth justifyContent="center" alignItems="center">
+                        <Button variant="primary" onClick={handleSubmitInning}>
+                            Submit Inning
+                        </Button>
+                    </Column>
+                </div>
+            )}
+            {(currentGameType === "Robday Night Football") && (
+                <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
+                    <Heading align="center">
+                        Dart Scoreboard (Game: {currentGameType})
+                    </Heading>
+                    <div style={{ marginBottom: '1rem' }}></div>
+                    <table
+                        style={{
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            textAlign: 'center',
+                            marginBottom: '1rem',
+                        }}
+                    >
+                        <thead style={{ padding: '10px' }}>
+                            <tr style={{ paddingBottom: '10px' }}>
+                                <th colSpan={2}>
+                                    <Text variant="heading-default-l">
+                                        <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)}
+                                            style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                        />
+                                    </Text>
+                                </th>
+                                <th>
+                                    <Text variant="heading-default-m">
+                                        vs
+                                    </Text>
+                                </th>
+                                <th colSpan={2}>
+                                    <Text variant="heading-default-l">
+                                        <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)}
+                                            style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                                        />
+                                    </Text>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th colSpan={5}>
+                                    <Text variant="body-default-xs">
+                                        -
+                                    </Text>
+                                </th>
+                            </tr>
+                            <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
+                                <th style={{ borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="heading-default-xs">
+                                        POINTS
+                                    </Text>
+                                </th>
+                                <th style={{ padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="label-default-xs">
+                                        TALLY
+                                    </Text>
+                                </th>
+                                <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
+                                    <Text variant="heading-strong-l">
+                                        {currentGameType}
+                                    </Text>
+                                </th>
+                                <th style={{ padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="heading-default-xs">
+                                        POINTS
+                                    </Text>
+                                </th>
+                                <th style={{ padding: "0.1rem", color: '#CCC' }}>
+                                    <Text variant="label-default-xs">
+                                        TALLY
+                                    </Text>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {/* You can implement the content for tbody here */}
+                        </tbody>
+                    </table>
+                </div>
             )}
 
             {/* <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
