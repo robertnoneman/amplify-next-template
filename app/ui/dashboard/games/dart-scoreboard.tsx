@@ -362,6 +362,16 @@ export default function DartScoreboard() {
             }
             setPlayer2Inputs({ ...player2Inputs, [val]: (player2Inputs[val] || 0) + 1 });
         }
+
+        // const result = client.models.DartGame.update({
+        //     id: currentGameId,
+        //     cricketMarksPlayer1: scoreboardValues.map((val) => player1Inputs[val]),
+        //     cricketMarksPlayer2: scoreboardValues.map((val) => player2Inputs[val]),
+        // }).then(() => {
+        //     console.log("Tally updated successfully");
+        // }).catch((error) => {
+        //     console.error("Error updating tally:", error);
+        // });
     };
 
     const addPointsCricket = (points: string, player: 'player1' | 'player2') => {
@@ -397,6 +407,18 @@ export default function DartScoreboard() {
         }
         setPlayerOnePoints(0);
         setPlayerTwoPoints(0);
+        
+        const result = client.models.DartGame.update({
+            id: currentGameId,
+            cricketTotalPointsPlayer1: newPlayerOneTotalPoints,
+            cricketTotalPointsPlayer2: newPlayerTwoTotalPoints,
+            cricketMarksPlayer1: scoreboardValues.map((val) => player1Inputs[val]),
+            cricketMarksPlayer2: scoreboardValues.map((val) => player2Inputs[val]),
+        }).then(() => {
+            console.log("Points added successfully");
+        }).catch((error) => {
+            console.error("Error adding points:", error);
+        });
     };
 
     const handleInputChangeCricket = (
