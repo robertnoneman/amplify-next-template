@@ -352,32 +352,73 @@ export default function DartScoreboard() {
     const incrementValTally = (player: 'player1' | 'player2', val: string) => {
         console.log("player", player);
         console.log("val", val);
-
+        let tempDict = player1Inputs;
+        let tempDict2 = player2Inputs;
         if (player === 'player1') {
             console.log("player1Inputs[val]", player1Inputs[val]);
             if (player1Inputs[val] === 3) {
                 setPlayer1Inputs({ ...player1Inputs, [val]: 0 });
+                tempDict = { ...player1Inputs, [val]: 0 };
                 return;
             }
             setPlayer1Inputs({ ...player1Inputs, [val]: (player1Inputs[val] || 0) + 1 });
+            tempDict = { ...player1Inputs, [val]: (player1Inputs[val] || 0) + 1 };
         } else {
             console.log("player2Inputs[val]", player2Inputs[val]);
             if (player2Inputs[val] === 3) {
                 setPlayer2Inputs({ ...player2Inputs, [val]: 0 });
+                tempDict2 = { ...player2Inputs, [val]: 0 };
                 return;
             }
             setPlayer2Inputs({ ...player2Inputs, [val]: (player2Inputs[val] || 0) + 1 });
+            tempDict2 = { ...player2Inputs, [val]: (player2Inputs[val] || 0) + 1 };
         }
 
-        // const result = client.models.DartGame.update({
-        //     id: currentGameId,
-        //     cricketMarksPlayer1: scoreboardValues.map((val) => player1Inputs[val]),
-        //     cricketMarksPlayer2: scoreboardValues.map((val) => player2Inputs[val]),
-        // }).then(() => {
-        //     console.log("Tally updated successfully");
-        // }).catch((error) => {
-        //     console.error("Error updating tally:", error);
-        // });
+        // map tally dict to array where 20 is index 0, 19 is index 1, etc.
+        const tallyArray = scoreboardValues.map((val) => tempDict[val]);
+        const tallyArray2 = scoreboardValues.map((val) => tempDict2[val]);
+        console.log("tallyArray", tallyArray);
+        const result = client.models.DartGame.update({
+            id: currentGameId,
+            cricketMarksPlayer1: tallyArray,
+            cricketMarksPlayer2: tallyArray2,
+        }).then(() => {
+            console.log("Tally updated successfully");
+        }).catch((error) => {
+            console.error("Error updating tally:", error);
+        });
+        // check if player1 or player2 has 3 tallies for all values
+        if (Object.values(tempDict).every((val) => val === 3)) {
+            // check if neither player has points or if player1 has more than player2
+            if (playerOnePoints === 0 || playerOnePoints > playerTwoPoints) {
+                fire("player1");
+                const result2 = client.models.DartGame.update({
+                    id: currentGameId,
+                    status: "Completed",
+                    winnerName: playerOneName,
+                    loserName: playerTwoName
+                }).then(() => {
+                    console.log("Game completed successfully");
+                }).catch((error) => {
+                    console.error("Error completing game:", error);
+                });
+            } 
+        } else if (Object.values(tempDict2).every((val) => val === 3)) {
+            // check if neither player has points or if player2 has more than player1
+            if (playerTwoPoints === 0 || playerTwoPoints > playerOnePoints) {
+                fire("player2");
+                const result2 = client.models.DartGame.update({
+                    id: currentGameId,
+                    status: "Completed",
+                    winnerName: playerTwoName,
+                    loserName: playerOneName
+                }).then(() => {
+                    console.log("Game completed successfully");
+                }).catch((error) => {
+                    console.error("Error completing game:", error);
+                });
+            }
+        }
     };
 
     const addPointsCricket = (points: string, player: 'player1' | 'player2') => {
@@ -392,9 +433,20 @@ export default function DartScoreboard() {
     };
 
     const onAddPointsCricket = () => {
+        let tempPlayer1Points = playerOnePoints;
+        let tempPlayer2Points = playerTwoPoints;
+        // If temp1Player1Points is NAN, set it to 0
+        if (isNaN(tempPlayer1Points)) {
+            tempPlayer1Points = 0;
+        }
 
-        const newPlayer1Total = playerOneTotalPoints[playerOneTotalPoints.length - 1] + playerOnePoints;
-        const newPlayer2Total = playerTwoTotalPoints[playerTwoTotalPoints.length - 1] + playerTwoPoints;
+
+        if (isNaN(tempPlayer2Points)) {
+            tempPlayer2Points = 0;
+        }
+
+        const newPlayer1Total = playerOneTotalPoints[playerOneTotalPoints.length - 1] + tempPlayer1Points;
+        const newPlayer2Total = playerTwoTotalPoints[playerTwoTotalPoints.length - 1] + tempPlayer2Points;
         const newPlayerOneTotalPoints = [...playerOneTotalPoints, newPlayer1Total];
         const newPlayerTwoTotalPoints = [...playerTwoTotalPoints, newPlayer2Total];
         if (newPlayerOneTotalPoints.length > 7) {
@@ -405,10 +457,10 @@ export default function DartScoreboard() {
         }
         console.log("newPlayerOneTotalPoints", newPlayerOneTotalPoints);
         console.log("newPlayerTwoTotalPoints", newPlayerTwoTotalPoints);
-        if (playerOnePoints > 0) {
+        if (tempPlayer1Points > 0) {
             setPlayerOneTotalPoints(newPlayerOneTotalPoints);
         }
-        if (playerTwoPoints > 0) {
+        if (tempPlayer2Points > 0) {
             setPlayerTwoTotalPoints(newPlayerTwoTotalPoints);
         }
         setPlayerOnePoints(0);
@@ -530,8 +582,8 @@ export default function DartScoreboard() {
             x01RoundScoresPlayer2: [],
             cricketMarksPlayer1: [],
             cricketMarksPlayer2: [],
-            cricketTotalPointsPlayer1: [],
-            cricketTotalPointsPlayer2: [],
+            cricketTotalPointsPlayer1: [0],
+            cricketTotalPointsPlayer2: [0],
             baseballInningScoresPlayer1: [],
             baseballInningScoresPlayer2: [],
             baseballInningErrorsPlayer1: [],
@@ -547,6 +599,20 @@ export default function DartScoreboard() {
         });
         console.log(result);
     };
+
+    const endDartGame = () => {
+        const result = client.models.DartGame.update({
+            id: currentGameId,
+            status: "Completed"
+        }).then(() => {
+            console.log("Dart game ended successfully");
+        }).catch((error) => {
+            console.error("Error ending dart game:", error);
+        });
+        console.log(result);
+        setCurrentGameId("");
+        resetScores();
+    }
 
     useEffect(() => {
         fetchActiveDartGames();
@@ -868,15 +934,13 @@ export default function DartScoreboard() {
                             </tr>
                         </tbody>
                     </table>
-                    <Row fillWidth gap="16" justifyContent="center">
+                    {( playerOnePoints > 0 || playerTwoPoints > 0) && (
+                        <Row fillWidth gap="16" justifyContent="center">
                         <Button variant="primary" onClick={onAddPointsCricket}>
                             Add Points
                         </Button>
-                        {/* <Button variant="secondary" onClick={undoRound}>
-                    Undo Round
-                </Button> */}
-                    </Row>
-
+                        </Row>
+                    )}
                 </div>
             )}
             {(currentGameType === "Baseball") && (
@@ -1120,6 +1184,13 @@ export default function DartScoreboard() {
                         </tbody>
                     </table>
                 </div>
+            )}
+            {(currentGameId !== "") && (
+                <Row fillWidth gap="16" justifyContent="center" padding="s">
+                    <Button variant="primary" onClick={endDartGame}>
+                        End Game
+                    </Button>
+                </Row>
             )}
             
 
