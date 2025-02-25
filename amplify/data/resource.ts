@@ -163,6 +163,8 @@ const schema = a.schema({
       cricketTotalPointsPlayer2: a.integer().array(),
       cricketMarksPlayer1: a.integer().array(),
       cricketMarksPlayer2: a.integer().array(),
+      robdayNightFootballScoresPlayer1: a.integer().array(),
+      robdayNightFootballScoresPlayer2: a.integer().array(),
       winnerName: a.string(),
       loserName: a.string(),
     }).authorization((allow) => [allow.publicApiKey()]),
