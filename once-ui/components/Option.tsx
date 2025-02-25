@@ -74,7 +74,7 @@ const Option = forwardRef<HTMLDivElement, OptionProps>(
             fillWidth
             direction="column"
           >
-            <Text onBackground="neutral-strong" variant="label-default-s">
+            <Text onBackground="neutral-strong" variant="body-default-xs">
               {label}
             </Text>
             {description && (

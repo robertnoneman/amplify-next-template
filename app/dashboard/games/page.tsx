@@ -8,7 +8,7 @@ import {
     Row
   } from "@/once-ui/components";
 
-
+import DartScoreboard from "@/app/ui/dashboard/games/dart-scoreboard";
 
 
 export default function Page() {
@@ -28,9 +28,9 @@ export default function Page() {
           <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
             GAMES
           </Heading>
-          HERE'S WHERE ALL THE AWESOME GAMES WILL BE!
+          <DartScoreboard />
         </Column>
-      <Row style={{width: "50%"}} >
+      <Row style={{width: "50%"}} marginBottom="xl" paddingBottom="l">
         <Carousel
           aspectRatio="1 / 1"
           indicator="line"

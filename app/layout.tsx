@@ -112,20 +112,21 @@ export default function RootLayout({
       {/* </body> */}
 
       <ToastProvider>
-          <Flex as="body" fillWidth direction="column" margin="0" padding="0" className={`antialiased`} gap="m">
+          <Flex as="body" fillWidth fillHeight direction="column" margin="0" padding="0" className={`antialiased`} gap="m">
             <Background
-              position="absolute"
+              position="fixed"
               mask={{
-                x: 100,
+                x: 0,
                 y: 0,
                 radius: 100,
+                cursor: true,
               }}
               gradient={{
                 display: true,
                 x: 50,
-                y: 110,
+                y: 100,
                 width: 70,
-                height: 150,
+                // height: 150,
                 tilt: 0,
                 opacity: 90,
                 colorStart: "accent-background-strong",
@@ -134,9 +135,9 @@ export default function RootLayout({
               grid={{
                 display: true,
                 opacity: 50,
-                width: "0.25rem",
+                width: "0.5rem",
                 color: "neutral-alpha-medium",
-                height: "0.25rem",
+                height: "0.5rem",
               }}
             />
             <SmartImage 
@@ -155,6 +156,7 @@ export default function RootLayout({
               opacity={10}
               background='transparent'
               style={{paddingTop: "4.5rem"}}
+              priority
               // paddingTop="xl"
               // style={{maskImage: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%)'}}
               // radius="s-8"

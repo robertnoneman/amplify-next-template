@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import "@/once-ui/styles/index.scss";
 import "@/once-ui/tokens/index.scss";
@@ -114,12 +114,13 @@ export default function RootLayout({
             />
           </head> */}
           <Flex fillWidth direction="column" margin="0" padding="0">
-            <Background
+            {/* <Background
               position="absolute"
               mask={{
                 x: 100,
                 y: 0,
                 radius: 100,
+                cursor: true
               }}
               gradient={{
                 display: true,
@@ -139,7 +140,7 @@ export default function RootLayout({
                 color: "neutral-alpha-medium",
                 height: "0.25rem",
               }}
-            />
+            /> */}
             <Flex
 						  fillWidth
 						  minHeight="16">

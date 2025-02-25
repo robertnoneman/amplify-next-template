@@ -175,6 +175,7 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
             })}
             aria-haspopup="listbox"
             aria-expanded={isDropdownOpen}
+            
           />
         }
         dropdown={
@@ -213,7 +214,7 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
                 />
               </Flex>
             )}
-            <Flex fillWidth padding="4" direction="column" gap="2">
+            <Flex fillWidth padding="4" direction="column" gap="2" textSize="xs">
               {options
                 .filter((option) =>
                   option.label?.toString().toLowerCase().includes(searchQuery.toLowerCase()),
@@ -229,6 +230,7 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
                     selected={option.value === value}
                     highlighted={index === highlightedIndex}
                     tabIndex={-1}
+                    
                   />
                 ))}
               {searchQuery &&
