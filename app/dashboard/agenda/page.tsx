@@ -14,9 +14,9 @@ import {
     Skeleton
   } from "@/once-ui/components";
 
-import AgendaWrapper from "@/app/ui/dashboard/planner/agenda-wrapper";
+// import AgendaWrapper from "@/app/ui/dashboard/planner/agenda-wrapper";
 
-import { Suspense } from "react";
+// import { Suspense } from "react";
 
 
 
@@ -141,113 +141,117 @@ export default async function Page() {
 
 
     return (
-    <Column fillWidth paddingY="80" paddingX="s" alignItems="center" flex={1}>
-      <Fade
-        zIndex={3}
-        pattern={{
-          display: true,
-          size: "4",
-        }}
-        position="fixed"
-        top="0"
-        left="0"
-        to="bottom"
-        height={5}
-        fillWidth
-        blur={0.25}
-      />
-      <Row position="fixed" top="0" fillWidth justifyContent="center" zIndex={3}>
-        <Row
-          data-border="rounded"
-          justifyContent="space-between"
-          maxWidth="l"
-          paddingRight="64"
-          paddingLeft="32"
-          paddingY="20"
-        >
-          <Row gap="16" show="s" alignItems="center" paddingRight="24">
-            <StyleOverlay top="20" right="24" />
-          </Row>
-        </Row>
-      </Row>
-      <Column
-        overflow="hidden"
-        as="main"
-        maxWidth="l"
-        position="relative"
-        radius="xl"
-        alignItems="center"
-        border="neutral-alpha-weak"
-        fillWidth
-      >
-        <Column
-          fillWidth
-          alignItems="center"
-          gap="48"
-          radius="xl"
-          paddingTop="80"
-          position="relative"
-        >
-          <Background
-            mask={{
-              x: 0,
-              y: 48,
-            }}
-            position="absolute"
-            grid={{
-              display: true,
-              width: "0.25rem",
-              color: "neutral-alpha-medium",
-              height: "0.25rem",
-            }}
-          />
-          <Background
-            mask={{
-              x: 80,
-              y: 0,
-              radius: 100,
-            }}
-            position="absolute"
-            gradient={{
-              display: true,
-              tilt: -35,
-              height: 50,
-              width: 75,
-              x: 100,
-              y: 40,
-              colorStart: "accent-solid-medium",
-              colorEnd: "static-transparent",
-            }}
-          />
-          <Background
-            mask={{
-              x: 100,
-              y: 0,
-              radius: 100,
-            }}
-            position="absolute"
-            gradient={{
-              display: true,
-              opacity: 100,
-              tilt: -35,
-              height: 20,
-              width: 120,
-              x: 120,
-              y: 35,
-              colorStart: "brand-solid-strong",
-              colorEnd: "static-transparent",
-            }}
-          />
-          <Column fillWidth alignItems="center" gap="32" padding="32" position="relative">
-            <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
-              On the next Robday...
-            </Heading>
-          </Column>
-          <Suspense fallback={<Skeleton shape="block" width="xl" height="l" />}>
-            <AgendaWrapper/>
-          </Suspense>
-      </Column>
-    </Column>
-  </Column>
-    )    
+      <div>
+
+      </div>
+    )
+  //   <Column fillWidth paddingY="80" paddingX="s" alignItems="center" flex={1}>
+  //     <Fade
+  //       zIndex={3}
+  //       pattern={{
+  //         display: true,
+  //         size: "4",
+  //       }}
+  //       position="fixed"
+  //       top="0"
+  //       left="0"
+  //       to="bottom"
+  //       height={5}
+  //       fillWidth
+  //       blur={0.25}
+  //     />
+  //     <Row position="fixed" top="0" fillWidth justifyContent="center" zIndex={3}>
+  //       <Row
+  //         data-border="rounded"
+  //         justifyContent="space-between"
+  //         maxWidth="l"
+  //         paddingRight="64"
+  //         paddingLeft="32"
+  //         paddingY="20"
+  //       >
+  //         <Row gap="16" show="s" alignItems="center" paddingRight="24">
+  //           <StyleOverlay top="20" right="24" />
+  //         </Row>
+  //       </Row>
+  //     </Row>
+  //     <Column
+  //       overflow="hidden"
+  //       as="main"
+  //       maxWidth="l"
+  //       position="relative"
+  //       radius="xl"
+  //       alignItems="center"
+  //       border="neutral-alpha-weak"
+  //       fillWidth
+  //     >
+  //       <Column
+  //         fillWidth
+  //         alignItems="center"
+  //         gap="48"
+  //         radius="xl"
+  //         paddingTop="80"
+  //         position="relative"
+  //       >
+  //         <Background
+  //           mask={{
+  //             x: 0,
+  //             y: 48,
+  //           }}
+  //           position="absolute"
+  //           grid={{
+  //             display: true,
+  //             width: "0.25rem",
+  //             color: "neutral-alpha-medium",
+  //             height: "0.25rem",
+  //           }}
+  //         />
+  //         <Background
+  //           mask={{
+  //             x: 80,
+  //             y: 0,
+  //             radius: 100,
+  //           }}
+  //           position="absolute"
+  //           gradient={{
+  //             display: true,
+  //             tilt: -35,
+  //             height: 50,
+  //             width: 75,
+  //             x: 100,
+  //             y: 40,
+  //             colorStart: "accent-solid-medium",
+  //             colorEnd: "static-transparent",
+  //           }}
+  //         />
+  //         <Background
+  //           mask={{
+  //             x: 100,
+  //             y: 0,
+  //             radius: 100,
+  //           }}
+  //           position="absolute"
+  //           gradient={{
+  //             display: true,
+  //             opacity: 100,
+  //             tilt: -35,
+  //             height: 20,
+  //             width: 120,
+  //             x: 120,
+  //             y: 35,
+  //             colorStart: "brand-solid-strong",
+  //             colorEnd: "static-transparent",
+  //           }}
+  //         />
+  //         <Column fillWidth alignItems="center" gap="32" padding="32" position="relative">
+  //           <Heading wrap="balance" variant="display-default-l" align="center" marginBottom="16">
+  //             On the next Robday...
+  //           </Heading>
+  //         </Column>
+  //         <Suspense fallback={<Skeleton shape="block" width="xl" height="l" />}>
+  //           <AgendaWrapper/>
+  //         </Suspense>
+  //     </Column>
+  //   </Column>
+  // </Column>
+  //   )    
 }
