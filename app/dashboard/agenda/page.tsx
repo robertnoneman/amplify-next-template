@@ -14,27 +14,11 @@ import {
     Skeleton
   } from "@/once-ui/components";
 
-import outputs from "@/amplify_outputs.json"
-import { Amplify } from "aws-amplify";
-import { generateClient } from "aws-amplify/data";
-import { data, type Schema } from "@/amplify/data/resource";
-import { getUrl } from 'aws-amplify/storage';
-import { 
-    RobDayLogActivityProps, 
-    LocationData, 
-    RobDayLogBaseActivityProps, 
-    RobdayLogProps,
-    WeatherProps,
-} from "@/app/lib/definitions";
-import { fetchRobdayLogs, populateBaseActivityProps, fetchLocations } from "@/app/lib/actions";
-import Agenda from "@/app/ui/dashboard/planner/agenda";
 import AgendaWrapper from "@/app/ui/dashboard/planner/agenda-wrapper";
-import { getWeather } from "@/app/lib/utils";
+
 import { Suspense } from "react";
 
-Amplify.configure(outputs);
 
-const client = generateClient<Schema>();
 
 
 export default async function Page() {

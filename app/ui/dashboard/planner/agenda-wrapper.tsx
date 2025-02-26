@@ -109,7 +109,7 @@ export default async function AgendaWrapper() {
       // const notes = robdayLogActivities.map(robdayLogActivity => robdayLogActivity.notes ?? "");
       robdayLogProps.push({
         // robdayLogNumber: robdayLog.robDayNumber?.toString() || "",
-        robdayLogId: robdayLog.id,
+        robdayLogId: robdayLog?.id,
         status: robdayLog.status ?? "Upcoming",
         robdayLogNumber: Number(robdayLog.robDayNumber),
         robdayLogDate: robdayLog.date,
