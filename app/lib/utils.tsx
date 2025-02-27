@@ -256,3 +256,85 @@ export const convertToPastTense2 = (sentence: string): string => {
   // Return the updated sentence
   return nlp(sentence).verbs().toPastTense().all().text();
 };
+
+export async function getHistoricalWeather(
+  date: string,
+  location: string
+): Promise<{ temperature: number; conditions: string } | null> {
+  try {
+    // Step 1: Geocode the location to get coordinates
+    // Open-Meteo provides a geocoding API
+    // const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`;
+    
+
+    // const geocodeResponse = await fetch(geocodeUrl);
+    // const geocodeData = await geocodeResponse.json();
+    
+    // if (!geocodeData.results || geocodeData.results.length === 0) {
+    //   throw new Error('Geocoding failed. Location not found.');
+    // }
+    
+    // const latitude = geocodeData.results[0].latitude;
+    // const longitude = geocodeData.results[0].longitude;
+
+    const latitude = 38.914183099207584;
+    const longitude = -77.01022865175987;
+
+
+    const historyUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${date}&end_date=${date}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
+    const weatherCodes = {
+      0: "Clear sky",
+      1: "Mainly clear",
+      2: "Partly cloudy",
+      3: "Overcast",
+      45: "Fog",
+      48: "Depositing rime fog",
+      51: "Light drizzle",
+      53: "Moderate drizzle",
+      55: "Dense drizzle",
+      56: "Light freezing drizzle",
+      57: "Dense freezing drizzle",
+      61: "Slight rain",
+      63: "Moderate rain",
+      65: "Heavy rain",
+      66: "Light freezing rain",
+      67: "Heavy freezing rain",
+      71: "Slight snow fall",
+      73: "Moderate snow fall",
+      75: "Heavy snow fall",
+      77: "Snow grains",
+      80: "Slight rain showers",
+      81: "Moderate rain showers",
+      82: "Violent rain showers",
+      85: "Slight snow showers",
+      86: "Heavy snow showers",
+      95: "Thunderstorm",
+      96: "Thunderstorm with slight hail",
+      99: "Thunderstorm with heavy hail"
+    };
+
+    const historyResponse = await fetch(historyUrl);
+    const historyData = await historyResponse.json();
+    
+    // Extract data
+    const maxTemp = historyData.daily.temperature_2m_max[0];
+    const minTemp = historyData.daily.temperature_2m_min[0];
+    const avgTemp = (maxTemp + minTemp) / 2;
+    const weatherCode = historyData.daily.weathercode[0] as keyof typeof weatherCodes;
+    
+    // if (!geocodeData.results || geocodeData.results.length === 0) {
+    //   throw new Error('Geocoding failed. Location not found.');
+    // }
+
+    const conditions = weatherCodes[weatherCode] || "Unknown";
+    
+    return {
+      temperature: avgTemp, 
+      conditions: conditions || "Unknown"
+    };
+  }
+    catch (error) {
+      console.error("Error fetching historical weather data:", error);
+      return null;
+    }
+}

@@ -49,10 +49,14 @@ export default function RobDayLogCard(
   const [activityInstanceProps, setActivityInstanceProps] = useState<RobDayLogActivityProps[]>([]);
   const [activityImages, setActivityImages] = useState<{ src: string, aspect_ratio: number }[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [cost, setCost] = useState<number | null>(null);
   const [notes, setNotes] = useState<string[]>([]);
   const [editedActivityInstanceId, setEditedActivityInstanceId] = useState<string>("");
+  const [newRobdayLogNumber, setNewRobdayLogNumber] = useState<number>(0);
+  const [newRobdayLogWeather, setNewRobdayLogWeather] = useState<string>("");
+  const [newRobdayLogTemperature, setNewRobdayLogTemperature] = useState<number>(0);
 
   const handleUploadData = async (file: File, activityInstanceId: string): Promise<void> => {
     await uploadData({
@@ -107,6 +111,13 @@ export default function RobDayLogCard(
     // const result = await client.models.ActivityInstance.update({ id: activityInstanceId, notes: notes });
     // console.log(result);
     fetchRobdayLogData();
+  }
+
+  const handleEditRobdayLog = async () => {
+    const result = await client.models.Robdaylog.update({ id: robdayLogId, robDayNumber: newRobdayLogNumber, weatherCondition: newRobdayLogWeather, temperature: newRobdayLogTemperature });
+    console.log(result);
+    fetchRobdayLogData();
+    setIsEditDialogOpen(false);
   }
 
   async function fetchRobdayLogData() {
@@ -195,6 +206,7 @@ export default function RobDayLogCard(
       gap="4"
       marginBottom="xl"
       fillWidth
+      onDoubleClick={() => setIsEditDialogOpen(true)}
     >
       <Background
         mask={{
@@ -219,8 +231,16 @@ export default function RobDayLogCard(
         ROBDAY #{robdayLogData?.robdayLogNumber}
       </Heading>
       <Line height={0.25} />
-      <Text variant="body-default-s">{formatDate(robdayLogData?.robdayLogDate ?? '')}</Text>
-      <Text variant="body-default-xs">Weather: {robdayLogData?.robdayLogWeather} - {robdayLogData?.robdayLogTemperature}°</Text>
+      <Text variant="body-default-l">{formatDate(robdayLogData?.robdayLogDate ?? '')}</Text>
+      {/* <Line width={15} height={0.1} background="neutral-alpha-medium" /> */}
+      <Row fillWidth alignItems="center" gap="8">
+      <Text variant="body-default-m">Weather: </Text>
+      <Text variant="body-default-xs">{robdayLogData?.robdayLogWeather} - {robdayLogData?.robdayLogTemperature}°</Text>
+      </Row>
+      <Row fillWidth alignItems="center" gap="8">
+      <Text variant="body-default-m">Notes: </Text>
+      <Text variant="body-default-xs">{robdayLogData?.notes.join(', ')}</Text>
+      </Row>
       <Line height={0.1} />
       <Column fillWidth fillHeight>
         <OverlayProvider>
@@ -420,8 +440,41 @@ export default function RobDayLogCard(
       defaultValue={notes?.toString()}
       onChange={(e) => setNotes([e.target.value])}
       />
-
-
+    </Dialog>
+    <Dialog
+      isOpen={isEditDialogOpen}
+      onClose={() => setIsEditDialogOpen(false)}
+      title="Edit Robday Log"
+      description="Edit Robday Log"
+      footer={
+        <>
+          <Button variant="primary" onClick={() => handleEditRobdayLog()}>
+            Save
+          </Button>
+          <Button variant="secondary" onClick={() => setIsEditDialogOpen(false)}>
+            Cancel
+          </Button>
+        </>
+      }
+    >
+      <Input
+        id="robday-number"
+        label="Robday Number"
+        defaultValue={robdayLogData?.robdayLogNumber.toString()}
+        onChange={(e) => setNewRobdayLogNumber(Number(e.target.value))}
+      />
+      <Input
+        id="weather"
+        label="Weather"
+        defaultValue={robdayLogData?.robdayLogWeather}
+        onChange={(e) => setNewRobdayLogWeather(e.target.value)}
+      />
+      <Input
+        id="temperature"
+        label="Temperature"
+        defaultValue={robdayLogData?.robdayLogTemperature.toString()}
+        onChange={(e) => setNewRobdayLogTemperature(Number(e.target.value))}
+      />
     </Dialog>
     </Card>
   )
