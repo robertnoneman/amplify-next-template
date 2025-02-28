@@ -35,8 +35,8 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
 export default function Page() {
-	const [selectedRobdayLog, setSelectedRobdayLog] = useState("48a09c0b-112b-4d1b-8ce5-e0e01890f65a");
-	const [selectedRobdayLogNumber, setSelectedRobdayLogNumber] = useState(7);
+	const [selectedRobdayLog, setSelectedRobdayLog] = useState("ae6be391-34f6-4a4c-9cfd-7f333f653eb6");
+	const [selectedRobdayLogNumber, setSelectedRobdayLogNumber] = useState(34);
 	// const [robdayLogs, setRobdayLogs] = useState<RobdayLogProps[]>([]);
 	const [robdayLogs, setRobdayLogs] = useState<Array<Schema["Robdaylog"]["type"]>>([]);
 	const [addRobdayLogDialogOpen, setAddRobdayLogDialogOpen] = useState(false);
@@ -76,8 +76,8 @@ export default function Page() {
 		if (robdayLogs.length === 0) {
 			return
 		}
-		setSelectedRobdayLog(robdayLogs[robdayLogs.length - 1].id ?? "48a09c0b-112b-4d1b-8ce5-e0e01890f65a");
-		setSelectedRobdayLogNumber(robdayLogs[robdayLogs.length - 1].robDayNumber ?? 33);
+		setSelectedRobdayLogNumber(robdayLogs[robdayLogs.length - 1].robDayNumber ?? 1);
+		setSelectedRobdayLog(robdayLogs[robdayLogs.length - 1].id ?? "ae6be391-34f6-4a4c-9cfd-7f333f653eb6");
 	}
 	function listActivities() {
 		client.models.Activity.observeQuery().subscribe({

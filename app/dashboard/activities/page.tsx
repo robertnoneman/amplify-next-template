@@ -66,6 +66,14 @@ export default function Page() {
       setFile(event.target.files[0]);
   };
 
+  const onRemoveTag = (tags: string[]) => {
+    console.log("Removing tag", tags);
+    if (editedActivity && editedActivity.categories) {
+      const updatedCategories = editedActivity.categories.filter(tag => tag !== null);
+      setTags(updatedCategories);
+    }
+  }
+
   const handleUploadData = async (file: File): Promise<void> => {
     await uploadData({
       path: `picture-submissions/${file.name}`, 
@@ -524,8 +532,9 @@ export default function Page() {
             />
             <TagInput
                 id="tags"
-                value={editedActivity?.categories?.filter(tag => tag !== null) ?? []}
+                value={tags}
                 onChange={(newTags: string[]) => {
+                  console.log("Updated tags:", newTags);
                   setTags(newTags);
                 }}
                 label="Tags"
