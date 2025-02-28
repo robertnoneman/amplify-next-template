@@ -1,6 +1,6 @@
 "use client";
 
-import { act, useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   Heading,

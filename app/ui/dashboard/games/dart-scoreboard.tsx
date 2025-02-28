@@ -23,6 +23,13 @@ import { data, type Schema } from "@/amplify/data/resource";
 import Pride from "react-canvas-confetti/dist/presets/pride";
 import ReactCanvasConfetti from "react-canvas-confetti";
 import confetti from "canvas-confetti";
+import SlidingImage from "@/app/ui/effects/slide-in-sticker";
+
+// Interface for ParentComponent state
+interface ParentComponentState {
+    triggerSlide: boolean;
+    animationCount: number;
+}
 
 Amplify.configure(outputs);
 
@@ -78,6 +85,24 @@ export default function DartScoreboard() {
   );
   const [commonOptions, setCommonOptions] = useState({});
   const [commonOptions2, setCommonOptions2] = useState({});
+  const [stickerState, setStickerState] = useState<ParentComponentState>({
+          triggerSlide: false,
+          animationCount: 0,
+      });
+  
+  const handleTrigger = (): void => {
+      setStickerState(prevState => ({
+          ...prevState,
+          triggerSlide: true
+      }));
+  };
+
+  const handleAnimationComplete = (): void => {
+    setStickerState(prevState => ({
+        triggerSlide: false,
+        animationCount: prevState.animationCount + 1
+    }));
+};
 
   const angles = [60, 120];
   const doubleAngles = angles.concat(angles);
@@ -630,6 +655,7 @@ export default function DartScoreboard() {
     setCurrentQuarter(1);
     setPossessions([{ player1: 0, player2: 0 }]);
     setCurrentPossesionScore({ player1: 0, player2: 0 });
+    handleTrigger();
   };
 
   const createNewDartGame = () => {
@@ -669,6 +695,7 @@ export default function DartScoreboard() {
       console.error("Error creating new dart game:", error);
     });
     console.log(result);
+    handleTrigger();
   };
 
   const endDartGame = () => {
@@ -718,6 +745,7 @@ export default function DartScoreboard() {
   return (
     <Column fillWidth fillHeight justifyContent="center" alignItems="center" background="surface" padding="xs">
       <ReactCanvasConfetti onInit={onInit} />
+      
       <Row fillWidth gap="16" justifyContent="center" padding="s">
         <Select
           id="game-type"
@@ -1353,6 +1381,19 @@ export default function DartScoreboard() {
             End Game
           </Button>
         </Row>
+      )}
+      {(stickerState.triggerSlide) && (
+      <SlidingImage
+          trigger={stickerState.triggerSlide}
+          onAnimationComplete={handleAnimationComplete}
+          slideInDuration={1000}
+          visibleDuration={1000}
+          slideOutDuration={1000}
+          axis="Y"
+          endPosition="30%"
+          // imageSrc="/stickers/robo_thumbsup1.png"
+          imageSrc="/stickers/robdartsstartgame.png"
+      />
       )}
 
 
