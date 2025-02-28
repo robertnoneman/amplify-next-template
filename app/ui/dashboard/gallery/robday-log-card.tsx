@@ -13,7 +13,8 @@ import {
   Grid,
   Dialog,
   Input,
-  Textarea
+  Textarea, 
+  Select
 } from "@/once-ui/components";
 import { Gallery } from 'next-gallery';
 import { RobdayLogProps, RobDayLogActivityProps, LocationData } from "@/app/lib/definitions";
@@ -37,6 +38,7 @@ const client = generateClient<Schema>();
 export default function RobDayLogCard(
   {
     images,
+    // TODO: location data??
     robdayLogId
   }: {
     images: { src: string, aspect_ratio: number }[];
@@ -44,8 +46,16 @@ export default function RobDayLogCard(
   }
 ) {
   const [robdayLogData, setRobdayLogData] = useState<RobdayLogProps | null>(null);
-  const [locationData, setLocationData] = useState<Schema["Location"]["type"] | null>(null);
+  // const [locationData, setLocationData] = useState<Schema["Location"]["type"] | null>(null);
+  const [locations, setLocations] = useState<Array<Schema["Location"]["type"]>>([]);
+  const [selectedLocation, setSelectedLocation] = useState<Schema["Location"]["type"] | null>(null);
+  const [isCreateNewLocationDialogOpen, setIsCreateNewLocationDialogOpen] = useState(false);
+  const [selectedLocationValue, setSelectedLocationValue] = useState("");
+  const [selectedLocationValueLabel, setSelectedLocationValueLabel] = useState("Choose a location");
+  const [newLocationName, setNewLocationName] = useState("");
+  const [newLocationAddress, setNewLocationAddress] = useState("");
   const [activityInstances, setActivityInstances] = useState<Schema["ActivityInstance"]["type"][]>([]);
+  const [activityDisplayName, setActivityDisplayName] = useState<string>("");
   const [activityInstanceProps, setActivityInstanceProps] = useState<RobDayLogActivityProps[]>([]);
   const [activityImages, setActivityImages] = useState<{ src: string, aspect_ratio: number }[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -71,29 +81,71 @@ export default function RobDayLogCard(
     fetchRobdayLogData();
   }
 
-  const editActivityRating = async (activityInstanceId: string, rating: number, cost: number, notes: string[]) => {
+  function listLocations() {
+    client.models.Location.observeQuery().subscribe({
+      next: async (data) => {
+        setLocations([...data.items]);
+      },
+    })
+  }
+
+  const handleSelectLocation = (location: Schema["Location"]["type"]) => {
+      console.log("Selected option:", location.name);
+      setSelectedLocation(location);
+    }
+
+  function createNewLocation() {
+      const newLocation = {
+        name: newLocationName,
+        address: newLocationAddress,
+      };
+      const location = client.models.Location.create({ ...newLocation });
+      console.log("Location created: ", location);
+      // setAddedLocation(location);
+      // setSelectedLocation(location);
+      // setSelectedLocationValue("");
+      // setSelectedLocationValueLabel("Choose a location");
+      setIsCreateNewLocationDialogOpen(false);
+    }
+  
+  function handleCreateNewLocation() {
+      setSelectedLocationValue("");
+      setSelectedLocationValueLabel("Choose a location");
+      setIsCreateNewLocationDialogOpen(true);
+    }
+
+  const editActivityInstance = async (activityInstanceId: string, displayName: string, rating: number, cost: number, notes: string[]) => {
     setRating(rating);
     setCost(cost);
     setNotes(notes);
+    setActivityDisplayName(displayName);
     console.log("Activity Instance ID:", activityInstanceId);
+    console.log("displayName:", displayName);
     console.log("Rating:", rating);
     // Cast rating to integer
     rating = Math.round(rating);
-    const result = await client.models.ActivityInstance.update({ id: editedActivityInstanceId, rating: rating, cost: cost, notes: notes });
+    const result = await client.models.ActivityInstance.update({ id: editedActivityInstanceId, rating: rating, cost: cost, notes: notes, displayName: displayName, locationId: selectedLocation?.id });
     console.log(result);
     setEditedActivityInstanceId("");
     setRating(null);
     setIsDialogOpen(false);
+    setSelectedLocationValue("");
+    setSelectedLocationValueLabel("Choose a location");
     fetchRobdayLogData();
   }
 
-  const onEditActivityRating = async (activityInstanceId: string, rating: number, cost: number, notes: string[]) => {
+  const onEditActivityRating = async (activityInstanceId: string, displayName: string, locationId: string, rating: number, cost: number, notes: string[]) => {
     console.log("Activity Instance ID:", activityInstanceId);
     console.log("Rating:", rating);
     setRating(rating);
     setCost(cost);
+    setActivityDisplayName(displayName);
     setNotes(notes);
     setEditedActivityInstanceId(activityInstanceId);
+    const tempSelectedLocation = locations.find((location) => location.id === locationId) ?? locations[0];
+    setSelectedLocation(tempSelectedLocation);
+    setSelectedLocationValue(tempSelectedLocation.name ?? "Location");
+    setSelectedLocationValueLabel(tempSelectedLocation.name ?? "Choose a location");
     setIsDialogOpen(true);
   }
 
@@ -114,8 +166,34 @@ export default function RobDayLogCard(
   }
 
   const handleEditRobdayLog = async () => {
-    const result = await client.models.Robdaylog.update({ id: robdayLogId, robDayNumber: newRobdayLogNumber, weatherCondition: newRobdayLogWeather, temperature: newRobdayLogTemperature });
+    let editedRobdayLogNumber = newRobdayLogNumber;
+    if (editedRobdayLogNumber === 0) {
+      editedRobdayLogNumber = robdayLogData?.robdayLogNumber ?? 0;
+    }
+    let editedRobdayLogWeather = newRobdayLogWeather;
+    if (editedRobdayLogWeather === "") {
+      editedRobdayLogWeather = robdayLogData?.robdayLogWeather ?? "";
+    }
+    let editedRobdayLogTemperature = newRobdayLogTemperature;
+    if (editedRobdayLogTemperature === 0) {
+      editedRobdayLogTemperature = robdayLogData?.robdayLogTemperature ?? 0;
+    }
+    let newNotes = notes;
+    if (newNotes.length === 0) {
+      newNotes = robdayLogData?.notes ?? [];
+    }
+    const result = await client.models.Robdaylog.update({
+      id: robdayLogId,
+      robDayNumber: editedRobdayLogNumber,
+      weatherCondition: editedRobdayLogWeather,
+      temperature: editedRobdayLogTemperature,
+      notes: newNotes
+    });
     console.log(result);
+    setNotes([]);
+    setNewRobdayLogNumber(0);
+    setNewRobdayLogWeather("");
+    setNewRobdayLogTemperature(0);
     fetchRobdayLogData();
     setIsEditDialogOpen(false);
   }
@@ -195,6 +273,7 @@ export default function RobDayLogCard(
   }
 
   useEffect(() => {
+    listLocations();
     fetchRobdayLogData();
   }, [robdayLogId]);
 
@@ -271,7 +350,7 @@ export default function RobDayLogCard(
               <Column fillWidth fillHeight>
                 <Row gap="4" 
                 // onClick={() => editActivityRating(activityInstance.activityInstanceId, 5)}
-                onClick={() => onEditActivityRating(activityInstance.activityInstanceId, activityInstance.activityInstanceRating, activityInstance.activityInstanceCost, activityInstance.activityInstanceNotes)}
+                onClick={() => onEditActivityRating(activityInstance.activityInstanceId, activityInstance.activityInstanceDisplayName, activityInstance.locationData.id, activityInstance.activityInstanceRating, activityInstance.activityInstanceCost, activityInstance.activityInstanceNotes)}
                 cursor="interactive"
                 zIndex={10}
                 >
@@ -289,7 +368,7 @@ export default function RobDayLogCard(
                 </Row>
                 <Line />
                 <Row gap="4"
-                onClick={() => onEditActivityRating(activityInstance.activityInstanceId, activityInstance.activityInstanceRating, activityInstance.activityInstanceCost, activityInstance.activityInstanceNotes)}
+                onClick={() => onEditActivityRating(activityInstance.activityInstanceId, activityInstance.activityInstanceDisplayName, activityInstance.locationData.id, activityInstance.activityInstanceRating, activityInstance.activityInstanceCost, activityInstance.activityInstanceNotes)}
                 cursor="interactive"
                 zIndex={10}>
                   <Column width={6}>
@@ -306,7 +385,7 @@ export default function RobDayLogCard(
                 </Row>
                 <Line />
                 <Row gap="4"
-                onClick={() => onEditActivityRating(activityInstance.activityInstanceId, activityInstance.activityInstanceRating, activityInstance.activityInstanceCost, activityInstance.activityInstanceNotes)}
+                onClick={() => onEditActivityRating(activityInstance.activityInstanceId, activityInstance.activityInstanceDisplayName, activityInstance.locationData.id, activityInstance.activityInstanceRating, activityInstance.activityInstanceCost, activityInstance.activityInstanceNotes)}
                 cursor="interactive"
                 zIndex={10}>
                   <Column width={6}>
@@ -413,7 +492,7 @@ export default function RobDayLogCard(
       fillHeight
       footer={
         <>
-          <Button variant="primary" onClick={() => editActivityRating(activityInstances[0].id, rating ?? 0, cost ?? 0, notes ?? [])}>
+          <Button variant="primary" onClick={() => editActivityInstance(activityInstances[0].id, activityDisplayName?? "", rating ?? 0, cost ?? 0, notes ?? [])}>
             Save
           </Button>
           <Button variant="secondary" onClick={() => setIsDialogOpen(false)}>
@@ -422,6 +501,37 @@ export default function RobDayLogCard(
         </>
       }
     >
+      <Input
+        id="activity-name"
+        label="Activity Display Name"
+        defaultValue={activityDisplayName}
+        onChange={(e) => setActivityDisplayName(e.target.value)}
+      />
+      <Select
+            searchable
+            id="location"
+            label={selectedLocation?.name ?? "Location"}
+            minHeight={300}
+            options={[
+              ...locations.map((location) => ({
+                value: location.id,
+                label: location.name,
+                description: location.address,
+              })),
+              { value: "create-new", label: "Create New", description: "Add a new location" },
+            ]}
+            onSelect={(value) => {
+              if (value === "create-new") {
+                // Handle the "create new" action here
+                // console.log("Create new location");
+                handleCreateNewLocation();
+                // You can open a modal or navigate to a different page to create a new location
+              } else {
+                handleSelectLocation(locations.find((location) => location.id === value) ?? locations[0]);
+              }
+            }}
+            value={selectedLocation?.name ?? ""}
+          />
       <Input
         id="rating"
         label="Rating"
@@ -434,13 +544,41 @@ export default function RobDayLogCard(
       defaultValue={cost?.toString()}
       onChange={(e) => setCost(Number(e.target.value))}
       />
-      <Textarea
+    <Textarea
       id="notes"
       label="Notes"
       defaultValue={notes?.toString()}
       onChange={(e) => setNotes([e.target.value])}
       />
     </Dialog>
+    <Dialog
+      isOpen={isCreateNewLocationDialogOpen}
+      onClose={() => setIsCreateNewLocationDialogOpen(false)}
+      title="Create New Location"
+      description=""
+      style={{marginBottom: "50%"}}
+      // onHeightChange={(height) => setFirstDialogHeight(height)}
+      footer={
+        <>
+          <Button variant="secondary" onClick={() => createNewLocation()}>
+            CREATE
+          </Button>
+        </>
+      }
+        >
+        <Input
+          id="location"
+          label="Location Name"
+          value={newLocationName}
+          onChange={(value) => setNewLocationName(value.target.value)}
+        />
+        <Input
+          id="address"
+          label="Location Address"
+          value={newLocationAddress}
+          onChange={(value) => setNewLocationAddress(value.target.value)}
+        />
+      </Dialog>
     <Dialog
       isOpen={isEditDialogOpen}
       onClose={() => setIsEditDialogOpen(false)}
@@ -474,6 +612,12 @@ export default function RobDayLogCard(
         label="Temperature"
         defaultValue={robdayLogData?.robdayLogTemperature.toString()}
         onChange={(e) => setNewRobdayLogTemperature(Number(e.target.value))}
+      />
+      <Textarea
+        id="notes"
+        label="Notes"
+        defaultValue={robdayLogData?.notes.join(", ")}
+        onChange={(e) => setNotes([e.target.value])}
       />
     </Dialog>
     </Card>
