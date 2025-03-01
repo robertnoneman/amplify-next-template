@@ -61,6 +61,9 @@ export default function Page() {
                 visibleDuration={1000}
                 slideOutDuration={1000}
                 imageSrc="/stickers/robo_thumbsup1.png"
+                startPosition="100%"
+                endPosition="30%"
+                startPosition2="-50%"
                 // imageSrc="/stickers/robo_tennis1.png"
             />
             <SlidingImage
@@ -70,7 +73,8 @@ export default function Page() {
                 visibleDuration={1000}
                 slideOutDuration={1000}
                 axis="Y"
-                endPosition="30%"
+                endPosition="0%"
+                startPosition="100%"
                 // imageSrc="/stickers/robo_thumbsup1.png"
                 imageSrc="/stickers/robo_tennis1.png"
             />

@@ -14,8 +14,9 @@ interface SlidingImageProps {
     width?: string | number;
     height?: string | number;
     axis?: 'X' | 'Y';
-    startPosition?: "105%" | "-105%";
+    startPosition?: string;
     endPosition?: string;
+    startPosition2?: string;
 }
 
 type AnimationState = 'hidden' | 'sliding-in' | 'visible' | 'sliding-out';
@@ -33,6 +34,7 @@ const SlidingImage: React.FC<SlidingImageProps> = ({
     axis = 'X',
     startPosition = "105%",
     endPosition = "55%",
+    startPosition2 = "0%"
     
 }) => {
     const [animationState, setAnimationState] = useState<AnimationState>('hidden');
@@ -78,7 +80,7 @@ const SlidingImage: React.FC<SlidingImageProps> = ({
 
     // Styles for the container
     const containerStyle: React.CSSProperties = {
-        position: 'absolute',
+        position: 'fixed',
         width,
         height,
         overflow: 'hidden',
@@ -86,28 +88,31 @@ const SlidingImage: React.FC<SlidingImageProps> = ({
 
     // Calculate the position based on the animation state
     const getImageStyle = (): React.CSSProperties => {
+        const secondAxis = axis === 'X' ? 'Y' : 'X';
         const baseStyle: React.CSSProperties = {
-            position: 'absolute',
+            position: 'fixed',
             height: '90%',
+            // Set the secondAxis to the startPosition2 value
+            transform: `translate${secondAxis}(${startPosition2})`,
             transition: `transform ${slideInDuration / 1000}s ease-in-out`,
         };
 
         switch (animationState) {
             case 'hidden':
-                return { ...baseStyle, transform: `translate${axis}(${startPosition})` };
+                return { ...baseStyle, transform: `translate${axis}(${startPosition}) translate${secondAxis}(${startPosition2})`};
             case 'sliding-in':
-                return { ...baseStyle, transform: `translate${axis}(${endPosition})` };
+                return { ...baseStyle, transform: `translate${axis}(${endPosition}) translate${secondAxis}(${startPosition2})` };
             case 'visible':
-                return { ...baseStyle, transform: `translate${axis}(${endPosition})` };
+                return { ...baseStyle, transform: `translate${axis}(${endPosition}) translate${secondAxis}(${startPosition2})` };
             case 'sliding-out':
-                return { ...baseStyle, transform: `translate${axis}(${startPosition})` };
+                return { ...baseStyle, transform: `translate${axis}(${startPosition}) translate${secondAxis}(${startPosition2})` };
             default:
                 return baseStyle;
         }
     };
 
     return (
-        <div style={containerStyle} className="items-center justify-center z-10 absolute">
+        <div style={containerStyle} className="items-center justify-center z-10">
             <img
                 src={imageSrc}
                 alt={altText}
