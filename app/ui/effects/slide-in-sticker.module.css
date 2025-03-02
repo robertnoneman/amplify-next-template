@@ -1,0 +1,45 @@
+
+
+.rob {
+    animation: slide-across 10s ease-out;
+    position: absolute;
+    bottom: 0px;
+    animation-iteration-count: infinite;
+}
+
+.robsDartboard {
+    animation: fade-in-fade-out 10s ease-out;
+    position: absolute;
+    bottom: 0px;
+    animation-iteration-count: infinite;
+}
+
+@keyframes slide-across {
+    0% {
+        transform: translateX(-100%);
+    }
+    40%{
+        transform: translateX(-40%) rotate(5deg);
+    }
+    50% {
+        transform: translateX(-40%) rotate(0deg) translateY(-5%);
+    }
+    80% {
+        transform: translateX(-40%) rotate(0deg);
+    }
+    100% {
+        transform: translateX(-100%) rotate(-5deg);
+    }
+}
+
+@keyframes fade-in-fade-out {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

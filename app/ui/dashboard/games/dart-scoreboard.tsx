@@ -24,6 +24,7 @@ import Pride from "react-canvas-confetti/dist/presets/pride";
 import ReactCanvasConfetti from "react-canvas-confetti";
 import confetti from "canvas-confetti";
 import SlidingImage from "@/app/ui/effects/slide-in-sticker";
+import styles from '@/app/ui/effects/slide-in-sticker.module.css';
 
 // Interface for ParentComponent state
 interface ParentComponentState {
@@ -89,9 +90,33 @@ export default function DartScoreboard() {
           triggerSlide: false,
           animationCount: 0,
       });
+
+  const [robOPointingStickerState, setRobOPointingStickerState] = useState<ParentComponentState>({
+      triggerSlide: false,
+      animationCount: 0,
+  });
+
+  const [robNPointingStickerState, setRobNPointingStickerState] = useState<ParentComponentState>({
+      triggerSlide: false,
+      animationCount: 0,
+  });
   
   const handleTrigger = (): void => {
       setStickerState(prevState => ({
+          ...prevState,
+          triggerSlide: true
+      }));
+  };
+
+  const handleRobOPointingTrigger = (): void => {
+      setRobOPointingStickerState(prevState => ({
+          ...prevState,
+          triggerSlide: true
+      }));
+  };
+
+  const handleRobNPointingTrigger = (): void => {
+      setRobNPointingStickerState(prevState => ({
           ...prevState,
           triggerSlide: true
       }));
@@ -102,7 +127,21 @@ export default function DartScoreboard() {
         triggerSlide: false,
         animationCount: prevState.animationCount + 1
     }));
-};
+  };
+
+  const handleRobOPointingAnimationComplete = (): void => {
+    setRobOPointingStickerState(prevState => ({
+        triggerSlide: false,
+        animationCount: prevState.animationCount + 1
+    }));
+  };
+
+  const handleRobNPointingAnimationComplete = (): void => {
+    setRobNPointingStickerState(prevState => ({
+        triggerSlide: false,
+        animationCount: prevState.animationCount + 1
+    }));
+  };
 
   const angles = [60, 120];
   const doubleAngles = angles.concat(angles);
@@ -208,6 +247,17 @@ export default function DartScoreboard() {
     setInnings([...innings, { player1: [currentInningScore.player1, currentInningErrors.player1], player2: [currentInningScore.player2, currentInningErrors.player2] }]);
     setCurrentInningScore({ player1: 0, player2: 0 });
     setCurrentInningErrors({ player1: 0, player2: 0 });
+    if (currentInningScore.player1 > currentInningScore.player2 && playerOneName.includes("RobO")) {
+      handleRobOPointingTrigger();
+    } else if (currentInningScore.player2 > currentInningScore.player1 && playerTwoName.includes("RobO")) {
+      handleRobOPointingTrigger();
+    }
+    else if (currentInningScore.player1 > currentInningScore.player2 && playerOneName.includes("RobN")) {
+      handleRobNPointingTrigger();
+    } else if (currentInningScore.player2 > currentInningScore.player1 && playerTwoName.includes("RobN")) {
+      handleRobNPointingTrigger();
+    }
+    
     let winner = "";
     setCurrentInning((parseInt(currentInning) + 1).toString());
     if (parseInt(currentInning) >= 9) {
@@ -412,6 +462,15 @@ export default function DartScoreboard() {
       status = "Completed";
     }
 
+    if (player1Score > player2Score && playerOneName.includes("RobO")) {
+      handleRobOPointingTrigger();
+    } else if (player2Score > player1Score && playerTwoName.includes("RobO")) {
+      handleRobOPointingTrigger();
+    } else if (player1Score > player2Score && playerOneName.includes("RobN")) {
+      handleRobNPointingTrigger();
+    } else if (player2Score > player1Score && playerTwoName.includes("RobN")) {
+      handleRobNPointingTrigger();
+    }
     // Push updates to server
     const result = client.models.DartGame.update({
       id: currentGameId,
@@ -1383,20 +1442,61 @@ export default function DartScoreboard() {
         </Row>
       )}
       {(stickerState.triggerSlide) && (
-      <SlidingImage
+      // <div>
+      //   <div className={`${styles.robsDartboard} flex`}>
+      //     <img src={"/stickers/robdartsstartgame.png"}></img>
+      //   </div>
+      // </div>
+        <SlidingImage
           trigger={stickerState.triggerSlide}
           onAnimationComplete={handleAnimationComplete}
           slideInDuration={1000}
           visibleDuration={1000}
           slideOutDuration={1000}
           axis="Y"
-          endPosition="30%"
+          startPosition="15%"
+          endPosition="0%"
+          rotateIn="0deg"
+          rotateOut="0deg"
           // imageSrc="/stickers/robo_thumbsup1.png"
           imageSrc="/stickers/robdartsstartgame.png"
-      />
+        />
       )}
-
-
+      {(robOPointingStickerState.triggerSlide) && (
+        <SlidingImage
+          trigger={robOPointingStickerState.triggerSlide}
+          onAnimationComplete={handleRobOPointingAnimationComplete}
+          slideInDuration={3000}
+          visibleDuration={2000}
+          slideOutDuration={3000}
+          axis="X"
+          startPosition="-100%"
+          endPosition="-35%"
+          startPosition2="30%"
+          rotateIn="5deg"
+          rotateOut="-5deg"
+          flip={-1}
+          imageSrc={["/stickers/robo_catch1.png", "/stickers/robo_pointing1.png", "/stickers/robo_pointing2.png", "/stickers/robo_catch2.png", "/stickers/robo_thumbsup1.png", "/stickers/robo_thumbsup2.png", "/stickers/robo_unhappy1.png"][robOPointingStickerState.animationCount % 7]}
+        />
+      )}
+      {(robNPointingStickerState.triggerSlide) && (
+        <SlidingImage
+          trigger={robNPointingStickerState.triggerSlide}
+          onAnimationComplete={handleRobNPointingAnimationComplete}
+          slideInDuration={2000}
+          visibleDuration={1500}
+          slideOutDuration={2000}
+          axis="X"
+          startPosition="100%"
+          endPosition="20%"
+          startPosition2="10%"
+          rotateIn="2deg"
+          rotateOut="-2deg"
+          // Cycle through array of images
+          imageSrc={["/stickers/robN_loser1.png", "/stickers/robN_uhoh.png", "/stickers/robN_winner1.png"][robNPointingStickerState.animationCount % 3]}
+          // imageSrc="/stickers/robN_uhoh.png"
+        />
+      )}
       {/* <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
                 <h2>Dart Scoreboard</h2>
                 <div style={{ marginBottom: '1rem' }}>

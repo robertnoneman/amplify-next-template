@@ -1,6 +1,6 @@
 "use client";
 
-
+import styles from '@/app/ui/dashboard/dartboard.module.css'
 import React, { useState, useEffect } from 'react';
 
 interface SlidingImageProps {
@@ -17,6 +17,9 @@ interface SlidingImageProps {
     startPosition?: string;
     endPosition?: string;
     startPosition2?: string;
+    rotateIn?: string;
+    rotateOut?: string;
+    flip?: number;
 }
 
 type AnimationState = 'hidden' | 'sliding-in' | 'visible' | 'sliding-out';
@@ -34,7 +37,10 @@ const SlidingImage: React.FC<SlidingImageProps> = ({
     axis = 'X',
     startPosition = "105%",
     endPosition = "55%",
-    startPosition2 = "0%"
+    startPosition2 = "0%",
+    rotateIn = "15deg",
+    rotateOut = "-5deg",
+    flip = 1,
     
 }) => {
     const [animationState, setAnimationState] = useState<AnimationState>('hidden');
@@ -93,7 +99,7 @@ const SlidingImage: React.FC<SlidingImageProps> = ({
             position: 'fixed',
             height: '90%',
             // Set the secondAxis to the startPosition2 value
-            transform: `translate${secondAxis}(${startPosition2})`,
+            transform: `translate${secondAxis}(${startPosition2}) scaleX(${flip})`,
             transition: `transform ${slideInDuration / 1000}s ease-in-out`,
         };
 
@@ -101,18 +107,18 @@ const SlidingImage: React.FC<SlidingImageProps> = ({
             case 'hidden':
                 return { ...baseStyle, transform: `translate${axis}(${startPosition}) translate${secondAxis}(${startPosition2})`};
             case 'sliding-in':
-                return { ...baseStyle, transform: `translate${axis}(${endPosition}) translate${secondAxis}(${startPosition2})` };
+                return { ...baseStyle, transform: `translate${axis}(${endPosition}) translate${secondAxis}(${startPosition2}) rotate(${rotateIn})` };
             case 'visible':
-                return { ...baseStyle, transform: `translate${axis}(${endPosition}) translate${secondAxis}(${startPosition2})` };
+                return { ...baseStyle, transform: `translate${axis}(${endPosition}) translate${secondAxis}(${startPosition2}) rotate(${rotateOut})` };
             case 'sliding-out':
-                return { ...baseStyle, transform: `translate${axis}(${startPosition}) translate${secondAxis}(${startPosition2})` };
+                return { ...baseStyle, transform: `translate${axis}(${startPosition}) translate${secondAxis}(${startPosition2}) rotate(${rotateIn})` };
             default:
                 return baseStyle;
         }
     };
 
     return (
-        <div style={containerStyle} className="items-center justify-center z-10">
+        <div style={containerStyle} className="items-center justify-center z-40">
             <img
                 src={imageSrc}
                 alt={altText}
