@@ -350,6 +350,13 @@ export default function Page() {
 
   function onEditActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
     setEditedActivityInstance(activityInstance);
+    if (activityInstance.locationId) {
+      const location = locations.find((location) => location.id === activityInstance.locationId);
+      setSelectedLocation(location);
+      setSelectedLocationValue(location?.name ?? "Choose a location");
+      setSelectedLocationValueLabel(location?.name ?? "Choose a location");
+    }
+    // activityInstance.locationId ? setSelectedLocationValueLabel(activityInstance.locationId) : setSelectedLocationValueLabel("Choose a location");
     setIsSecondDialogOpen(true);
   }
 
@@ -1344,7 +1351,7 @@ export default function Page() {
         }
           >
           <Text variant="body-default-s">
-            Ability to edit activity here coming soon...
+            Set/change the location or add notes
           </Text>
           <Select
             searchable
