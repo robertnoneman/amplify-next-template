@@ -117,6 +117,7 @@ export default function Page() {
   const [currentWeather, setCurrentWeather] = useState<string>();
   const [currentLat, setCurrentLat] = useState<number>();
   const [currentLong, setCurrentLong] = useState<number>();
+  const [activityInstanceNotes, setActivityInstanceNotes] = useState<string>("");
 
   const handleSelect = (activity: Schema["Activity"]["type"]) => {
     console.log("Selected option:", activity.name);
@@ -432,7 +433,16 @@ export default function Page() {
     if (activityInstance) {
       // editedActivityInstance.date = robDayDate ? robDayDate.toDateString() : "";
       console.log("Selected location: ", selectedLocation);
-      selectedLocation ? activityInstance.locationId = selectedLocation.id : null;
+      if (selectedLocation) {
+        activityInstance.locationId = selectedLocation.id;
+      }
+      if (activityInstanceNotes) {
+        if (activityInstance.notes) {
+          activityInstance.notes.push(activityInstanceNotes);
+        } else {
+          activityInstance.notes = [activityInstanceNotes];
+        }
+      }
       // const test = await client.models.ActivityInstance.get({ id: activityInstance.id });
       // console.log("Activity Instance found: ", test);
       // console.log("Location of test: ", test.location().data);
@@ -440,7 +450,10 @@ export default function Page() {
       if (selectedLocation) {
         const result = client.models.ActivityInstance.update({ id: activityInstance.id, locationId: selectedLocation.id });
         console.log("Activity Instance updated: ", result);
-      }
+      } 
+
+      const updateResult = client.models.ActivityInstance.update({ id: activityInstance.id, notes: activityInstance.notes });
+      console.log("Activity Instance notes updated: ", updateResult);
     }
     else {
       console.log("No Activity Instance found for som efucking reason... ", activityInstance);
@@ -458,6 +471,7 @@ export default function Page() {
     setIsSecondDialogOpen(false);
     setSelectedLocationValue("");
     setSelectedLocationValueLabel("Choose a location");
+    setActivityInstanceNotes("");
   }
 
   const addPhotoToActivityInstance = async (activityInstance: Schema["ActivityInstance"]["type"], file: File): Promise<void> => {
@@ -1356,6 +1370,12 @@ export default function Page() {
               }
             }}
             value={selectedLocationValue}
+          />
+          <Textarea
+            id="notes"
+            label="Activity Notes"
+            value={activityInstanceNotes}
+            onChange={(value) => setActivityInstanceNotes(value.target.value)}
           />
         </Dialog>
       <Dialog
