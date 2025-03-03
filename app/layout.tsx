@@ -132,13 +132,13 @@ export default function RootLayout({
                 colorStart: "accent-background-strong",
                 colorEnd: "page-background",
               }}
-              grid={{
-                display: true,
-                opacity: 50,
-                width: "0.5rem",
-                color: "neutral-alpha-medium",
-                height: "0.5rem",
-              }}
+              // grid={{
+              //   display: true,
+              //   opacity: 50,
+              //   width: "0.5rem",
+              //   color: "neutral-alpha-medium",
+              //   height: "0.5rem",
+              // }}
             />
             <SmartImage 
               // src="/robdaycrop.jpeg"

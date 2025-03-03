@@ -118,6 +118,7 @@ export default function Page() {
   const [currentLat, setCurrentLat] = useState<number>();
   const [currentLong, setCurrentLong] = useState<number>();
   const [activityInstanceNotes, setActivityInstanceNotes] = useState<string>("");
+  const { addToast } = useToast();
 
   const handleSelect = (activity: Schema["Activity"]["type"]) => {
     console.log("Selected option:", activity.name);
@@ -150,6 +151,10 @@ export default function Page() {
       await uploadData({
         path: `picture-submissions/${file.name}`, 
         data: file
+      });
+      addToast({
+        message: "Upload successful",
+        variant: "success",
       });
       // setActivityImage(`picture-submissions/${file.name}`)
     }
@@ -397,6 +402,10 @@ export default function Page() {
       }
     }
     removedActivity ? client.models.Activity.update({ ...removedActivity }) : null;
+    addToast({
+      message: "Activity removed",
+      variant: "success",
+    });
     setRemovedActivity(undefined);
     setRemovedActivityInstance(undefined);
     setIsFirstDialogOpen(false);
@@ -404,7 +413,12 @@ export default function Page() {
 
   function removeActivityInstance(activityInstance: Schema["ActivityInstance"]["type"]) {
     const result = client.models.ActivityInstance.delete({ id: activityInstance.id });
+
     console.log("Activity Instance removed: ", result);
+    addToast({
+      message: "Activity removed",
+      variant: "success",
+    });
     if (removedActivity) {
       const activ = selectedActivities.find((activity) => activity.id === removedActivity.id);
       if (activ) {
@@ -461,9 +475,17 @@ export default function Page() {
 
       const updateResult = client.models.ActivityInstance.update({ id: activityInstance.id, notes: activityInstance.notes });
       console.log("Activity Instance notes updated: ", updateResult);
+      addToast({
+        message: "Activity updated",
+        variant: "success",
+      });
     }
     else {
       console.log("No Activity Instance found for som efucking reason... ", activityInstance);
+      addToast({
+        message: "Activity not found",
+        variant: "danger",
+      });
     }
     if (editededActivity) {
       const activ = selectedActivities.find((activity) => activity.id === editededActivity.id);
@@ -488,6 +510,10 @@ export default function Page() {
     images.push(key);
     const result = client.models.ActivityInstance.update({ id: activityInstance.id, images: images });
     console.log("Activity Instance updated: ", result);
+    addToast({
+      message: "Image uploaded",
+      variant: "success",
+    });
     const url = await getImageUrl(key);
     if (url) {
       const myImageUrls = { ...newImageUrls };
@@ -508,6 +534,10 @@ export default function Page() {
     addedActivity ? addedActivity.isOnNextRobDay = true : null;
     addedActivity ? client.models.Activity.update({ ...addedActivity }) : null;
     addedActivity ? createActivityInstance({ ...addedActivity}) : null;
+    addToast({
+      message: "Activity added",
+      variant: "success",
+    });
     setAddedActivity(undefined);
     setIsAddActivityDialogOpen(false);
     setSelectedValue("");
@@ -545,6 +575,10 @@ export default function Page() {
     const temp = Number(currentTemp?.split(" F")[0]);
     const result = client.models.ActivityInstance.update({ id: activity.id, status: "InProgress", startTime: startTime, weatherCondition: currentWeather, temperature: temp, robdaylogId: robDayLog?.id });
     console.log("Activity Instance started: ", startTime, result);
+    addToast({
+      message: "Activity started",
+      variant: "success",
+    });
   }
 
   function stopActivity(activity: Schema["ActivityInstance"]["type"]) {
@@ -555,11 +589,19 @@ export default function Page() {
     }
     const result = client.models.ActivityInstance.update({ id: activity.id, status: "Paused", endTime: endTime, totalTime: duration });
     console.log("Activity Instance stopped: ", endTime, result);
+    addToast({
+      message: "Activity stopped",
+      variant: "success",
+    });
   }
 
   function resetActivityTime(activity: Schema["ActivityInstance"]["type"]) {
     const result = client.models.ActivityInstance.update({ id: activity.id, startTime: 0, endTime: 0, totalTime: 0, status: null });
     console.log("Activity Instance reset: ", result);
+    addToast({
+      message: "Activity reset",
+      variant: "success",
+    });
   }
 
   function completeActivity() {
@@ -584,6 +626,10 @@ export default function Page() {
     completedActivityInstance ? client.models.ActivityInstance.update({ ...completedActivityInstance }) : null;
     setCompletedActivityInstance(undefined);
     setIsCompleteDialogOpen(false);
+    addToast({
+      message: "Activity completed",
+      variant: "success",
+    });
   }
 
   async function createRobdayLog() {
@@ -612,6 +658,10 @@ export default function Page() {
       const result = client.models.ActivityInstance.update({ id: activityInstanceId, robdaylogId: myRobdayLog.data?.id });
       console.log("Activity Instance updated: ", result);
     });
+    addToast({
+      message: "Robday Log created",
+      variant: "success",
+    });
   }
 
   async function startRobDay() {
@@ -619,6 +669,10 @@ export default function Page() {
     const result = await client.models.Robdaylog.update({ id: robDayLogId ?? "", status: "Started"})
     console.log("Robday started!", result)
     listRobDayLogs();
+    addToast({
+      message: "Robday started",
+      variant: "success",
+    });
   }
 
   function updateRobdayLog() {
@@ -670,6 +724,10 @@ export default function Page() {
       });
       const result = client.models.Robdaylog.update({ id: robDayLog.id, endTime: endTime, totalTime: duration, status: "Completed" });
       console.log("Robday Log completed: ", result);
+      addToast({
+        message: "Robday completed",
+        variant: "success",
+      });
     }
   }
 
@@ -699,6 +757,10 @@ export default function Page() {
     };
     const location = client.models.Location.create({ ...newLocation });
     console.log("Location created: ", location);
+    addToast({
+      message: "Location created",
+      variant: "success",
+    });
     // setAddedLocation(location);
     // setSelectedLocation(location);
     // setSelectedLocationValue("");
