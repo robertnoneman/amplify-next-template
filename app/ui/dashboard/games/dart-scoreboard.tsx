@@ -28,8 +28,8 @@ import styles from '@/app/ui/effects/slide-in-sticker.module.css';
 
 // Interface for ParentComponent state
 interface ParentComponentState {
-    triggerSlide: boolean;
-    animationCount: number;
+  triggerSlide: boolean;
+  animationCount: number;
 }
 
 Amplify.configure(outputs);
@@ -47,6 +47,7 @@ export default function DartScoreboard() {
   const [currentGameId, setCurrentGameId] = useState("");
   const [playerOneName, setPlayerOneName] = useState("Player 1");
   const [playerTwoName, setPlayerTwoName] = useState("Player 2");
+  const [saveNameButtonActive, setSaveNameButtonActive] = useState(false);
   const boardNumbers = [20, 19, 18, 17, 16, 15, "BULL", "T", "D", "3B"];
   const scoreboardValues = ["20", "19", "18", "17", "16", "15", 'BULL'];
   const [baseBallInningValues, setBaseBallInningValues] = useState(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
@@ -87,60 +88,109 @@ export default function DartScoreboard() {
   const [commonOptions, setCommonOptions] = useState({});
   const [commonOptions2, setCommonOptions2] = useState({});
   const [stickerState, setStickerState] = useState<ParentComponentState>({
-          triggerSlide: false,
-          animationCount: 0,
-      });
+    triggerSlide: false,
+    animationCount: 0,
+  });
 
   const [robOPointingStickerState, setRobOPointingStickerState] = useState<ParentComponentState>({
-      triggerSlide: false,
-      animationCount: 0,
+    triggerSlide: false,
+    animationCount: 0,
   });
 
   const [robNPointingStickerState, setRobNPointingStickerState] = useState<ParentComponentState>({
-      triggerSlide: false,
-      animationCount: 0,
+    triggerSlide: false,
+    animationCount: 0,
   });
-  
+
   const handleTrigger = (): void => {
-      setStickerState(prevState => ({
-          ...prevState,
-          triggerSlide: true
-      }));
+    setStickerState(prevState => ({
+      ...prevState,
+      triggerSlide: true
+    }));
   };
 
   const handleRobOPointingTrigger = (): void => {
-      setRobOPointingStickerState(prevState => ({
-          ...prevState,
-          triggerSlide: true
-      }));
+    setRobOPointingStickerState(prevState => ({
+      ...prevState,
+      triggerSlide: true
+    }));
   };
 
   const handleRobNPointingTrigger = (): void => {
-      setRobNPointingStickerState(prevState => ({
-          ...prevState,
-          triggerSlide: true
-      }));
+    setRobNPointingStickerState(prevState => ({
+      ...prevState,
+      triggerSlide: true
+    }));
   };
 
   const handleAnimationComplete = (): void => {
     setStickerState(prevState => ({
-        triggerSlide: false,
-        animationCount: prevState.animationCount + 1
+      triggerSlide: false,
+      animationCount: prevState.animationCount + 1
     }));
   };
 
   const handleRobOPointingAnimationComplete = (): void => {
     setRobOPointingStickerState(prevState => ({
-        triggerSlide: false,
-        animationCount: prevState.animationCount + 1
+      triggerSlide: false,
+      animationCount: prevState.animationCount + 1
     }));
   };
 
   const handleRobNPointingAnimationComplete = (): void => {
     setRobNPointingStickerState(prevState => ({
-        triggerSlide: false,
-        animationCount: prevState.animationCount + 1
+      triggerSlide: false,
+      animationCount: prevState.animationCount + 1
     }));
+  };
+
+  const handleSetPlayerOneName = (e: string) => {
+    setPlayerOneName(e);
+    if (currentGameId !== "") {
+      setSaveNameButtonActive(true);
+      //   const result = client.models.DartGame.update({
+      //     id: currentGameId,
+      //     player1Name: e
+      //   }).then(() => {
+      //     console.log("Player 1 name updated successfully");
+      //   }).catch((error) => {
+      //     console.error("Error updating player 1 name:", error);
+      //   });
+      //   console.log(result);
+    }
+  }
+
+  const handleSetPlayerTwoName = (e: string) => {
+    setPlayerTwoName(e);
+    if (currentGameId !== "") {
+      setSaveNameButtonActive(true);
+      //   const result = client.models.DartGame.update({
+      //     id: currentGameId,
+      //     player2Name: e
+      //   }).then(() => {
+      //     console.log("Player 2 name updated successfully");
+      //   }).catch((error) => {
+      //     console.error("Error updating player 2 name:", error);
+      //   });
+      //   console.log(result);
+    }
+  }
+
+  const handleSavePlayerNames = () => {
+    if (currentGameId === "") {
+      return;
+    }
+    const result = client.models.DartGame.update({
+      id: currentGameId,
+      player1Name: playerOneName,
+      player2Name: playerTwoName
+    }).then(() => {
+      console.log("Player names updated successfully");
+    }).catch((error) => {
+      console.error("Error updating player names:", error);
+    });
+    console.log(result);
+    setSaveNameButtonActive(false);
   };
 
   const angles = [60, 120];
@@ -233,6 +283,8 @@ export default function DartScoreboard() {
         setInnings(inningData);
       }
       setCurrentGameId(game.id ?? "");
+      setPlayerOneName(game.player1Name ?? "Player 1");
+      setPlayerTwoName(game.player2Name ?? "Player 2");
     });
     return parsedData;
   };
@@ -257,7 +309,7 @@ export default function DartScoreboard() {
     } else if (currentInningScore.player2 > currentInningScore.player1 && playerTwoName.includes("RobN")) {
       handleRobNPointingTrigger();
     }
-    
+
     let winner = "";
     setCurrentInning((parseInt(currentInning) + 1).toString());
     if (parseInt(currentInning) >= 9) {
@@ -288,7 +340,8 @@ export default function DartScoreboard() {
       baseballInningErrorsPlayer2: [...innings.map((inning) => inning.player2[1]), currentInningErrors.player2],
       winnerName: winner === "player1" ? playerOneName : winner === "player2" ? playerTwoName : "",
       loserName: winner === "player1" ? playerTwoName : winner === "player2" ? playerOneName : "",
-      status: winner ? "Completed" : "InProgress"
+      status: winner ? "Completed" : "InProgress",
+      endTime: winner ? new Date().getTime() : null
     }).then(() => {
       console.log("Inning submitted successfully");
     }).catch((error) => {
@@ -360,7 +413,8 @@ export default function DartScoreboard() {
         id: currentGameId,
         winnerName: winner === "player1" ? playerOneName : winner === "player2" ? playerTwoName : "",
         loserName: winner === "player1" ? playerTwoName : winner === "player2" ? playerOneName : "",
-        status: "Completed"
+        status: "Completed",
+        endTime: new Date().getTime()
       }).then(() => {
         console.log("Game completed successfully");
       }).catch((error) => {
@@ -479,6 +533,7 @@ export default function DartScoreboard() {
       status: status as "InProgress" | "Completed",
       winnerName: winner === "player1" ? playerOneName : winner === "player2" ? playerTwoName : "",
       loserName: winner === "player1" ? playerTwoName : winner === "player2" ? playerOneName : "",
+      endTime: winner ? new Date().getTime() : null
     }).then(() => {
       console.log("Round submitted successfully");
     }).catch((error) => {
@@ -547,7 +602,8 @@ export default function DartScoreboard() {
           id: currentGameId,
           status: "Completed",
           winnerName: playerOneName,
-          loserName: playerTwoName
+          loserName: playerTwoName,
+          endTime: new Date().getTime()
         }).then(() => {
           console.log("Game completed successfully");
         }).catch((error) => {
@@ -562,7 +618,8 @@ export default function DartScoreboard() {
           id: currentGameId,
           status: "Completed",
           winnerName: playerTwoName,
-          loserName: playerOneName
+          loserName: playerOneName,
+          endTime: new Date().getTime()
         }).then(() => {
           console.log("Game completed successfully");
         }).catch((error) => {
@@ -747,6 +804,7 @@ export default function DartScoreboard() {
       status: "InProgress",
       player1Name: playerOneName,
       player2Name: playerTwoName,
+      startTime: new Date().getTime(),
     }).then((data) => {
       console.log("New dart game created:", data);
       // setCurrentGameId(data.id ?? "");
@@ -760,7 +818,8 @@ export default function DartScoreboard() {
   const endDartGame = () => {
     const result = client.models.DartGame.update({
       id: currentGameId,
-      status: "Completed"
+      status: "Completed",
+      endTime: new Date().getTime()
     }).then(() => {
       console.log("Dart game ended successfully");
     }).catch((error) => {
@@ -804,7 +863,7 @@ export default function DartScoreboard() {
   return (
     <Column fillWidth fillHeight justifyContent="center" alignItems="center" background="surface" padding="xs">
       <ReactCanvasConfetti onInit={onInit} />
-      
+
       <Row fillWidth gap="16" justifyContent="center" padding="s">
         <Select
           id="game-type"
@@ -842,7 +901,7 @@ export default function DartScoreboard() {
               <tr style={{ paddingBottom: '10px' }}>
                 <th colSpan={2}>
                   <Text variant="heading-default-l">
-                    <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)}
+                    <input type="text" value={playerOneName} onChange={(e) => handleSetPlayerOneName(e.target.value)}
                       style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
@@ -854,12 +913,23 @@ export default function DartScoreboard() {
                 </th>
                 <th colSpan={2}>
                   <Text variant="heading-default-l">
-                    <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)}
+                    <input type="text" value={playerTwoName} onChange={(e) => handleSetPlayerTwoName(e.target.value)}
                       style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
                 </th>
               </tr>
+              {saveNameButtonActive && (
+                <tr>
+                  <th colSpan={5}>
+                    <Column fillWidth alignItems="center" justifyContent="center">
+                      <Button variant="primary" onClick={handleSavePlayerNames}>
+                        Save Names
+                      </Button>
+                    </Column>
+                  </th>
+                </tr>
+              )}
               <tr>
                 <th colSpan={5}>
                   <Text variant="body-default-xs">
@@ -1342,7 +1412,7 @@ export default function DartScoreboard() {
                 (currentQuarter > index + 1) ?
                   (<tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
                     <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
-                      {possesions[index+1]?.player1}
+                      {possesions[index + 1]?.player1}
                     </td>
                     <td style={{ color: "#BBB" }}>
                     </td>
@@ -1355,7 +1425,7 @@ export default function DartScoreboard() {
                         <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}</td>
                       )}
                     <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
-                      {possesions[index+1]?.player2}
+                      {possesions[index + 1]?.player2}
                     </td>
                     <td style={{ color: "#BBB" }}>
                     </td>
@@ -1374,13 +1444,13 @@ export default function DartScoreboard() {
                       </td>
                       <td style={{ color: "#BBB" }}></td>
                       {((index + 1) % 2 === 0) ? (
-                      <td style={{ borderBottom: "1px solid #DDD", borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}
-                      </td>
-                    )
-                      :
-                      (
-                        <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}</td>
-                      )}
+                        <td style={{ borderBottom: "1px solid #DDD", borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}
+                        </td>
+                      )
+                        :
+                        (
+                          <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}</td>
+                        )}
                       <td style={{ color: "#BBB" }}>
                         <input
                           type="number"
@@ -1396,13 +1466,13 @@ export default function DartScoreboard() {
                       <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}></td>
                       <td style={{ color: "#BBB" }}></td>
                       {((index + 1) % 2 === 0) ? (
-                      <td style={{ borderBottom: "1px solid #DDD", borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}
-                      </td>
-                    )
-                      :
-                      (
-                        <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}</td>
-                      )}
+                        <td style={{ borderBottom: "1px solid #DDD", borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}
+                        </td>
+                      )
+                        :
+                        (
+                          <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}</td>
+                        )}
                       <td style={{ color: "#BBB" }}></td>
                     </tr>)
               ))}
@@ -1424,7 +1494,7 @@ export default function DartScoreboard() {
                 <td>
                 </td>
               </tr>
-              
+
             </tbody>
           </table>
           <Column fillWidth justifyContent="center" alignItems="center">
@@ -1442,11 +1512,11 @@ export default function DartScoreboard() {
         </Row>
       )}
       {(stickerState.triggerSlide) && (
-      // <div>
-      //   <div className={`${styles.robsDartboard} flex`}>
-      //     <img src={"/stickers/robdartsstartgame.png"}></img>
-      //   </div>
-      // </div>
+        // <div>
+        //   <div className={`${styles.robsDartboard} flex`}>
+        //     <img src={"/stickers/robdartsstartgame.png"}></img>
+        //   </div>
+        // </div>
         <SlidingImage
           trigger={stickerState.triggerSlide}
           onAnimationComplete={handleAnimationComplete}
@@ -1476,7 +1546,7 @@ export default function DartScoreboard() {
           rotateIn="5deg"
           rotateOut="-5deg"
           flip={-1}
-          imageSrc={["/stickers/robo_catch1.png", "/stickers/robo_pointing1.png", "/stickers/robo_pointing2.png", "/stickers/robo_catch2.png", "/stickers/robo_thumbsup1.png", "/stickers/robo_thumbsup2.png", "/stickers/robo_unhappy1.png"][robOPointingStickerState.animationCount % 7]}
+          imageSrc={["/stickers/robo_catch1.png", "/stickers/robo_pointing1.png", "/stickers/robo_pointing2.png", "/stickers/robo_catch2.png", "/stickers/robo_thumbsup1.png", "/stickers/robo_thumbsup2.png", "/stickers/robo_unhappy1.png", "/stickers/robO_loser1.png", "/stickers/robO_loser2.png"][robOPointingStickerState.animationCount % 9]}
         />
       )}
       {(robNPointingStickerState.triggerSlide) && (
@@ -1493,8 +1563,8 @@ export default function DartScoreboard() {
           rotateIn="2deg"
           rotateOut="-2deg"
           // Cycle through array of images
-          imageSrc={["/stickers/robN_loser1.png", "/stickers/robN_uhoh.png", "/stickers/robN_winner1.png"][robNPointingStickerState.animationCount % 3]}
-          // imageSrc="/stickers/robN_uhoh.png"
+          imageSrc={["/stickers/robN_loser1.png", "/stickers/robN_uhoh.png", "/stickers/robN_winner1.png", "/stickers/robN_loser2.png"][robNPointingStickerState.animationCount % 4]}
+        // imageSrc="/stickers/robN_uhoh.png"
         />
       )}
       {/* <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
