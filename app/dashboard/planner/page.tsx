@@ -597,6 +597,7 @@ export default function Page() {
     setStarted(true);
     const result = await client.models.Robdaylog.update({ id: robDayLogId ?? "", status: "Started"})
     console.log("Robday started!", result)
+    listRobDayLogs();
   }
 
   function updateRobdayLog() {

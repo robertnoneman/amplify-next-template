@@ -39,7 +39,7 @@ export default function RobDayLogCard(
   {
     images,
     // TODO: location data??
-    robdayLogId
+    robdayLogId,
   }: {
     images: { src: string, aspect_ratio: number }[];
     robdayLogId: string;
