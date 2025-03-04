@@ -64,7 +64,93 @@ export default async function RadialBarWrapper() {
     const robOHighestScoreAsPlayerTwo = Math.max(...dartGames.data
         .filter((dartGame) => (dartGame.gameType === "SevenOhOne" || dartGame.gameType === "FiveOhOne" || dartGame.gameType === "ThreeOhOne") && dartGame.player2Name === "RobO")
         .map((dartGame) => dartGame.x01RoundScoresPlayer2 ? Math.max(...dartGame.x01RoundScoresPlayer2.filter(score => score !== null)) : 0));
+
+    const robNMultiRunInnings = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player1Name === "RobN")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer1 ?? [])
+        .filter((runs) => runs !== null && runs > 1).length;
+
+    const robNMultiRunInningsAsPlayer2 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player2Name === "RobN")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer2 ?? [])
+        .filter((runs) => runs !== null && runs > 1).length;
+
+    const robNInningsWithRunsAsPlayer1 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player1Name === "RobN")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer1 ?? [])
+        .filter((runs) => runs !== null && runs > 0).length;
+
+    const robNInningsWithRunsAsPlayer2 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player2Name === "RobN")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer2 ?? [])
+        .filter((runs) => runs !== null && runs > 0).length;
+
+    const robNTotalInnings1 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && (dartGame.player1Name === "RobN"))
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer1 ?? []).length;
     
+    const robNTotalInnings2 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && (dartGame.player2Name === "RobN"))
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer2 ?? []).length;
+
+    const RobOMultiRunInnings = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player1Name === "RobO")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer1 ?? [])
+        .filter((runs) => runs !== null && runs > 1).length;
+
+    const RobNTotalRunsScoredAsPlayer1 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player1Name === "RobN")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer1 ?? []).reduce((acc, runs) => (acc ?? 0) + (runs ?? 0), 0);
+
+    const RobNTotalRunsScoredAsPlayer2 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player2Name === "RobN")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer2 ?? []).reduce((acc, runs) => (acc ?? 0) + (runs ?? 0), 0);
+    
+    console.log("RobN Total Runs Scored as Player 1: ", RobNTotalRunsScoredAsPlayer1);
+    console.log("RobN Total Runs Scored as Player 2: ", RobNTotalRunsScoredAsPlayer2);
+
+    const RobNTotalRunsScored = (RobNTotalRunsScoredAsPlayer1 ?? 0) + (RobNTotalRunsScoredAsPlayer2 ?? 0);
+    console.log("RobN Total Runs Scored: ", RobNTotalRunsScored);
+    const RobNTotalAtBats = robNTotalInnings1 + robNTotalInnings2;
+    console.log("RobN Total At Bats: ", RobNTotalAtBats);
+    const robNSluggingPercentage = Number((RobNTotalRunsScored / (RobNTotalAtBats * 3)).toPrecision(3)) * 100;
+    console.log("RobN Slugging Percentage: ", robNSluggingPercentage);
+
+    const robOTotalRunsScoredAsPlayer1 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player1Name === "RobO")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer1 ?? []).reduce((acc, runs) => (acc ?? 0) + (runs ?? 0), 0);
+
+    console.log("RobO Total Runs Scored as Player 1: ", robOTotalRunsScoredAsPlayer1);
+
+    const robOTotalRunsScoredAsPlayer2 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player2Name === "RobO")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer2 ?? []).reduce((acc, runs) => (acc ?? 0) + (runs ?? 0), 0);
+
+    console.log("RobO Total Runs Scored as Player 2: ", robOTotalRunsScoredAsPlayer2);
+
+    const RobOMultiRunInningsAsPlayer2 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player2Name === "RobO")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer2 ?? [])
+        .filter((runs) => runs !== null && runs > 1).length;
+
+    const RobOInningsWithRunsAsPlayer1 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player1Name === "RobO")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer1 ?? [])
+        .filter((runs) => runs !== null && runs > 0).length;
+
+    const RobOInningsWithRunsAsPlayer2 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && dartGame.player2Name === "RobO")
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer2 ?? [])
+        .filter((runs) => runs !== null && runs > 0).length;
+
+    const RobOTotalInnings1 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && (dartGame.player1Name === "RobO"))
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer1 ?? []).length;
+
+    const RobOTotalInnings2 = dartGames.data.filter((dartGame) => dartGame.gameType === "Baseball" && (dartGame.player2Name === "RobO"))
+        .flatMap((dartGame) => dartGame.baseballInningScoresPlayer2 ?? []).length;
+
+    const RobOTotalAtBats = RobOTotalInnings1 + RobOTotalInnings2;
+    const robOSluggingPercentage = Number((((robOTotalRunsScoredAsPlayer1 ?? 0) + (robOTotalRunsScoredAsPlayer2 ?? 0)) / (RobOTotalAtBats * 3)).toPrecision(3)) * 100;
+    console.log("RobO Slugging Percentage: ", robOSluggingPercentage);
+    const robNTotalInnings = robNTotalInnings1 + robNTotalInnings2;
+    const robOTotalInnings = RobOTotalInnings1 + RobOTotalInnings2;
+
+    const robNMultiRunPercentage = (robNTotalInnings > 0 ? Number(((robNMultiRunInnings + robNMultiRunInningsAsPlayer2) / robNTotalInnings).toPrecision(3)) : 0) * 100;
+    const robNBattingAverage = (robNTotalInnings > 0 ? Number(Number((robNInningsWithRunsAsPlayer1 + robNInningsWithRunsAsPlayer2) / robNTotalInnings).toPrecision(3)) : 0) * 100;
+
+    const robOMultiRunPercentage = (robOTotalInnings > 0 ? Number(((RobOMultiRunInnings + RobOMultiRunInningsAsPlayer2) / robOTotalInnings).toPrecision(3)) : 0) * 100;
+    const robOBattingAverage = (robOTotalInnings > 0 ? Number(Number((RobOInningsWithRunsAsPlayer1 + RobOInningsWithRunsAsPlayer2) / robOTotalInnings).toPrecision(3)) : 0) * 100;
+
+    console.log("RobN Multi Run Percentage: ", robNMultiRunPercentage);
+    console.log("RobN Batting Average: ", robNBattingAverage);
+    console.log("RobO Multi Run Percentage: ", robOMultiRunPercentage);
+    console.log("RobO Batting Average: ", robOBattingAverage);
 
     console.log("RobO Highest Score as Player One: ", robOHighestScoreAsPlayerOne);
     console.log("RobO Highest Score as Player Two: ", robOHighestScoreAsPlayerTwo);
@@ -123,6 +209,12 @@ export default async function RadialBarWrapper() {
                         <StackedBar labels={["RobO", "RobN"]} series={[{name: "Cricket", data: [robOCricketwins, robNCricketwins]}, {name: "Baseball", data: [robOBaseballwins, robNBaseballwins]}, {name: "RNF", data: [robORnfwins, robNRnfwins]}, {name: "301", data: [robOThreeOhOnewins, robNThreeOhOnewins]}, {name: "501", data: [robOFiveOhOnewins, robNFiveOhOnewins]}, {name: "701", data: [robOSevenOhOnewins, robNSevenOhOnewins]}]} />
                         <RadialBar labels={["ROBN HIGHEST SCORE"]} series={[Math.max(robNHighestScoreAsPlayerOne, robNHighestScoreAsPlayerTwo)]} colors={["#FD6325"]} height={200} fontSize="14px" />
                         <RadialBar labels={["ROBO HIGHEST SCORE"]} series={[Math.max(robOHighestScoreAsPlayerOne, robOHighestScoreAsPlayerTwo)]} colors={["#FD6325"]} height={200} fontSize="14px" />
+                        <RadialBar labels={["ROBN MULTI RUN PERCENTAGE"]} series={[robNMultiRunPercentage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
+                        <RadialBar labels={["ROBN BATTING AVERAGE"]} series={[robNBattingAverage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
+                        <RadialBar labels={["ROBO MULTI RUN PERCENTAGE"]} series={[robOMultiRunPercentage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
+                        <RadialBar labels={["ROBO BATTING AVERAGE"]} series={[robOBattingAverage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
+                        <RadialBar labels={["ROBN SLUGGING PERCENTAGE"]} series={[robNSluggingPercentage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
+                        <RadialBar labels={["ROBO SLUGGING PERCENTAGE"]} series={[robOSluggingPercentage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
                     </Column>
                 </Accordion>
                 {/* <RadialBar labels={["TOTAL LOCATIONS VISITED"]} series={[locations.data.length]} colors={["#FD6325"]} height={200} fontSize="14px" /> */}

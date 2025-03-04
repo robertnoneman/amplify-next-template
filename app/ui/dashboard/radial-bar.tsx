@@ -13,10 +13,10 @@ interface MyComponentProps {
     colors?: string[];
     height?: number;
     fontSize?: string;
+    percentageFormatter?: boolean;
 }
 
-export default function RadialBar({ labels, series, colors=["#E90507"], height=350, fontSize="22px" }: MyComponentProps) {
-    // const [isLoaded, setIsLoaded] = useState(false);
+export default function RadialBar({ labels, series, colors=["#E90507"], height=350, fontSize="22px", percentageFormatter=false }: MyComponentProps) {
     const [chartOptions, setChartOptions] = useState({ chart: {
         type: 'radialBar' as 'radialBar',
       },
@@ -57,9 +57,7 @@ export default function RadialBar({ labels, series, colors=["#E90507"], height=3
                 color: "#fff",
                 fill: "#fff",
                 fontFamily: "__Roboto_1e0c0b",
-                formatter: function (val: number): string{
-                  return val + "";
-                }
+                formatter: percentageFormatter ? function (val: number): string { return (val/100).toFixed(3) + "%"; } : function (val: number): string { return val.toString(); }
               }
             }
           }
