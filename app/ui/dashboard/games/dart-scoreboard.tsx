@@ -244,10 +244,13 @@ export default function DartScoreboard() {
         const player1RoundScores = game.x01RoundScoresPlayer1 ?? [];
         const player2RoundScores = game.x01RoundScoresPlayer2 ?? [];
         const roundData: { player1: number; player2: number }[] = [];
-        player1RoundScores.forEach((score, index) => {
-          roundData.push({ player1: score ?? 0, player2: player2RoundScores[index] ?? 0 });
+        player2RoundScores.forEach((score, index) => {
+          roundData.push({ player1: player1RoundScores[index] ?? 0, player2: score ?? 0 });
         });
         setRounds(roundData);
+        if (game.cricketTotalPointsPlayer1 && game.cricketTotalPointsPlayer1.length > 0) {
+          setCurrentRound({ player1: game.cricketTotalPointsPlayer1?.[game.cricketTotalPointsPlayer1.length - 1]?.toString() ?? "", player2: "" });
+        }
       }
       if (game.gameType === "Cricket") {
         const player1TotalPoints = game.cricketTotalPointsPlayer1 ?? [];
@@ -498,6 +501,22 @@ export default function DartScoreboard() {
     return initialScore - (cumulativeScore(player) + currentScore);
   };
 
+  const submitRoundPlayer1 = () => {
+    console.log("Player 1 current round: ", currentRound.player1);
+    const player1Score = parseInt(currentRound.player1, 10) || 0;
+    const result = client.models.DartGame.update({
+      id: currentGameId,
+      // temporarily store the value in cricket points so we don't create a new round
+      cricketTotalPointsPlayer1: [...playerOneTotalPoints, player1Score]
+    }).then(() => {
+      console.log("Player 1 round score saved successfully");
+    }).catch((error) => {
+      console.error("Error saving Player 1 round score:", error);
+    });
+    console.log(result);
+    // setRounds([...rounds, { player1: player1Score, player2: 0 }]);
+  }
+
   // When the user clicks "Submit Round", parse the inputs and add the round to the list
   const submitRound = () => {
     // Parse the input values, defaulting to 0 if empty or invalid.
@@ -533,7 +552,8 @@ export default function DartScoreboard() {
       status: status as "InProgress" | "Completed",
       winnerName: winner === "player1" ? playerOneName : winner === "player2" ? playerTwoName : "",
       loserName: winner === "player1" ? playerTwoName : winner === "player2" ? playerOneName : "",
-      endTime: winner ? new Date().getTime() : null
+      endTime: winner ? new Date().getTime() : null,
+      cricketTotalPointsPlayer1: []
     }).then(() => {
       console.log("Round submitted successfully");
     }).catch((error) => {
@@ -547,6 +567,7 @@ export default function DartScoreboard() {
         fire("player2");
       }
       setCurrentGameId("");
+      setCurrentRound({ player1: '', player2: '' });
       // resetScores();
     }
   };
@@ -1002,12 +1023,15 @@ export default function DartScoreboard() {
               </tr>
             </tbody>
           </table>
-          <Row fillWidth gap="16" justifyContent="center">
-            <Button variant="primary" onClick={submitRound}>
-              Submit Round
+          <Row fillWidth gap="16" justifyContent="space-between" padding="s">
+            <Button variant="primary" onClick={submitRoundPlayer1} size="s">
+              Save Player1
             </Button>
             <Button variant="secondary" onClick={undoRound}>
-              Undo Round
+              Undo
+            </Button>
+            <Button variant="primary" onClick={submitRound} size="s">
+              Save Player2
             </Button>
           </Row>
         </div>
