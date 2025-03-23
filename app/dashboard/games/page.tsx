@@ -13,7 +13,7 @@ import DartScoreboard from "@/app/ui/dashboard/games/dart-scoreboard";
 
 export default function Page() {
     return (
-      <Column fillWidth alignItems="center" gap="32" padding="32" position="relative">
+      <Column fillWidth alignItems="center" gap="32" padding="16" position="relative">
         <Column 
           fillWidth
           alignItems="center"

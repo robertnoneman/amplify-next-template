@@ -25,6 +25,7 @@ import ReactCanvasConfetti from "react-canvas-confetti";
 import confetti from "canvas-confetti";
 import SlidingImage from "@/app/ui/effects/slide-in-sticker";
 import styles from '@/app/ui/effects/slide-in-sticker.module.css';
+import { Homemade_Apple, Splash, Cabin_Sketch } from "next/font/google";
 
 // Interface for ParentComponent state
 interface ParentComponentState {
@@ -32,14 +33,20 @@ interface ParentComponentState {
   animationCount: number;
 }
 
+
+const appleFont = Homemade_Apple({ weight: "400", subsets: ["latin"], });
+const splashFont = Splash({ weight: "400", subsets: ["latin"], });
+const cabinFont = Cabin_Sketch({ weight: ["400", "700"], subsets: ["latin"], });
+
+
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
 
 export default function DartScoreboard() {
-  const [playerOnePoints, setPlayerOnePoints] = useState(0);
-  const [playerTwoPoints, setPlayerTwoPoints] = useState(0);
+  const [playerOnePoints, setPlayerOnePoints] = useState("");
+  const [playerTwoPoints, setPlayerTwoPoints] = useState("");
   const [playerOneTotalPoints, setPlayerOneTotalPoints] = useState([0]);
   const [playerTwoTotalPoints, setPlayerTwoTotalPoints] = useState([0]);
   const [gameTypes, setGameTypes] = useState(["301", "501", "701", "Cricket", "Baseball", "Robday Night Football"]);
@@ -53,7 +60,7 @@ export default function DartScoreboard() {
   const [baseBallInningValues, setBaseBallInningValues] = useState(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
   const [robdayNightFootballValues, setRobdayNightFootballValues] = useState(["1", "-", "2", "-", "3", "-", "4", "-"])
   const [currentInning, setCurrentInning] = useState("1");
-  const [currentInningScore, setCurrentInningScore] = useState({ player1: 0, player2: 0 });
+  const [currentInningScore, setCurrentInningScore] = useState({ player1: "", player2: "" });
   const [currentInningErrors, setCurrentInningErrors] = useState({ player1: 0, player2: 0 });
   const [totalBaseballScore, setTotalBaseballScore] = useState({ player1: 0, player2: 0 });
   const [innings, setInnings] = useState<{ player1: [number, number]; player2: [number, number] }[]>([{ player1: [0, 0], player2: [0, 0] }]);
@@ -70,7 +77,7 @@ export default function DartScoreboard() {
   const [player2Scores, setPlayer2Scores] = useState({ ...initialPlayerScores });
   const [currentQuarter, setCurrentQuarter] = useState(1);
   const [possesions, setPossessions] = useState<{ player1: number; player2: number }[]>([{ player1: 0, player2: 0 }]);
-  const [currentPossesionScore, setCurrentPossesionScore] = useState({ player1: 0, player2: 0 });
+  const [currentPossesionScore, setCurrentPossesionScore] = useState({ player1: "", player2: "" });
 
   // Initialize input states for each player/category
   const [player1Inputs, setPlayer1Inputs] = useState(
@@ -299,17 +306,17 @@ export default function DartScoreboard() {
       return acc;
     }, { player1: 0, player2: 0 });
     setTotalBaseballScore(totalBaseballScore);
-    setInnings([...innings, { player1: [currentInningScore.player1, currentInningErrors.player1], player2: [currentInningScore.player2, currentInningErrors.player2] }]);
-    setCurrentInningScore({ player1: 0, player2: 0 });
+    setInnings([...innings, { player1: [Number(currentInningScore.player1), currentInningErrors.player1], player2: [Number(currentInningScore.player2), currentInningErrors.player2] }]);
+    setCurrentInningScore({ player1: "", player2: "" });
     setCurrentInningErrors({ player1: 0, player2: 0 });
-    if (currentInningScore.player1 > currentInningScore.player2 && playerOneName.includes("RobO")) {
+    if (Number(currentInningScore.player1) > Number(currentInningScore.player2) && playerOneName.includes("RobO")) {
       handleRobOPointingTrigger();
-    } else if (currentInningScore.player2 > currentInningScore.player1 && playerTwoName.includes("RobO")) {
+    } else if (Number(currentInningScore.player2) > Number(currentInningScore.player1) && playerTwoName.includes("RobO")) {
       handleRobOPointingTrigger();
     }
-    else if (currentInningScore.player1 > currentInningScore.player2 && playerOneName.includes("RobN")) {
+    else if (Number(currentInningScore.player1) > Number(currentInningScore.player2) && playerOneName.includes("RobN")) {
       handleRobNPointingTrigger();
-    } else if (currentInningScore.player2 > currentInningScore.player1 && playerTwoName.includes("RobN")) {
+    } else if (Number(currentInningScore.player2) > Number(currentInningScore.player1) && playerTwoName.includes("RobN")) {
       handleRobNPointingTrigger();
     }
 
@@ -337,8 +344,8 @@ export default function DartScoreboard() {
     }
     const result = client.models.DartGame.update({
       id: currentGameId,
-      baseballInningScoresPlayer1: [...innings.map((inning) => inning.player1[0]), currentInningScore.player1],
-      baseballInningScoresPlayer2: [...innings.map((inning) => inning.player2[0]), currentInningScore.player2],
+      baseballInningScoresPlayer1: [...innings.map((inning) => inning.player1[0]), Number(currentInningScore.player1)],
+      baseballInningScoresPlayer2: [...innings.map((inning) => inning.player2[0]), Number(currentInningScore.player2)],
       baseballInningErrorsPlayer1: [...innings.map((inning) => inning.player1[1]), currentInningErrors.player1],
       baseballInningErrorsPlayer2: [...innings.map((inning) => inning.player2[1]), currentInningErrors.player2],
       winnerName: winner === "player1" ? playerOneName : winner === "player2" ? playerTwoName : "",
@@ -371,9 +378,9 @@ export default function DartScoreboard() {
 
     const value = parseInt(e, 10) || 0;
     if (type === 'score') {
-      setCurrentInningScore({ ...currentInningScore, [player]: value });
+      setCurrentInningScore({ ...currentInningScore, [player]: String(value) });
     } else if (type === 'errors') {
-      setCurrentInningErrors({ ...currentInningErrors, [player]: value });
+      setCurrentInningErrors({ ...currentInningErrors, [player]: String(value) });
     }
   };
 
@@ -389,9 +396,9 @@ export default function DartScoreboard() {
 
   const handleRNFSubmit = () => {
     const updatedPossesions = [...possesions];
-    updatedPossesions.push({ player1: currentPossesionScore.player1, player2: currentPossesionScore.player2 });
+    updatedPossesions.push({ player1: Number(currentPossesionScore.player1), player2: Number(currentPossesionScore.player2) });
     setPossessions(updatedPossesions);
-    setCurrentPossesionScore({ player1: 0, player2: 0 });
+    setCurrentPossesionScore({ player1: "", player2: "" });
     const result = client.models.DartGame.update({
       id: currentGameId,
       robdayNightFootballScoresPlayer1: updatedPossesions.map((possession) => possession.player1),
@@ -617,7 +624,7 @@ export default function DartScoreboard() {
     // check if player1 or player2 has 3 tallies for all values
     if (Object.values(tempDict).every((val) => val === 3)) {
       // check if neither player has points or if player1 has more than player2
-      if (playerOnePoints === 0 || playerOnePoints > playerTwoPoints) {
+      if (Number(playerOnePoints) === 0 || Number(playerOnePoints) > Number(playerTwoPoints)) {
         fire("player1");
         const result2 = client.models.DartGame.update({
           id: currentGameId,
@@ -633,7 +640,7 @@ export default function DartScoreboard() {
       }
     } else if (Object.values(tempDict2).every((val) => val === 3)) {
       // check if neither player has points or if player2 has more than player1
-      if (playerTwoPoints === 0 || playerTwoPoints > playerOnePoints) {
+      if (Number(playerTwoPoints) === 0 || Number(playerTwoPoints) > Number(playerOnePoints)) {
         fire("player2");
         const result2 = client.models.DartGame.update({
           id: currentGameId,
@@ -655,15 +662,15 @@ export default function DartScoreboard() {
     const numericPoints = parseInt(points, 10) || 0;
 
     if (player === 'player1') {
-      setPlayerOnePoints(numericPoints);
+      setPlayerOnePoints(String(numericPoints));
     } else {
-      setPlayerTwoPoints(numericPoints);
+      setPlayerTwoPoints(String(numericPoints));
     }
   };
 
   const onAddPointsCricket = () => {
-    let tempPlayer1Points = playerOnePoints;
-    let tempPlayer2Points = playerTwoPoints;
+    let tempPlayer1Points = Number(playerOnePoints);
+    let tempPlayer2Points = Number(playerTwoPoints);
     // If temp1Player1Points is NAN, set it to 0
     if (isNaN(tempPlayer1Points)) {
       tempPlayer1Points = 0;
@@ -692,8 +699,8 @@ export default function DartScoreboard() {
     if (tempPlayer2Points > 0) {
       setPlayerTwoTotalPoints(newPlayerTwoTotalPoints);
     }
-    setPlayerOnePoints(0);
-    setPlayerTwoPoints(0);
+    setPlayerOnePoints("");
+    setPlayerTwoPoints("");
 
     const result = client.models.DartGame.update({
       id: currentGameId,
@@ -774,8 +781,8 @@ export default function DartScoreboard() {
   const resetScores = () => {
     setCurrentRound({ player1: '', player2: '' });
     setRounds([]);
-    setPlayerOnePoints(0);
-    setPlayerTwoPoints(0);
+    setPlayerOnePoints("");
+    setPlayerTwoPoints("");
     setPlayerOneTotalPoints([0]);
     setPlayerTwoTotalPoints([0]);
     setPlayer1Scores({ ...initialPlayerScores });
@@ -784,14 +791,14 @@ export default function DartScoreboard() {
     setPlayer2Inputs({ ...initialPlayerScores });
     setInnings([]);
     setCurrentInning("1");
-    setCurrentInningScore({ player1: 0, player2: 0 });
+    setCurrentInningScore({ player1: "", player2: "" });
     setCurrentInningErrors({ player1: 0, player2: 0 });
     setTotalBaseballScore({ player1: 0, player2: 0 });
     setBaseBallInningValues(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
     setRobdayNightFootballValues(["1", "-", "2", "-", "3", "-", "4", "-"]);
     setCurrentQuarter(1);
     setPossessions([{ player1: 0, player2: 0 }]);
-    setCurrentPossesionScore({ player1: 0, player2: 0 });
+    setCurrentPossesionScore({ player1: "", player2: "" });
     handleTrigger();
   };
 
@@ -882,7 +889,7 @@ export default function DartScoreboard() {
   }, []);
 
   return (
-    <Column fillWidth fillHeight justifyContent="center" alignItems="center" background="surface" padding="xs">
+    <Column fillWidth fillHeight justifyContent="center" alignItems="center" className="bg-stone-950" padding="xs" border="surface">
       <ReactCanvasConfetti onInit={onInit} />
 
       <Row fillWidth gap="16" justifyContent="center" padding="s">
@@ -906,8 +913,8 @@ export default function DartScoreboard() {
       )}
       {(currentGameType === "301" || currentGameType === "501" || currentGameType === "701") && (
         <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
-          <Heading align="center">
-            Dart Scoreboard (Game: {initialScore})
+          <Heading align="center" className={`${cabinFont.className} text-2xl`}>
+            {initialScore}
           </Heading>
           <div style={{ marginBottom: '1rem' }}></div>
           <table
@@ -921,21 +928,21 @@ export default function DartScoreboard() {
             <thead style={{ padding: '10px' }}>
               <tr style={{ paddingBottom: '10px' }}>
                 <th colSpan={2}>
-                  <Text variant="heading-default-l">
+                  <Text variant="heading-default-xl" className={`${appleFont.className} text-2xl`}>
                     <input type="text" value={playerOneName} onChange={(e) => handleSetPlayerOneName(e.target.value)}
-                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', height: "40px", backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
                 </th>
                 <th>
-                  <Text variant="heading-default-m">
+                  <Text variant="heading-default-m" className={`${splashFont.className}`}>
                     vs
                   </Text>
                 </th>
                 <th colSpan={2}>
-                  <Text variant="heading-default-l">
+                  <Text variant="heading-default-xl" className={`${splashFont.className}`}>
                     <input type="text" value={playerTwoName} onChange={(e) => handleSetPlayerTwoName(e.target.value)}
-                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', height: "40px", backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
                 </th>
@@ -960,27 +967,27 @@ export default function DartScoreboard() {
               </tr>
               <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
                 <th style={{ borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
-                  <Text variant="heading-default-xs">
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
                     ROUND SCORE
                   </Text>
                 </th>
                 <th style={{ padding: "0.1rem", color: '#CCC' }}>
-                  <Text variant="label-default-xs">
+                  <Text variant="label-default-xs" className={`${cabinFont.className}`}>
                     REMAINING
                   </Text>
                 </th>
                 <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
-                  <Text variant="heading-strong-l">
+                  <Text variant="heading-strong-l" className={`${cabinFont.className}`}>
                     {currentGameType}
                   </Text>
                 </th>
                 <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
-                  <Text variant="heading-default-xs">
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
                     ROUND SCORE
                   </Text>
                 </th>
                 <th style={{ padding: "0.1rem", color: '#CCC' }}>
-                  <Text variant="label-default-xs">
+                  <Text variant="label-default-xs" className={`${cabinFont.className}`}>
                     REMAINING
                   </Text>
                 </th>
@@ -989,16 +996,16 @@ export default function DartScoreboard() {
             <tbody>
               {/* Render each finalized round */}
               {rounds.map((round, index) => (
-                <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                <tr className={`${cabinFont.className}`} key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
                   <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round.player1}</td>
                   <td style={{ color: "#BBB", textDecoration: "line-through" }}>{computeRemainingAfterRound('player1', index)}</td>
-                  <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{index + 1}</td>
+                  <td className={`${cabinFont.className}`} style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{index + 1}</td>
                   <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round.player2}</td>
                   <td style={{ color: "#BBB", textDecoration: "line-through" }}>{computeRemainingAfterRound('player2', index)}</td>
                 </tr>
               ))}
               {/* Current round input row */}
-              <tr style={{ borderTop: '2px dashed #666' }}>
+              <tr className={`${appleFont.className}`} style={{ borderTop: '2px dashed #666' }}>
                 <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
                   <input
                     type="number"
@@ -1009,7 +1016,7 @@ export default function DartScoreboard() {
                   />
                 </td>
                 <td style={{ color: "#EEE" }}>{currentRemaining('player1')}</td>
-                <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} >{rounds.length + 1}</td>
+                <td className={`${cabinFont.className}`} style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} >{rounds.length + 1}</td>
                 <td >
                   <input
                     type="number"
@@ -1024,13 +1031,13 @@ export default function DartScoreboard() {
             </tbody>
           </table>
           <Row fillWidth gap="16" justifyContent="space-between" padding="s">
-            <Button variant="primary" onClick={submitRoundPlayer1} size="s">
+            <Button variant="primary" onClick={submitRoundPlayer1} size="s" className={`${cabinFont.className}`}>
               Save Player1
             </Button>
-            <Button variant="secondary" onClick={undoRound}>
+            <Button variant="secondary" onClick={undoRound} size="s" className={`${cabinFont.className}`}>
               Undo
             </Button>
-            <Button variant="primary" onClick={submitRound} size="s">
+            <Button variant="primary" onClick={submitRound} size="s" className={`${cabinFont.className}`}>
               Save Player2
             </Button>
           </Row>
@@ -1039,8 +1046,8 @@ export default function DartScoreboard() {
 
       {(currentGameType === "Cricket") && (
         <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
-          <Heading align="center">
-            Dart Scoreboard (Game: {currentGameType})
+          <Heading align="center" className={`${cabinFont.className} text-2xl`}>
+            {currentGameType}
           </Heading>
           <div style={{ marginBottom: '1rem' }}></div>
           <table
@@ -1051,24 +1058,24 @@ export default function DartScoreboard() {
               marginBottom: '1rem',
             }}
           >
-            <thead style={{ padding: '10px' }}>
+            <thead style={{ padding: '10px' }} className={`${cabinFont.className}`}>
               <tr style={{ paddingBottom: '10px' }}>
                 <th colSpan={2}>
-                  <Text variant="heading-default-l">
+                  <Text variant="heading-default-l" className={`${appleFont.className}`}>
                     <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)}
-                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', height: '40px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
                 </th>
                 <th>
-                  <Text variant="heading-default-m">
+                  <Text variant="heading-default-m" className={`${splashFont.className}`}>
                     vs
                   </Text>
                 </th>
                 <th colSpan={2}>
-                  <Text variant="heading-default-l">
+                  <Text variant="heading-default-l" className={`${splashFont.className}`}>
                     <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)}
-                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', height: '40px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
                 </th>
@@ -1082,7 +1089,7 @@ export default function DartScoreboard() {
               </tr>
               <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
                 <th style={{ borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
-                  <Text variant="heading-default-xs">
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
                     POINTS
                   </Text>
                 </th>
@@ -1092,7 +1099,7 @@ export default function DartScoreboard() {
                   </Text>
                 </th>
                 <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
-                  <Text variant="heading-strong-l">
+                  <Text variant="heading-strong-l" className={`${cabinFont.className}`}>
                     {currentGameType}
                   </Text>
                 </th>
@@ -1102,7 +1109,7 @@ export default function DartScoreboard() {
                   </Text>
                 </th>
                 <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
-                  <Text variant="heading-default-xs">
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
                     POINTS
                   </Text>
                 </th>
@@ -1111,16 +1118,9 @@ export default function DartScoreboard() {
             <tbody>
               {/* Render each finalized round */}
               {scoreboardValues.map((round, index) => (
-                <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }} className={`${cabinFont.className}`}>
                   <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB", textDecoration: (playerOneTotalPoints.length > index + 1 ? "line-through" : "none") }}>
                     {playerOneTotalPoints[index]?.toString()}
-                    {/* <input
-                                        type="number"
-                                        value={playerOnePoints}
-                                        onChange={(e) => handleInputChangeCricket("player1", round, parseInt(e.target.value), 0)}
-                                        placeholder={""}
-                                        style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #555', color: '#BBB', zIndex: 10 }}
-                                        /> */}
                   </td>
                   <td style={{ color: "#BBB" }}>
                     <Card maxWidth={10} height={3} onClick={incrementValTally.bind(null, 'player1', round)} zIndex={10} alignItems="center" justifyContent="center" border="transparent">
@@ -1132,7 +1132,7 @@ export default function DartScoreboard() {
                       </Column>
                     </Card>
                   </td>
-                  <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>
+                  <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} className={`${cabinFont.className}`}>
                     {round}
                   </td>
                   <td style={{ color: "#BBB" }}>
@@ -1147,25 +1147,18 @@ export default function DartScoreboard() {
                   </td>
                   <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
                     {playerTwoTotalPoints[index]?.toString()}
-                    {/* <input
-                                        type="number"
-                                        // value={player2Scores[round]}
-                                        value={playerTwoPoints}
-                                        onChange={(e) => handleInputChangeCricket("player2", round, parseInt(e.target.value), 0)}
-                                        placeholder={""}
-                                        style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #555', color: '#BBB', zIndex: 10 }}
-                                    /> */}
                   </td>
                 </tr>
               ))}
               {/* Current round input row */}
-              <tr style={{ borderTop: '2px dashed #666' }}>
+              <tr style={{ borderTop: '2px dashed #666' }} className={`${cabinFont.className}`}>
                 <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
                   <input
                     type="number"
                     value={playerOnePoints}
                     onChange={(e) => addPointsCricket(e.target.value, 'player1')}
                     placeholder={""}
+                    className={`${cabinFont.className}`}
                     style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
                   />
                 </td>
@@ -1180,13 +1173,14 @@ export default function DartScoreboard() {
                     value={playerTwoPoints}
                     onChange={(e) => addPointsCricket(e.target.value, 'player2')}
                     placeholder={""}
+                    className={`${cabinFont.className}`}
                     style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
                   />
                 </td>
               </tr>
             </tbody>
           </table>
-          {(playerOnePoints > 0 || playerTwoPoints > 0) && (
+          {(Number(playerOnePoints) > 0 || Number(playerTwoPoints) > 0) && (
             <Row fillWidth gap="16" justifyContent="center">
               <Button variant="primary" onClick={onAddPointsCricket}>
                 Add Points
@@ -1197,8 +1191,8 @@ export default function DartScoreboard() {
       )}
       {(currentGameType === "Baseball") && (
         <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
-          <Heading align="center">
-            Dart Scoreboard (Game: {currentGameType})
+          <Heading align="center" className={`${cabinFont.className} text-2xl`}>
+            {currentGameType}
           </Heading>
           <div style={{ marginBottom: '1rem' }}></div>
           <table
@@ -1212,21 +1206,21 @@ export default function DartScoreboard() {
             <thead style={{ padding: '10px' }}>
               <tr style={{ paddingBottom: '10px' }}>
                 <th colSpan={2}>
-                  <Text variant="heading-default-l">
+                  <Text variant="heading-default-l" className={`${appleFont.className}`}>
                     <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)}
-                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '75px', height: '40px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
                 </th>
                 <th>
-                  <Text variant="heading-default-m">
+                  <Text variant="heading-default-m" className={`${appleFont.className}`}>
                     vs
                   </Text>
                 </th>
                 <th colSpan={2}>
-                  <Text variant="heading-default-l">
+                  <Text variant="heading-default-l" className={`${splashFont.className}`}>
                     <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)}
-                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '75px', height: '40px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
                 </th>
@@ -1238,29 +1232,29 @@ export default function DartScoreboard() {
                   </Text>
                 </th>
               </tr>
-              <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
+              <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }} className={`${cabinFont.className}`}>
                 <th style={{ borderRight: "1px solid #EEE", paddingLeft: "0.5rem", paddingRight: "0.5rem", color: '#CCC' }}>
-                  <Text variant="heading-default-xs">
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
                     RUNS
                   </Text>
                 </th>
                 <th style={{ paddingRight: "0.5rem", paddingLeft: "0.5rem", color: '#CCC' }}>
-                  <Text variant="label-default-xs">
+                  <Text variant="label-default-xs" className={`${cabinFont.className}`}>
                     E
                   </Text>
                 </th>
                 <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.5rem", color: "#EEE" }}>
-                  <Text variant="heading-strong-l">
+                  <Text variant="heading-strong-l" className={`${cabinFont.className}`}>
                     {currentGameType}
                   </Text>
                 </th>
                 <th style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem", color: '#CCC' }}>
-                  <Text variant="heading-default-xs">
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
                     RUNS
                   </Text>
                 </th>
                 <th style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem", color: '#CCC', borderLeft: '1px solid #EEE' }}>
-                  <Text variant="label-default-xs">
+                  <Text variant="label-default-xs" className={`${cabinFont.className}`}>
                     E
                   </Text>
                 </th>
@@ -1269,7 +1263,7 @@ export default function DartScoreboard() {
             <tbody>
               {baseBallInningValues.map((inning, index) => (
                 (parseInt(currentInning) > index + 1) ? (
-                  <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                  <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }} className={`${cabinFont.className}`}>
                     <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{innings[index]?.player1[0]}</td>
                     <td style={{ color: "#BBB" }}>{innings[index]?.player1[1]}</td>
                     <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{inning}</td>
@@ -1278,7 +1272,7 @@ export default function DartScoreboard() {
                   </tr>
                 ) :
                   (parseInt(currentInning) === index + 1) ? (
-                    <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                    <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }} className={`${cabinFont.className}`}>
                       <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
                         <input
                           type="number"
@@ -1318,7 +1312,7 @@ export default function DartScoreboard() {
                       </td>
                     </tr>
                   ) : (
-                    <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                    <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }} className={`${cabinFont.className}`}>
                       <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>-</td>
                       <td style={{ color: "#BBB" }}>-</td>
                       <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{inning}</td>
@@ -1329,24 +1323,24 @@ export default function DartScoreboard() {
               ))}
               <tr>
                 <td>
-                  <Text>
+                  <Text className={`${cabinFont.className}`}>
                     {cumulativeScoreBaseball("player1")}
                   </Text>
                 </td>
                 <td>
-                  <Text>
+                  <Text className={`${cabinFont.className}`}>
                     {cumulativeErrorsBaseball("player1")}
                   </Text>
                 </td>
                 <td>
                 </td>
                 <td>
-                  <Text>
+                  <Text className={`${cabinFont.className}`}>
                     {cumulativeScoreBaseball("player2")}
                   </Text>
                 </td>
                 <td>
-                  <Text>
+                  <Text className={`${cabinFont.className}`}>
                     {cumulativeErrorsBaseball("player2")}
                   </Text>
                 </td>
@@ -1354,7 +1348,7 @@ export default function DartScoreboard() {
             </tbody>
           </table>
           <Column fillWidth justifyContent="center" alignItems="center">
-            <Button variant="primary" onClick={handleSubmitInning}>
+            <Button variant="primary" onClick={handleSubmitInning} className={`${cabinFont.className}`}>
               Submit Inning
             </Button>
           </Column>
@@ -1362,8 +1356,8 @@ export default function DartScoreboard() {
       )}
       {(currentGameType === "Robday Night Football") && (
         <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
-          <Heading align="center">
-            Dart Scoreboard (Game: {currentGameType})
+          <Heading align="center" className={`${cabinFont.className} text-2xl`}>
+            {currentGameType}
           </Heading>
           <div style={{ marginBottom: '1rem' }}></div>
           <table
@@ -1377,21 +1371,21 @@ export default function DartScoreboard() {
             <thead style={{ padding: '10px' }}>
               <tr style={{ paddingBottom: '10px' }}>
                 <th colSpan={2}>
-                  <Text variant="heading-default-l">
+                  <Text variant="heading-default-l" className={`${appleFont.className}`}>
                     <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)}
-                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', height: '40px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
                 </th>
                 <th>
-                  <Text variant="heading-default-m">
+                  <Text variant="heading-default-m" className={`${appleFont.className} text-2xl`}>
                     vs
                   </Text>
                 </th>
                 <th colSpan={2}>
-                  <Text variant="heading-default-l">
+                  <Text variant="heading-default-l" className={`${splashFont.className}`}>
                     <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)}
-                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', height: '40px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
                   </Text>
                 </th>
@@ -1405,7 +1399,7 @@ export default function DartScoreboard() {
               </tr>
               <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
                 <th style={{ padding: "0.1rem", color: '#CCC' }}>
-                  <Text variant="heading-default-xs">
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
                     POINTS
                   </Text>
                 </th>
@@ -1415,12 +1409,12 @@ export default function DartScoreboard() {
                   </Text>
                 </th>
                 <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
-                  <Text variant="heading-strong-l">
+                  <Text variant="heading-strong-l" className={`${cabinFont.className}`}>
                     {currentGameType}
                   </Text>
                 </th>
                 <th style={{ padding: "0.1rem", color: '#CCC', borderLeft: "1px solid #EEE" }}>
-                  <Text variant="heading-default-xs">
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
                     POINTS
                   </Text>
                 </th>
@@ -1434,7 +1428,7 @@ export default function DartScoreboard() {
             <tbody>
               {robdayNightFootballValues.map((round, index) => (
                 (currentQuarter > index + 1) ?
-                  (<tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                  (<tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }} className={`${cabinFont.className}`}>
                     <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
                       {possesions[index + 1]?.player1}
                     </td>
@@ -1455,7 +1449,7 @@ export default function DartScoreboard() {
                     </td>
                   </tr>) :
                   (currentQuarter === index + 1) ?
-                    (<tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                    (<tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }} className={`${appleFont.className}`}>
                       {/* Additional content for the current quarter can be added here */}
                       <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>
                         <input
@@ -1473,7 +1467,7 @@ export default function DartScoreboard() {
                       )
                         :
                         (
-                          <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{round}</td>
+                          <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }} className={`${cabinFont.className}`}>{round}</td>
                         )}
                       <td style={{ color: "#BBB" }}>
                         <input
@@ -1485,7 +1479,7 @@ export default function DartScoreboard() {
                         />
                       </td>
                     </tr>) :
-                    (<tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }}>
+                    (<tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }} className={`${cabinFont.className}`}>
                       {/* Additional content for the current quarter can be added here */}
                       <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}></td>
                       <td style={{ color: "#BBB" }}></td>
@@ -1502,7 +1496,7 @@ export default function DartScoreboard() {
               ))}
               <tr>
                 <td>
-                  <Text>
+                  <Text className={`${cabinFont.className}`}>
                     {cumulativeScoreRNF("player1")}
                   </Text>
                 </td>
@@ -1511,7 +1505,7 @@ export default function DartScoreboard() {
                 <td>
                 </td>
                 <td>
-                  <Text>
+                  <Text className={`${cabinFont.className}`}>
                     {cumulativeScoreRNF("player2")}
                   </Text>
                 </td>
@@ -1522,7 +1516,7 @@ export default function DartScoreboard() {
             </tbody>
           </table>
           <Column fillWidth justifyContent="center" alignItems="center">
-            <Button variant="primary" onClick={handleRNFSubmit}>
+            <Button variant="primary" onClick={handleRNFSubmit} className={`${cabinFont.className}`}>
               Submit Possesion
             </Button>
           </Column>
@@ -1530,7 +1524,7 @@ export default function DartScoreboard() {
       )}
       {(currentGameId !== "") && (
         <Row fillWidth gap="16" justifyContent="center" padding="s">
-          <Button variant="primary" onClick={endDartGame}>
+          <Button variant="danger" onClick={endDartGame} size="s" className={`${cabinFont.className}`}>
             End Game
           </Button>
         </Row>
