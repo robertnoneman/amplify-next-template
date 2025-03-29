@@ -5,18 +5,26 @@
 const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { Roboto } from 'next/font/google';
 
+const roboto = Roboto({
+  variable: '--font-primary',
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['100']
+});
 
 interface MyComponentProps {
     labels: string[];
     series: number[];
     colors?: string[];
     height?: number;
+    width?: number;
     fontSize?: string;
     percentageFormatter?: boolean;
 }
 
-export default function RadialBar({ labels, series, colors=["#E90507"], height=350, fontSize="22px", percentageFormatter=false }: MyComponentProps) {
+export default function RadialBar({ labels, series, colors=["#E90507"], height=350, width=300, fontSize="22px", percentageFormatter=false }: MyComponentProps) {
     const [chartOptions, setChartOptions] = useState({ chart: {
         type: 'radialBar' as 'radialBar',
       },
@@ -47,16 +55,16 @@ export default function RadialBar({ labels, series, colors=["#E90507"], height=3
                 show: true,
                 offsetY: 25,
                 color: '#fff',
-                fontFamily: "__Roboto_1e0c0b",
-                fontSize: fontSize
+                fontSize: fontSize,
+                fontFamily: roboto.style.fontFamily,
               },
-              style: {colors: ["#fff"], fill: "#fff"},
+              style: {colors: ["#fff"], fill: "#fff", fontFamily: roboto.style.fontFamily},
               value: {
                 offsetY: -25,
                 fontSize: fontSize,
                 color: "#fff",
                 fill: "#fff",
-                fontFamily: "__Roboto_1e0c0b",
+                fontFamily: roboto.style.fontFamily,
                 formatter: percentageFormatter ? function (val: number): string { return (val/100).toFixed(3) + "%"; } : function (val: number): string { return val.toString(); }
               }
             }
@@ -94,6 +102,8 @@ export default function RadialBar({ labels, series, colors=["#E90507"], height=3
         series={chartOptions.series}
         type="radialBar"
         height={height}
+        // width={width}
+        className={`${roboto.className}`} 
       />
     </div>
   );

@@ -7,6 +7,7 @@ import {
     Row,
     Grid,
     Accordion,
+    Line,
     Text
 } from "@/once-ui/components";
 
@@ -174,13 +175,14 @@ export default async function RadialBarWrapper() {
     return (
         <Column justifyContent='center' alignItems='center'>
             <Row mobileDirection="column">
-                <RadialBar labels={["ROBDAYS COMPLETED"]} series={[robdayLogs.data.filter((robdayLog) => robdayLog.status === "Completed").length]} />
+                <RadialBar labels={["ROBDAYS COMPLETED"]} series={[robdayLogs.data.filter((robdayLog) => robdayLog.status === "Completed").length]} width={400}/>
             </Row>
             <Grid columns="3" mobileColumns="1">
                 <RadialBar labels={["AVERAGE ROBDAY RATING"]} series={[99]} height={200} fontSize="14px" />
                 <RadialBar labels={["TOTAL DART GAMES PLAYED"]} series={[dartGames.data.length]} colors={["#FD6325"]} height={200} fontSize="14px" />
+                <RadialBar labels={["AVERAGE ROBDAY COST"]} series={[25]} colors={["#01CF38", "#FD6325"]} height={200} fontSize="14px" />
                 <Accordion title="Dart Game Stats" >
-                    <Column fillWidth >
+                    <Column fillWidth background="surface">
                         <StackedBar labels={["Games Played"]} series={[{name: "Cricket", data: [cricketGamesPlayed]}, {name: "Baseball", data: [baseballGamesPlayed]}, {name: "RNF", data: [rnfGamesPlayed]}, {name: "301", data: [threeOhOneGamesPlayed]}, {name: "501", data: [fiveOhOneGamesPlayed]}, {name: "701", data: [sevenOhOneGamesPlayed]}]} />
                         <RadialBar labels={["TOTAL ROBN WINS"]} series={[robNDartGameWins]} colors={["#FD6325"]} height={200} fontSize="14px" />
                         <RadialBar labels={["TOTAL ROBO WINS"]} series={[robODartGameWins]} colors={["#FD6325"]} height={200} fontSize="14px" />
@@ -204,21 +206,30 @@ export default async function RadialBarWrapper() {
                         <RadialBar labels={["ROBO 701 WINS"]} series={[robOSevenOhOnewins]} colors={["#FD6325"]} height={200} fontSize="14px" />
                     </Column>
                 </Accordion>
-                <Accordion title="Dart Game Player Stats" >
-                    <Column fillWidth >
+                <Line width="xs"></Line>
+                <Accordion title="Dart Game Player Stats">
+                    <Column fillWidth background="surface" padding="2">
                         <StackedBar labels={["RobO", "RobN"]} series={[{name: "Cricket", data: [robOCricketwins, robNCricketwins]}, {name: "Baseball", data: [robOBaseballwins, robNBaseballwins]}, {name: "RNF", data: [robORnfwins, robNRnfwins]}, {name: "301", data: [robOThreeOhOnewins, robNThreeOhOnewins]}, {name: "501", data: [robOFiveOhOnewins, robNFiveOhOnewins]}, {name: "701", data: [robOSevenOhOnewins, robNSevenOhOnewins]}]} />
-                        <RadialBar labels={["ROBN HIGHEST SCORE"]} series={[Math.max(robNHighestScoreAsPlayerOne, robNHighestScoreAsPlayerTwo)]} colors={["#FD6325"]} height={200} fontSize="14px" />
-                        <RadialBar labels={["ROBO HIGHEST SCORE"]} series={[Math.max(robOHighestScoreAsPlayerOne, robOHighestScoreAsPlayerTwo)]} colors={["#FD6325"]} height={200} fontSize="14px" />
+                        <Text>501</Text>
+                        <Line height={0.25}></Line>
+                        <RadialBar labels={["ROBN HIGHEST ROUND SCORE"]} series={[Math.max(robNHighestScoreAsPlayerOne, robNHighestScoreAsPlayerTwo)]} colors={["#FD6325"]} height={200} fontSize="14px" />
+                        <RadialBar labels={["ROBO HIGHEST ROUND SCORE"]} series={[Math.max(robOHighestScoreAsPlayerOne, robOHighestScoreAsPlayerTwo)]} colors={["#FD6325"]} height={200} fontSize="14px" />
+                        
+                        <Text>Baseball</Text>
+                        <Line height={0.25}></Line>
                         <RadialBar labels={["ROBN MULTI RUN PERCENTAGE"]} series={[robNMultiRunPercentage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
-                        <RadialBar labels={["ROBN BATTING AVERAGE"]} series={[robNBattingAverage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
                         <RadialBar labels={["ROBO MULTI RUN PERCENTAGE"]} series={[robOMultiRunPercentage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
+                        <Line></Line>
+                        <RadialBar labels={["ROBN BATTING AVERAGE"]} series={[robNBattingAverage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
                         <RadialBar labels={["ROBO BATTING AVERAGE"]} series={[robOBattingAverage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
+                        <Line></Line>
                         <RadialBar labels={["ROBN SLUGGING PERCENTAGE"]} series={[robNSluggingPercentage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
                         <RadialBar labels={["ROBO SLUGGING PERCENTAGE"]} series={[robOSluggingPercentage]} colors={["#FD6325"]} height={200} fontSize="14px" percentageFormatter={true} />
+                        <Line></Line>
                     </Column>
                 </Accordion>
                 {/* <RadialBar labels={["TOTAL LOCATIONS VISITED"]} series={[locations.data.length]} colors={["#FD6325"]} height={200} fontSize="14px" /> */}
-                <RadialBar labels={["AVERAGE ROBDAY COST"]} series={[25]} colors={["#01CF38", "#FD6325"]} height={200} fontSize="14px" />
+                
                 <RadialBar labels={["AVERAGE ACTIVITY RATING"]} series={[averageRating]} colors={["#01CF38", "#FD6325"]} height={200} fontSize="14px" />
                 <RadialBar labels={["AVERAGE ACTIVITY COST"]} series={[averageActivityCost]} colors={["#01CF38", "#FD6325"]} height={200} fontSize="14px" />
                 <RadialBar labels={["UNIQUE ACTIVITIES DONE"]} series={[12]} colors={["#FD6325"]} height={200} fontSize="14px" />
