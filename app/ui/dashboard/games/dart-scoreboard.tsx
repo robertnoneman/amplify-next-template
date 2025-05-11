@@ -11,9 +11,8 @@ import {
   IconButton,
   Heading,
   Line,
-  NumberInput,
   Card,
-  Icon
+  Icon,
 } from "@/once-ui/components";
 
 import outputs from "@/amplify_outputs.json"
@@ -49,11 +48,11 @@ export default function DartScoreboard() {
   const [playerTwoPoints, setPlayerTwoPoints] = useState("");
   const [playerOneTotalPoints, setPlayerOneTotalPoints] = useState([0]);
   const [playerTwoTotalPoints, setPlayerTwoTotalPoints] = useState([0]);
-  const [gameTypes, setGameTypes] = useState(["301", "501", "701", "Cricket", "Baseball", "Robday Night Football"]);
+  const [gameTypes, setGameTypes] = useState(["301", "501", "701", "Cricket", "Baseball", "Robday Night Football", "Pushups and Situps"]);
   const [currentGameType, setCurrentGameType] = useState("301");
   const [currentGameId, setCurrentGameId] = useState("");
-  const [playerOneName, setPlayerOneName] = useState("Player 1");
-  const [playerTwoName, setPlayerTwoName] = useState("Player 2");
+  const [playerOneName, setPlayerOneName] = useState("RobN");
+  const [playerTwoName, setPlayerTwoName] = useState("RobO");
   const [saveNameButtonActive, setSaveNameButtonActive] = useState(false);
   const boardNumbers = [20, 19, 18, 17, 16, 15, "BULL", "T", "D", "3B"];
   const scoreboardValues = ["20", "19", "18", "17", "16", "15", 'BULL'];
@@ -78,6 +77,9 @@ export default function DartScoreboard() {
   const [currentQuarter, setCurrentQuarter] = useState(1);
   const [possesions, setPossessions] = useState<{ player1: number; player2: number }[]>([{ player1: 0, player2: 0 }]);
   const [currentPossesionScore, setCurrentPossesionScore] = useState({ player1: "", player2: "" });
+  // Pushups and Situps (Real man's games)
+  const [pushups, setPushups] = useState<{ player1: string; player2: string }[]>([{ player1: "", player2: "" }]);
+  const [situps, setSitups] = useState<{ player1: string; player2: string }[]>([{ player1: "", player2: "" }]);
 
   // Initialize input states for each player/category
   const [player1Inputs, setPlayer1Inputs] = useState(
@@ -929,6 +931,15 @@ export default function DartScoreboard() {
               <tr style={{ paddingBottom: '10px' }}>
                 <th colSpan={2}>
                   <Text variant="heading-default-xl" className={`${appleFont.className} text-2xl`}>
+                    {/* <Select 
+                      id="player1-name"
+                      label=""
+                      value={playerOneName}
+                      options={["RobN", "RobO"].map((type) => ({ label: type, value: type }))}
+                      onSelect={(e) => handleSetPlayerOneName(e)}
+                      className={`${appleFont.className} text-2xl`}
+                      height="s"
+                      /> */}
                     <input type="text" value={playerOneName} onChange={(e) => handleSetPlayerOneName(e.target.value)}
                       style={{ paddingLeft: 0, paddingRight: 0, width: '70px', height: "40px", backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
                     />
@@ -1522,6 +1533,140 @@ export default function DartScoreboard() {
           </Column>
         </div>
       )}
+      {(currentGameType === "Pushups and Situps") && (
+        <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
+          <Heading align="center" className={`${cabinFont.className} text-2xl`}>
+            {currentGameType}
+          </Heading>
+          <div style={{ marginBottom: '1rem' }}></div>
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              textAlign: 'center',
+              marginBottom: '1rem',
+            }}
+          >
+            <thead style={{ padding: '10px' }}>
+              <tr style={{ paddingBottom: '10px' }}>
+                <th colSpan={2}>
+                  <Text variant="heading-default-l" className={`${appleFont.className}`}>
+                    <input type="text" value={playerOneName} onChange={(e) => setPlayerOneName(e.target.value)}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', height: '40px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                    />
+                  </Text>
+                </th>
+                <th>
+                  <Text variant="heading-default-m" className={`${appleFont.className}`}>
+                    vs
+                  </Text>
+                </th>
+                <th colSpan={2}>
+                  <Text variant="heading-default-l" className={`${splashFont.className}`}>
+                    <input type="text" value={playerTwoName} onChange={(e) => setPlayerTwoName(e.target.value)}
+                      style={{ paddingLeft: 0, paddingRight: 0, width: '70px', height: '40px', backgroundColor: 'transparent', border: 'none', color: '#BBB', zIndex: 10 }}
+                    />
+                  </Text>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan={5}>
+                  <Text variant="body-default-xs">
+                    -
+                  </Text>
+                </th>
+              </tr>
+              <tr style={{ borderBottom: '2px solid #EEE', marginTop: '10px' }}>
+                <th style={{ borderRight: "1px solid #EEE", padding: "0.1rem", color: '#CCC' }}>
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
+                    PUSHUPS
+                  </Text>
+                </th>
+                <th style={{ padding: "0.1rem", color: '#CCC' }}>
+                  <Text variant="label-default-xs" className={`${cabinFont.className}`}>
+                    SITUPS
+                  </Text>
+                </th>
+                <th style={{ borderLeft: '1px solid #EEE', borderRight: "1px solid #EEE", padding: "0.1rem", color: "#EEE" }}>
+                  <Text variant="heading-strong-l" className={`${cabinFont.className}`}>
+                    SETS
+                  </Text>
+                </th>
+                <th style={{ padding: "0.1rem", color: '#CCC' }}>
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
+                    PUSHUPS
+                  </Text>
+                </th>
+                <th style={{ padding: "0.1rem", color: '#CCC', borderLeft: '1px solid #EEE' }}>
+                  <Text variant="heading-default-xs" className={`${cabinFont.className}`}>
+                    SITUPS
+                  </Text>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {pushups.map((round, index) => (
+                <tr key={index} style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666' }} className={`${cabinFont.className}`}>
+                  <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round?.player1[0]}</td>
+                  <td style={{ color: "#BBB" }}>{situps[index].player1}</td>
+                  <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}>{index + 1}</td>
+                  <td style={{ borderLeft: '1px solid #666', borderRight: '1px solid #666', color: "#BBB" }}>{round?.player2}</td>
+                  <td style={{ color: "#BBB" }}>{situps[index].player2}</td>
+                </tr>
+              ))}
+              <tr style={{ borderTop: '2px dashed #666' }} className={`${cabinFont.className}`}>
+                <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#BBB" }}>
+                  <input
+                    type="number"
+                    value={currentRound.player1[0]}
+                    // onChange={(e) => handleInputChange(e.target.value, 'player1', 'pushups')}
+                    placeholder={""}
+                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                  />
+                </td>
+                <td style={{ color: "#EEE" }}>
+                  <input
+                    type="number"
+                    value={currentRound.player1[1]}
+                    // onChange={(e) => handleInputChange(e.target.value, 'player1', 'situps')}
+                    placeholder={""}
+                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                  />
+                </td>
+                <td style={{ borderLeft: '1px solid #DDD', borderRight: '1px solid #DDD', color: "#BBB" }}></td>
+                <td style={{ borderLeft: '1px dashed #666', borderRight: '1px dashed #666', color: "#EEE" }}>
+                  <input
+                    type="number"
+                    value={currentRound.player2[0]}
+                    // onChange={(e) => handleInputChange(e.target.value, 'player2', 'pushups')}
+                    placeholder={""}
+                    style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0, width: '30px', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #EEE', color: '#EEE', zIndex: 10 }}
+                  />
+                </td>
+                <td >
+                  <input
+                    type="number"
+                    value={currentRound.player2[1]}
+                    // onChange={(e) => handleInputChange(e.target.value, 'player2', 'situps')}
+                    placeholder={""}
+                    style={{
+                      textAlign: "center",
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                      width: '30px',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      borderBottom: '1px solid #EEE',
+                      color: '#EEE',
+                      zIndex: 10
+                    }}
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
       {(currentGameId !== "") && (
         <Row fillWidth gap="16" justifyContent="center" padding="s">
           <Button variant="danger" onClick={endDartGame} size="s" className={`${cabinFont.className}`}>
@@ -1585,70 +1730,6 @@ export default function DartScoreboard() {
         // imageSrc="/stickers/robN_uhoh.png"
         />
       )}
-      {/* <div style={{ padding: '1rem', fontFamily: 'Arial, sans-serif' }}>
-                <h2>Dart Scoreboard</h2>
-                <div style={{ marginBottom: '1rem' }}>
-                    <strong>Player 1 Total: </strong> {totalScore(player1Scores)}<br />
-                    <strong>Player 2 Total: </strong> {totalScore(player2Scores)}<br />
-                    <button onClick={resetScores}>Reset Scores</button>
-                </div>
-                <table
-                    style={{
-                        width: '100%',
-                        borderCollapse: 'collapse',
-                        textAlign: 'center',
-                    }}
-                >
-                    <thead>
-                        <tr>
-                            <th colSpan={2}>Player 1</th>
-                            <th>Scoreboard</th>
-                            <th colSpan={2}>Player 2</th>
-                        </tr>
-                        <tr>
-                            <th>Score</th>
-                            <th>Add Score</th>
-                            <th>Value</th>
-                            <th>Add Score</th>
-                            <th>Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {scoreboardValues.map((val) => (
-                            <tr key={val} >
-                                <td style={{ padding: '0.5rem', borderRight: "1px solid #ccc" }}>{player1Scores[val]}</td>
-                                <td style={{ padding: '0.5rem', borderRight: "1px solid #ccc" }}>
-                                    
-                                    <NumberInput
-                                        id="player1-input"
-                                        value={player1Inputs[val]}
-                                        label="Score"
-                                        max={180}
-                                        onChange={(e) => handleInputChangeCricket("player1", val, e)}
-                                    />
-                                    <button onClick={() => handleAddScore({ player: 'player1', val: player1Inputs[val] })}>
-                                        Add
-                                    </button>
-                                </td>
-                                <td style={{ padding: '0.5rem', fontWeight: 'bold', borderRight: "1px solid #ccc" }}>{val}</td>
-                                <td style={{ padding: '0.5rem', borderRight: "1px solid #ccc" }}>
-                                    <NumberInput
-                                        id="player2-input"
-                                        value={player2Inputs[val]}
-                                        label="Score"
-                                        max={180}
-                                        onChange={(e) => handleInputChangeCricket("player2", val, e)}
-                                    />
-                                    <button onClick={() => handleAddScore({ player: 'player2', val: player2Inputs[val] })}>
-                                        Add
-                                    </button>
-                                </td>
-                                <td style={{ padding: '0.5rem', borderRight: "1px solid #ccc" }}>{player2Scores[val]}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div> */}
     </Column>
   );
 }

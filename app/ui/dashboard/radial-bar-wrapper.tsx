@@ -1,6 +1,7 @@
 
 import RadialBar from '@/app/ui/dashboard/radial-bar';
 import StackedBar from '@/app/ui/dashboard/charts/stacked-bar';
+import RadarChart from '@/app/ui/dashboard/charts/radar-chart';
 import {
     Column,
     Heading,
@@ -15,6 +16,7 @@ import outputs from "@/amplify_outputs.json"
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import { data, type Schema } from "@/amplify/data/resource";
+
 
 
 Amplify.configure(outputs);
@@ -209,6 +211,7 @@ export default async function RadialBarWrapper() {
                 <Line width="xs"></Line>
                 <Accordion title="Dart Game Player Stats">
                     <Column fillWidth background="surface" padding="2">
+                        <RadarChart labels={[]} series={[]} />
                         <StackedBar labels={["RobO", "RobN"]} series={[{name: "Cricket", data: [robOCricketwins, robNCricketwins]}, {name: "Baseball", data: [robOBaseballwins, robNBaseballwins]}, {name: "RNF", data: [robORnfwins, robNRnfwins]}, {name: "301", data: [robOThreeOhOnewins, robNThreeOhOnewins]}, {name: "501", data: [robOFiveOhOnewins, robNFiveOhOnewins]}, {name: "701", data: [robOSevenOhOnewins, robNSevenOhOnewins]}]} />
                         <Text>501</Text>
                         <Line height={0.25}></Line>

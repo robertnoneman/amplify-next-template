@@ -41,6 +41,7 @@ export default function RadialBar({ labels, series, colors=["#E90507"], height=3
               background: "#e7e7e7",
               strokeWidth: '97%',
               margin: 5, // margin is in pixels
+              opacity: 0.1,
               dropShadow: {
                 enabled: true,
                 top: 2,
@@ -79,10 +80,10 @@ export default function RadialBar({ labels, series, colors=["#E90507"], height=3
           colors: colors,
           type: 'gradient',
           gradient: {
-            shade: 'light',
+            shade: 'dark',
             shadeIntensity: 0.4,
             inverseColors: false,
-            opacityFrom: 1,
+            opacityFrom: .5,
             opacityTo: 1,
             stops: [0, 50, 53, 91]
           },
